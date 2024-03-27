@@ -1,0 +1,341 @@
+require "prefabutil"
+
+local cooking = require("cooking")
+
+local assets =
+{
+    Asset("ANIM", "anim/cook_pot.zip"),
+    Asset("ANIM", "anim/cook_pot_food.zip"),
+    Asset("ANIM", "anim/ui_cookpot_1x4.zip"),
+}
+
+local prefabs =
+{
+    "collapse_small",
+}
+
+
+local assets_archive =
+{
+    Asset("ANIM", "anim/cook_pot.zip"),
+    Asset("ANIM", "anim/cookpot_archive.zip"),
+    Asset("ANIM", "anim/cook_pot_food.zip"),
+    Asset("ANIM", "anim/ui_cookpot_1x4.zip"),
+    Asset("MINIMAP_IMAGE", "cookpot_archive"),
+}
+
+for k, v in pairs(cooking.recipes.cookpot) do
+    table.insert(prefabs, v.name)
+
+	if v.overridebuild then
+        table.insert(assets, Asset("ANIM", "anim/"..v.overridebuild..".zip"))
+        table.insert(assets_archive, Asset("ANIM", "anim/"..v.overridebuild..".zip"))
+	end
+end
+
+local containers = require("containers")
+local containers_params = containers.params
+local widgetsetup_old = containers.widgetsetup
+
+local gale_cookpot =
+{
+    widget =
+    {
+        slotpos =
+        {
+            Vector3(0, 64 + 32 + 8 + 4, 0), 
+            Vector3(0, 32 + 4, 0),
+            Vector3(0, -(32 + 4), 0), 
+            Vector3(0, -(64 + 32 + 8 + 4), 0),
+        },
+        animbank = "ui_cookpot_1x4",
+        animbuild = "ui_cookpot_1x4",
+        pos = Vector3(200, 0, 0),
+        side_align_tip = 100,
+        buttoninfo =
+        {
+            text = STRINGS.ACTIONS.COOK,
+            position = Vector3(0, -165, 0),
+        }
+    },
+    acceptsstacks = false,
+    type = "cooker",
+}
+
+function gale_cookpot.itemtestfn(container, item, slot)
+    return cooking.IsCookingIngredient(item.prefab) and not container.inst:HasTag("burnt")
+end
+
+function gale_cookpot.widget.buttoninfo.fn(inst)
+    if inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+        SendModRPCToServer( MOD_RPC["gale_rpc"]["cook_qte_button_clicked"],inst)
+    end
+end
+
+function gale_cookpot.widget.buttoninfo.validfn(inst)
+    return inst.replica.container ~= nil and inst.replica.container:IsFull()
+end
+
+containers_params["gale_cookpot"] = gale_cookpot
+-- function containers.widgetsetup(container, prefab, data, ...)
+--     if container.inst.prefab == "gale_cookpot" or prefab == "gale_cookpot" then
+--         for k, v in pairs(gale_cookpot) do
+--             container[k] = v
+--         end
+--         container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
+--         return
+--     end
+--     return widgetsetup_old(container, prefab, data, ...)
+-- end
+
+local function onhammered(inst, worker)
+    if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
+        inst.components.burnable:Extinguish()
+    end
+
+    if inst.components.container ~= nil then
+        inst.components.container:DropEverything()
+    end
+    inst.components.lootdropper:DropLoot()
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("metal")
+    inst:Remove()
+end
+
+local function onhit(inst, worker)
+    if not inst:HasTag("burnt") then
+        if inst.components.gale_qte_cooker:IsCooking() then
+            inst.AnimState:PlayAnimation("hit_cooking")
+            inst.AnimState:PushAnimation("cooking_loop", true)
+            inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_close")
+        else
+            if inst.components.container ~= nil and inst.components.container:IsOpen() then
+                inst.components.container:Close()
+                --onclose will trigger sfx already
+            else
+                inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_close")
+            end
+            inst.AnimState:PlayAnimation("hit_empty")
+            inst.AnimState:PushAnimation("idle_empty", false)
+        end
+    end
+end
+
+--anim and sound callbacks
+
+local function startcookfn(inst)
+    if not inst:HasTag("burnt") then
+        inst.AnimState:ClearOverrideSymbol("swap_cooked")
+        print(inst,"startcookfn!!!")
+        inst.AnimState:PlayAnimation("cooking_loop", true)
+        inst.SoundEmitter:KillSound("snd")
+        inst.SoundEmitter:PlaySound("gale_sfx/cooking/cooking_sizzle", "snd")
+        inst.Light:Enable(true)
+    end
+end
+
+local function onopen(inst)
+    if not inst:HasTag("burnt") then
+        inst.AnimState:PlayAnimation("cooking_pre_loop")
+        inst.SoundEmitter:KillSound("snd")
+        inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_open")
+        inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot", "snd")
+    end
+end
+
+local function onclose(inst)
+    if not inst:HasTag("burnt") then 
+        if not inst.components.gale_qte_cooker:IsCooking() then
+            inst.AnimState:PlayAnimation("idle_empty")
+            inst.SoundEmitter:KillSound("snd")
+        end
+        inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_close")
+    end
+end
+
+local function SetProductSymbol(inst, product, overridebuild)
+    local recipe = cooking.GetRecipe("cookpot", product)
+    local potlevel = recipe ~= nil and recipe.potlevel or nil
+    local build = overridebuild or (recipe ~= nil and recipe.overridebuild) or "cook_pot_food"
+    local overridesymbol = (recipe ~= nil and recipe.overridesymbolname) or product
+
+    if potlevel == "high" then
+        inst.AnimState:Show("swap_high")
+        inst.AnimState:Hide("swap_mid")
+        inst.AnimState:Hide("swap_low")
+    elseif potlevel == "low" then
+        inst.AnimState:Hide("swap_high")
+        inst.AnimState:Hide("swap_mid")
+        inst.AnimState:Show("swap_low")
+    else
+        inst.AnimState:Hide("swap_high")
+        inst.AnimState:Show("swap_mid")
+        inst.AnimState:Hide("swap_low")
+    end
+
+    inst.AnimState:OverrideSymbol("swap_cooked", build, overridesymbol)
+end
+
+local function ShowProduct(inst)
+    if not inst:HasTag("burnt") then
+        local product = inst.components.gale_qte_cooker.product
+        SetProductSymbol(inst, product, IsModCookingProduct("cookpot", product) and product or nil)
+    end
+end
+
+local function harvestfn(inst)
+    if not inst:HasTag("burnt") then
+        inst.AnimState:ClearOverrideSymbol("swap_cooked")
+        inst.AnimState:PlayAnimation("idle_empty")
+        inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_close")
+    end
+end
+
+local function donecookfn(inst,end_state)
+    if not inst:HasTag("burnt") then
+
+        if end_state ~= "INTERRUPTE" then 
+            inst.AnimState:PlayAnimation("cooking_pst")
+            inst.AnimState:PushAnimation("idle_full", false)
+            ShowProduct(inst)
+        else
+            harvestfn(inst)
+        end 
+        inst.SoundEmitter:KillSound("snd")
+        -- inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_finish")
+        inst.SoundEmitter:PlaySound("gale_sfx/cooking/cooking_finished")
+        inst.Light:Enable(false)
+
+        
+    end
+end
+
+local function getstatus(inst)
+    return (inst:HasTag("burnt") and "BURNT")
+        or (not inst.components.gale_qte_cooker:IsCooking() and "EMPTY")
+        or "COOKING_SHORT"
+end
+
+local function onbuilt(inst)
+    inst.AnimState:PlayAnimation("place")
+    inst.AnimState:PushAnimation("idle_empty", false)
+    inst.SoundEmitter:PlaySound("dontstarve/common/cook_pot_craft")
+end
+
+local function onsave(inst, data)
+    if inst:HasTag("burnt") or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning()) then
+        data.burnt = true
+    end
+end
+
+local function onload(inst, data)
+    if data ~= nil and data.burnt then
+        inst.components.burnable.onburnt(inst)
+        inst.Light:Enable(false)
+    end   
+end
+
+local function onloadpostpass(inst, newents, data)
+    if data and data.additems and inst.components.container then
+        for i, itemname in ipairs(data.additems)do
+            local ent = SpawnPrefab(itemname)
+            inst.components.container:GiveItem( ent )
+        end
+    end
+end
+
+
+local function cookpot_common(inst)
+    inst.AnimState:SetBank("cook_pot")
+    inst.AnimState:SetBuild("cook_pot")
+    inst.AnimState:PlayAnimation("idle_empty")
+    inst.MiniMapEntity:SetIcon("cookpot.png")    
+end
+
+local function cookpot_common_master(inst)
+    inst.components.container:WidgetSetup("gale_cookpot")    
+end
+
+local function MakeCookPot(name, common_postinit, master_postinit, assets, prefabs)
+    local function fn()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddLight()
+        inst.entity:AddNetwork()
+
+        MakeObstaclePhysics(inst, .5)
+
+        inst.Light:Enable(false)
+        inst.Light:SetRadius(.6)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.5)
+        inst.Light:SetColour(235/255,62/255,12/255)
+        --inst.Light:SetColour(1,0,0)
+
+        inst:AddTag("structure")
+
+        if common_postinit ~= nil then
+            common_postinit(inst)
+        end
+
+        MakeSnowCoveredPristine(inst)
+
+        inst.entity:SetPristine()
+
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("gale_qte_cooker")
+        inst.components.gale_qte_cooker.onstartcooking = startcookfn
+        inst.components.gale_qte_cooker.ondonecooking = donecookfn
+        inst.components.gale_qte_cooker.onharvest = harvestfn
+
+        inst:AddComponent("container")
+        --inst.components.container:WidgetSetup("cookpot")
+        inst.components.container.onopenfn = onopen
+        inst.components.container.onclosefn = onclose
+        inst.components.container.skipclosesnd = true
+        inst.components.container.skipopensnd = true
+
+        inst:AddComponent("inspectable")
+        inst.components.inspectable.getstatus = getstatus
+
+        inst:AddComponent("lootdropper")
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+        inst.components.workable:SetWorkLeft(4)
+        inst.components.workable:SetOnFinishCallback(onhammered)
+        inst.components.workable:SetOnWorkCallback(onhit)
+
+        inst:AddComponent("hauntable")
+        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+        --inst.components.hauntable:SetOnHauntFn(OnHaunt)
+
+        MakeSnowCovered(inst)
+        inst:ListenForEvent("onbuilt", onbuilt)
+
+        MakeMediumBurnable(inst, nil, nil, true)
+        MakeSmallPropagator(inst)
+
+        inst.OnSave = onsave 
+        inst.OnLoad = onload
+        inst.OnLoadPostPass = onloadpostpass
+
+        if master_postinit ~= nil then
+            master_postinit(inst)
+        end
+
+        return inst
+    end
+
+    return Prefab(name, fn, assets, prefabs)
+end 
+
+return MakeCookPot("gale_cookpot", cookpot_common, cookpot_common_master, assets, prefabs),
+    MakePlacer("gale_cookpot_placer", "cook_pot", "cook_pot", "idle_empty")
