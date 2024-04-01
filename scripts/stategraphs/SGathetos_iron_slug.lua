@@ -12,7 +12,7 @@ local events = {
 
         if not inst.components.locomotor:WantsToMoveForward() then
             if inst.sg:HasStateTag("creepping") then
-                inst.sg:GoToState("funny_idle")
+                inst.sg:GoToState(math.random() < 0.75 and "funny_idle" or "idle")
             end
         else
             if not inst.sg:HasStateTag("creepping") then
@@ -23,9 +23,11 @@ local events = {
     EventHandler("attacked",
                  function(inst, data)
                      if not inst.components.health:IsDead() then
-                         inst.sg:GoToState("funny_idle")
+                         inst.sg:GoToState("hit", data)
                      end
                  end)
+    -- CommonHandlers.OnAttacked(),
+
 }
 
 
@@ -62,6 +64,74 @@ local states = {
 
         onexit = function(inst)
             inst.SoundEmitter:KillSound("di")
+        end,
+    },
+
+    State {
+        name = "hit",
+        tags = { "hit", "busy" },
+
+        onenter = function(inst, data)
+            inst:StopBrain()
+
+            inst.components.locomotor:StopMoving()
+
+            inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:PushAnimation("idle", true)
+
+            if data and data.attacker then
+                local fx = SpawnAt("gale_weaponsparks", inst)
+                local offset = (data.attacker:GetPosition() - inst:GetPosition()):GetNormalized() *
+                    (data.attacker.Physics ~= nil and data.attacker.Physics:GetRadius() or 1)
+                offset.y = offset.y + GetRandomMinMax(0, 0.6)
+                fx.Transform:SetPosition((inst:GetPosition() + offset):Get())
+                fx.AnimState:PlayAnimation("hit_3")
+                fx.AnimState:SetScale(data.attacker:GetRotation() > 0 and -.7 or .7, .7)
+            end
+
+            inst.sg:SetTimeout(GetRandomMinMax(2, 3))
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle", true)
+        end,
+
+        timeline = {},
+
+        onexit = function(inst)
+            inst:RestartBrain()
+        end,
+    },
+
+    State {
+        name = "steaming",
+        tags = { "busy", },
+
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+
+
+            inst.AnimState:PlayAnimation("idle")
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/athetos_iron_slug/steam", "steam")
+
+            inst.sg.statemem.fxs = inst:SteamAndFertilize()
+
+            inst.sg:SetTimeout(GetRandomMinMax(2, 3))
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle")
+        end,
+
+
+        onexit = function(inst)
+            inst.SoundEmitter:KillSound("steam")
+
+            for _, v in pairs(inst.sg.statemem.fxs) do
+                if v:IsValid() then
+                    v:Remove()
+                end
+            end
         end,
     },
 
@@ -144,6 +214,18 @@ local states = {
     },
 }
 
-CommonStates.AddIdle(states, "funny_idle", "idle")
+CommonStates.AddIdle(states, "funny_idle", "idle", {
+    TimeEvent(10 * FRAMES, function(inst)
+        local pos = inst:GetPosition()
+        local r = TheWorld.Map:IsFarmableSoilAtPoint(pos.x, pos.y, pos.z) and inst.steam_fram_possibility or
+            inst.steam_possibility
+
+        if math.random() < r and GetTime() - (inst.last_steam_time or 0) > 10 then
+            inst.last_steam_time = GetTime()
+            inst.sg:GoToState("steaming")
+        end
+    end),
+})
+
 
 return StateGraph("SGathetos_iron_slug", states, events, "idle", actionhandlers)

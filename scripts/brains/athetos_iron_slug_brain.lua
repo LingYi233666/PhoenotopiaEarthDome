@@ -1,4 +1,5 @@
 require "behaviours/wander"
+require "behaviours/leash"
 
 local SlugBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
@@ -11,9 +12,14 @@ local WANDER_TIMING = {
     randwaittime = 3,
 }
 
+local function FindFarmPoint(inst)
+    local cands = inst:FindFarmPoints()
+    return cands[1]
+end
 
 function SlugBrain:OnStart()
     local root = PriorityNode({
+                                  Leash(self.inst, FindFarmPoint, 2, 1, false),
                                   Wander(self.inst, nil, nil, WANDER_TIMING),
                               }, 1)
 

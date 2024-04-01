@@ -88,6 +88,8 @@ local function AoeDoAttack(inst, pos, radius, aoe_data, validfn)
             not inst.components.combat:IsAlly(other)
     end
 
+    aoe_data = aoe_data or {}
+
     local applyfn = function(inst, other)
         local weapon, projectile, stimuli, instancemult, ignorehitrange
         if type(aoe_data) == "function" then

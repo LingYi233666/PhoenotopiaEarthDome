@@ -105,16 +105,26 @@ local function DoSpawnAttackSpike(inst, x, z, level, attack_hit_targets)
 
 
     GaleCommon.AoeDestroyWorkableStuff(inst, Vector3(x, 0, z), 1.5, 4)
-    local ents = TheSim:FindEntities(x, 0, z, 1.5, { "_combat", "_health" }, { "INLIMBO", })
 
-    for k, ent in pairs(ents) do
-        if not attack_hit_targets[ent.GUID]
-            and ent ~= inst
-            and inst.components.combat:CanTarget(ent)
-            and not GaleCommon.IsShadowCreature(ent) then
-            inst.components.combat:DoAttack(ent)
-            attack_hit_targets[ent.GUID] = true
-        end
+
+    local hitted_ents = GaleCommon.AoeDoAttack(inst,
+                                               Vector3(x, 0, z),
+                                               1.5,
+                                               {
+                                                   ignorehitrange = true,
+                                               },
+                                               function(inst, other)
+                                                   -- Should not attack shadow creatures,unless they attack me
+                                                   if GaleCommon.IsShadowCreature(other) and not (inst.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(inst))) then
+                                                       return false
+                                                   end
+                                                   return not attack_hit_targets[other.GUID]
+                                                       and inst.components.combat:CanTarget(other)
+                                                       and not inst.components.combat:IsAlly(other)
+                                               end
+    )
+    for k, ent in pairs(hitted_ents) do
+        attack_hit_targets[ent.GUID] = true
     end
 end
 
@@ -143,14 +153,6 @@ local function SpawnAttackFx(inst)
         inst:DoTaskInTime(math.random() * SPIKE_SPAWNTIME, DoSpawnAttackSpike, x + offset.x, z + offset.z, 2,
                           attack_hit_targets)
     end
-
-    -- for i=math.random(5,8),1,-1 do
-    --     local newarc = 180 - AOEarc
-    --     local theta =  ( angle -180 + math.random(newarc *2) - newarc ) * DEGREES
-    --     local radius = 2 * math.random() +1
-    --     local offset = Vector3(radius * math.cos( theta ), 0, -radius * math.sin( theta ))
-    --     inst:DoTaskInTime(math.random() * SPIKE_SPAWNTIME, DoSpawnAttackSpike, x+offset.x, z+offset.z,1,attack_hit_targets)
-    -- end
 
     if inst._check_attack_spikeshit_task ~= nil then
         inst._check_attack_spikeshit_task:Cancel()
@@ -259,6 +261,10 @@ local states = {
 
                                                   other.components.combat:GetAttacked(attacker, GetRandomMinMax(1, 2))
                                               end, function(attacker, other)
+                                                  -- Should not attack shadow creatures,unless they attack me
+                                                  if GaleCommon.IsShadowCreature(other) and not (inst.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(inst))) then
+                                                      return false
+                                                  end
                                                   return (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other))
                                               end)
                     end,
@@ -387,6 +393,10 @@ local states = {
 
                                                   other.components.combat:GetAttacked(attacker, GetRandomMinMax(1, 2))
                                               end, function(attacker, other)
+                                                  -- Should not attack shadow creatures,unless they attack me
+                                                  if GaleCommon.IsShadowCreature(other) and not (inst.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(inst))) then
+                                                      return false
+                                                  end
                                                   return (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other))
                                               end)
                     end,
@@ -1213,11 +1223,14 @@ local states = {
                                            stimuli = "electric",
                                        },
                                        function(inst, other)
-                                           return inst.components.combat
-                                               and inst.components.combat:CanTarget(other)
+                                           -- Should not attack shadow creatures,unless they attack me
+                                           if GaleCommon.IsShadowCreature(other) and not (inst.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(inst))) then
+                                               return false
+                                           end
+
+                                           return inst.components.combat:CanTarget(other)
                                                and not inst.components.combat:IsAlly(other)
                                                and GaleCommon.GetFaceAngle(inst, other) <= 45
-                                               and not GaleCommon.IsShadowCreature(other)
                                        end
                 )
                 local face_vec = GaleCommon.GetFaceVector(inst)
@@ -1255,11 +1268,15 @@ local states = {
                                            stimuli = "electric",
                                        },
                                        function(inst, other)
+                                           -- Should not attack shadow creatures,unless they attack me
+                                           if GaleCommon.IsShadowCreature(other) and not (inst.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(inst))) then
+                                               return false
+                                           end
+
                                            return inst.components.combat
                                                and inst.components.combat:CanTarget(other)
                                                and not inst.components.combat:IsAlly(other)
                                                and GaleCommon.GetFaceAngle(inst, other) <= 45
-                                               and not GaleCommon.IsShadowCreature(other)
                                        end
                 )
                 local face_vec = GaleCommon.GetFaceVector(inst)

@@ -570,6 +570,17 @@ STRINGS.GALE_ITEM_DESC.GALEBOSS_KATASH_BLADE = {
 	COMPLEX =
 	"科伯特的首领才有资格佩戴的动力剑，拥有电属性攻击力。\n能够将敌人电至眩晕，然后趁虚而入，发动卑鄙偷袭。\n是与卡塔什作风十分相符的武器。\n战技·雷电狼球：\n效仿科伯特祖先狩猎姿态的战技。\n能发出狼嚎，缠绕电浆向前滚动。\n滚动会持续10秒，期间可以通过方向键稍微改变方向。",
 }
+
+STRINGS.NAMES.ATHETOS_IRON_SLUG = "潮虫"
+STRINGS.RECIPE_DESC.ATHETOS_IRON_SLUG = "战后修缮工作中可以使用的魔像。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_IRON_SLUG = "铁皮毛毛虫，咕泳蛄蛹。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_IRON_SLUG = {
+	SIMPLE = "形似毛毛虫的奇怪魔像，十分坚固。",
+	COMPLEX =
+	"过去由阿瑟托斯工业研发，\n可用于战后修缮工作的魔像。\n侧面开有孔，能吸入空气，排出肥料。\n此举也可以净化有毒气体。\n阿瑟托斯工业的员工大多是难民，\n他们曾对地球抱有幻想：\n战争会在有生之年结束，\n届时大家可以重建家园。",
+}
+
+
 -- Foods are below...
 
 

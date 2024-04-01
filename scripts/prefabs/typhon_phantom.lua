@@ -113,10 +113,10 @@ end
 local function CanTarget(inst, target)
     local leader = inst.components.follower:GetLeader()
 
+    -- Should not attack shadow creatures,unless they attack me
     return inst.components.combat:CanTarget(target)
         and target ~= leader
-        and (not GaleCommon.IsShadowCreature(target)
-            or inst.components.combat:TargetIs(target)
+        and (not GaleCommon.IsShadowCreature(target) or inst.components.combat:TargetIs(target)
             or (target.components.combat and target.components.combat:TargetIs(inst)))
 end
 
