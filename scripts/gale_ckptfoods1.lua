@@ -385,7 +385,8 @@ local foods = {
                 or eater.prefab == "wobysmall"
                 or eater:HasTag("critter")
                 or eater:HasTag("woby")
-                or eater:HasTag("hound") then
+                or eater:HasTag("hound")
+                or eater:HasTag("warg") then
                 if eater.components.health then
                     eater.components.health:DoDelta(TUNING.HEALING_HUGE)
                 end

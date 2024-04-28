@@ -261,9 +261,10 @@ STRINGS.GALE_ITEM_DESC.GALE_COOKPOT_ITEM_DUPLICATE = {
 }
 
 STRINGS.NAMES.GALE_BLASTER_KATASH = "科伯特爆能枪"
+STRINGS.RECIPE_DESC.GALE_BLASTER_KATASH = "科伯特佣兵的制式武器。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_BLASTER_KATASH = "科伯特的战士绝不会放跑猎物。"
 STRINGS.GALE_ITEM_DESC.GALE_BLASTER_KATASH = {
-	SIMPLE = "修复的外星科技爆能枪。",
+	SIMPLE = "外星科技爆能枪。",
 	COMPLEX =
 	"被称作宇宙佣兵的科伯特一族，其战士配备的光束枪。\n能够根据需要发射不稳定霰弹或高爆飞弹。\n独特的充能弹仓设计，使这把枪攻守兼备。\n战技·微力扳机：\n花费最多2充能，发射强力能量弹。\n花费的充能越多，能量弹的伤害越高。",
 }
@@ -1462,7 +1463,7 @@ STRINGS.UI.COOKBOOK.FOOD_EFFECTS_GAIN_POWER_WITH_THRESHOLD = "获得力量加成
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_RECOVER_STAMINA_OVER_TIME = "在一段时间内提高耐力恢复速度。"
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_GAIN_POWER_AND_RECOVER_STAMINA_OVER_TIME = "获得力量与耐力加成。"
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_RECOVER_STAMINA = "立刻恢复耐力。"
-STRINGS.UI.COOKBOOK.FOOD_EFFECTS_DOG_FOOD = "喂给犬类生物，可以为其恢复更多属性值。"
+STRINGS.UI.COOKBOOK.FOOD_EFFECTS_DOG_FOOD = "宠物或者犬类生物非常喜欢吃。"
 -- //////////////////////////////////////////////////////////////////////
 --                              Skill Cast
 -- //////////////////////////////////////////////////////////////////////

@@ -74,7 +74,7 @@ GaleModAddRecipe2(
     "gale_spear",
     {
         Ingredient("spear", 1),
-        Ingredient("moonrocknugget", 8),
+        Ingredient("wagpunk_bits", 2),
         Ingredient("blue_cap", 1),
     },
     TECH.NONE,
@@ -127,7 +127,7 @@ GaleModAddRecipe2(
     {
         -- builder_tag = "gale",
     },
-    { "CHARACTER", "STRUCTURES", "MAGIC" }
+    { "STRUCTURES", "MAGIC" }
 )
 
 GaleModAddRecipe2(
@@ -351,4 +351,34 @@ GaleModAddRecipe2(
 
     },
     { "RESTORATION", "CHARACTER" }
+)
+
+GaleModAddRecipe2(
+    "gale_blaster_katash",
+    {
+        Ingredient("transistor", 4),
+        Ingredient("wagpunk_bits", 8),
+        Ingredient("redgem", 1),
+        Ingredient("bluegem", 4),
+    },
+    TECH.LOST,
+    {
+
+    },
+    { "WEAPONS" }
+)
+
+GaleModAddRecipe2(
+    "galeboss_katash_blade",
+    {
+        Ingredient("transistor", 2),
+        Ingredient("wagpunk_bits", 4),
+        Ingredient("purplegem", 1),
+        Ingredient("lightninggoathorn", 1),
+    },
+    TECH.LOST,
+    {
+
+    },
+    { "WEAPONS" }
 )

@@ -20,11 +20,16 @@ local DASHATTACK_DELAY     = 1
 local DASHATTACK_CD        = 20
 local DASHATTACK_LOW_HP_CD = 10
 local THROW_CD             = 1
+local ROLLING_CD           = 20 --20
 
 local THROW_MIN_DIST_SQ    = 8 * 8
 local THROW_MAX_DIST_SQ    = 20 * 20
 
-local DASH_HP_THRES        = 0.33
+local ROLLING_MAX_DIST_SQ  = 20 * 20
+
+
+local DASH_HP_THRES = 0.33
+local ROLLING_HP_THRES = 0.5 --0.5
 
 
 
@@ -169,6 +174,29 @@ local function CastThrow(inst)
     })
 end
 
+
+local function CanCastRolling(inst)
+    local target = inst.components.combat.target
+    if not target
+        or IsEntityDead(inst)
+        or inst.sg:HasStateTag("busy")
+        or inst.components.timer:TimerExists("rolling_attack")
+        or inst.components.health:GetPercent() > ROLLING_HP_THRES then
+        return
+    end
+
+    local dist_sq = inst:GetDistanceSqToInst(target)
+
+    return dist_sq <= ROLLING_MAX_DIST_SQ
+end
+
+local function CastRolling(inst)
+    inst.components.timer:StartTimer("rolling_attack", ROLLING_CD)
+    inst.sg:GoToState("lightning_roll_pre", {
+        target = inst.components.combat.target,
+    })
+end
+
 local function GetHomeLocation(inst)
     return inst.components.knownlocations:GetLocation("base")
 end
@@ -176,6 +204,14 @@ end
 
 function KatashBrain:OnStart()
     local root = PriorityNode({
+                                  IfNode(function()
+                                             return CanCastRolling(self.inst)
+                                         end, "CastRolling",
+                                         ActionNode(function()
+                                             CastRolling(self.inst)
+                                         end)
+                                  ),
+
                                   IfNode(function()
                                              return CanCastSpinAttack(self.inst)
                                          end, "CastSpinAttack",
@@ -199,6 +235,7 @@ function KatashBrain:OnStart()
                                              CastDash(self.inst)
                                          end)
                                   ),
+
 
                                   IfNode(function()
                                              return CanCastThrow(self.inst)

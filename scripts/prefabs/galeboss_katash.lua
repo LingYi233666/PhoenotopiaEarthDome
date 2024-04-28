@@ -325,6 +325,28 @@ local function AOEAttackAndStealFood(inst, radius, damage, ignore_victims, steal
     return targets
 end
 
+local function EnableBladeAnim(inst, enable)
+    if inst.swapanim_ent and inst.swapanim_ent:IsValid() then
+        inst.swapanim_ent:Remove()
+    end
+    inst.swapanim_ent = nil
+
+    if enable then
+        inst.AnimState:ClearOverrideSymbol("swap_object")
+
+        inst.swapanim_ent = inst:SpawnChild("galeboss_katash_blade_swapanims")
+        inst.swapanim_ent.entity:AddFollower()
+        inst.swapanim_ent.Follower:FollowSymbol(inst.GUID, "swap_object", nil, nil, nil, true, nil, 0, 8)
+        inst.swapanim_ent.components.highlightchild:SetOwner(inst)
+        if inst.components.colouradder ~= nil then
+            inst.components.colouradder:AttachChild(inst.swapanim_ent)
+        end
+    else
+        inst.AnimState:OverrideSymbol("swap_object", "swap_gale_blaster_katash", "swap_gale_blaster_katash")
+    end
+end
+
+
 -- End of attack and skills
 
 
@@ -385,8 +407,11 @@ local function KatashServerFn(inst)
     inst.CreateTeleportTask = CreateTeleportTask
     inst.GenerateDashPosList = GenerateDashPosList
     inst.AOEAttackAndStealFood = AOEAttackAndStealFood
+    inst.EnableBladeAnim = EnableBladeAnim
 
     inst.OnLoad = OnLoad
+
+
 
     inst:AddComponent("timer")
 

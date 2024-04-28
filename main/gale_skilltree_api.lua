@@ -5,6 +5,14 @@ local GaleCondition = require("util/gale_conditions")
 local skilltree_Assets = {
     Asset("ANIM", "anim/gale_skill_desc_brain.zip"),
 
+
+    Asset("IMAGE", "images/ui/skill_tab/energy.tex"),
+    Asset("ATLAS", "images/ui/skill_tab/energy.xml"),
+    Asset("IMAGE", "images/ui/skill_tab/morph.tex"),
+    Asset("ATLAS", "images/ui/skill_tab/morph.xml"),
+    Asset("IMAGE", "images/ui/skill_tab/psy.tex"),
+    Asset("ATLAS", "images/ui/skill_tab/psy.xml"),
+
     Asset("IMAGE", "images/ui/skill_slot/anatomy.tex"),
     Asset("ATLAS", "images/ui/skill_slot/anatomy.xml"),
     Asset("IMAGE", "images/ui/skill_slot/bufficon_empty.tex"),

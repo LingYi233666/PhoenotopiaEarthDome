@@ -13,11 +13,14 @@ local function GaleAddStaticLayout(name, path)
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE] = WORLD_TILES.GALE_JUNGLE
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE_DEEP] = WORLD_TILES.GALE_JUNGLE_DEEP
 	Layouts[name].ground_types[WORLD_TILES.GALE_SAVANNAH_DETAIL] = WORLD_TILES.GALE_SAVANNAH_DETAIL
+	Layouts[name].ground_types[WORLD_TILES.FARMING_SOIL] = WORLD_TILES.FARMING_SOIL
 
 	return Layouts[name]
 end
+
 GaleAddStaticLayout("zophiel_statue", "layouts/zophiel_statue")
 GaleAddStaticLayout("katash_impact_zone", "layouts/katash_impact_zone")
+GaleAddStaticLayout("athetos_employee_farmland1", "layouts/athetos_employee_farmland1")
 
 local Boons = {
 	["AthetosStaffBoon_Security"] = StaticLayout.Get("map/static_layouts/small_boon", {
@@ -158,9 +161,13 @@ AddRoom("duri_forest_bg_room", {
 	colour = { r = 0, g = 1, b = 0, a = 1 },
 	value = WORLD_TILES.GALE_JUNGLE_DEEP,
 	tags = {},
+	required_prefabs = { "athetos_iron_slug" },
 	contents = {
 		countprefabs = {
 			livingtree = 1,
+			athetos_iron_slug = function()
+				return 1
+			end
 		},
 
 		distributepercent = 0.5,
@@ -265,6 +272,41 @@ AddRoom("duri_forest_zophiel_statue", {
 			carrot_planted = 0.2,
 		},
 	},
+})
+
+AddRoom("duri_forest_farmland1", {
+	colour = { r = 0, g = 1, b = 0, a = 1 },
+	value = WORLD_TILES.GALE_JUNGLE_DEEP,
+	tags = {},
+	required_prefabs = { "athetos_iron_slug" },
+	contents = {
+		countstaticlayouts = {
+			athetos_employee_farmland1 = 1,
+		},
+		distributepercent = 0.5,
+		distributeprefabs = {
+			trees = { weight = 0.2, prefabs = { "gale_forest_pillar_tree" } },
+
+			gale_forest_hanging_vine_dynamic = 0.2,
+			gale_forest_hanging_vine_static = 0.3,
+			gale_forest_lightray = 0.1,
+
+			deciduoustree = 0.15,
+			rabbithole = 0.6,
+			evergreen_sparse = 0.1,
+			flower = 1.2,
+			grass = 0.6,
+			sapling = 0.8,
+			twiggytree = 0.8,
+			ground_twigs = 0.06,
+			berrybush = 0.15,
+			berrybush2 = 0.1,
+			berrybush_juicy = 0.15,
+			red_mushroom = 0.3,
+			green_mushroom = 0.2,
+			carrot_planted = 0.2,
+		},
+	},
 
 })
 
@@ -288,6 +330,7 @@ AddTask("duri_forest", {
 		duri_forest_bg_room = 4,
 		-- duri_forest_dragon_snare_room = 1,
 		duri_forest_zophiel_statue = 1,
+		duri_forest_farmland1 = 1,
 	},
 	room_bg = WORLD_TILES.GALE_JUNGLE_DEEP,
 	background_room = "duri_forest_bg_room",
@@ -334,7 +377,7 @@ end)
 
 AddTaskPreInit("For a nice walk", function(tasksetdata)
 	tasksetdata.room_choices = tasksetdata.room_choices or {}
-	tasksetdata.room_choices.katash_impact_zone_room = 1
+	-- tasksetdata.room_choices.katash_impact_zone_room = 1
 end)
 
 AddLevelPreInitAny(function(level)
@@ -342,19 +385,59 @@ AddLevelPreInitAny(function(level)
 		if level.required_setpieces == nil then
 			level.required_setpieces = {}
 		end
+
+		local my_setpieces = {}
 		for i = 1, 10 do
-			table.insert(level.required_setpieces, "AthetosStaffBoon_Security")
+			table.insert(my_setpieces, "AthetosStaffBoon_Security")
 		end
 		for i = 1, 5 do
-			table.insert(level.required_setpieces, "AthetosStaffBoon_Psychic")
+			table.insert(my_setpieces, "AthetosStaffBoon_Psychic")
 		end
 		for i = 1, 3 do
-			table.insert(level.required_setpieces, "AthetosStaffBoon_Psychic_Weaver")
+			table.insert(my_setpieces, "AthetosStaffBoon_Psychic_Weaver")
 		end
 		for i = 1, 10 do
-			table.insert(level.required_setpieces, "AthetosStaffBoon_Scientist")
+			table.insert(my_setpieces, "AthetosStaffBoon_Scientist")
+		end
+
+		local old_ChooseSetPieces = level.ChooseSetPieces
+		assert(level.ChooseSetPieces ~= nil, "ChooseSetPieces is nil, sth wrong !!!")
+
+
+
+		level.ChooseSetPieces = function(self, ...)
+			local task_names_no_typhoon = {
+				"Make a pick", "Dig that rock", "duri_forest"
+			}
+			local tasks = self:GetTasksForLevelSetPieces()
+			local i = 1
+			while i <= #tasks do
+				if table.contains(task_names_no_typhoon, tasks[i].id) then
+					table.remove(tasks, i)
+				else
+					i = i + 1
+				end
+			end
+
+			assert(#tasks > 0, "Not enough tasks !!!")
+
+			print("Aviable tasks for typhoon boon:")
+			for _, v in pairs(tasks) do
+				print(v.id)
+			end
+
+			for _, set_piece in pairs(my_setpieces) do
+				--Get random task
+				local idx = math.random(#tasks)
+
+				if tasks[idx].random_set_pieces == nil then
+					tasks[idx].random_set_pieces = {}
+				end
+				print("[Phoenotopia] " .. set_piece .. " added to task " .. tasks[idx].id)
+				table.insert(tasks[idx].random_set_pieces, set_piece)
+			end
+			return old_ChooseSetPieces(self, ...)
 		end
 	end
 end)
-
 -- c_gonext("gale_forest_pillar_tree")

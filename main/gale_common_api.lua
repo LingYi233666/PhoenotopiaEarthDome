@@ -58,18 +58,8 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_TALKTO, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_TALKTO, "give"))
 
 
-for i = 5, 120, 5 do
+for i = 1, 25 do
     AddStategraphState("wilson", State
-        {
-            name = "gale_dolongaction_" .. tostring(i),
-            tags = {},
-
-            onenter = function(inst)
-                inst.sg:GoToState("dolongaction", i)
-            end,
-        })
-
-    AddStategraphState("wilson_client", State
         {
             name = "gale_dolongaction_" .. tostring(i),
             tags = {},
@@ -103,5 +93,5 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_DISSECT, functio
     return "gale_dolongaction_5"
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_DISSECT, function(inst)
-    return "gale_dolongaction_5"
+    return "dolongaction"
 end))

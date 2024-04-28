@@ -373,7 +373,10 @@ table.insert(SERVER_SG, State {
                 -- inst:PushBufferedAction(inst.sg.statemem.buffaction_storage)
                 inst.bufferedaction = inst.sg.statemem.buffaction_storage
             end
-            inst:PerformBufferedAction()
+            local result = inst:PerformBufferedAction()
+            if not result then
+                print(inst, "action failed:", result)
+            end
         end),
 
         TimeEvent(4 * FRAMES, function(inst)
@@ -1261,7 +1264,7 @@ table.insert(SERVER_SG, State {
         -- end
 
 
-        inst.Physics:SetMotorVel(6, 0, 0)
+        inst.Physics:SetMotorVel(inst.components.locomotor:GetRunSpeed(), 0, 0)
     end,
 
 

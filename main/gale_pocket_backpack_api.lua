@@ -86,8 +86,8 @@ AddComponentAction("USEITEM", "gale_pocket_backpack_updater", function(inst, doe
 end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_UPDATE_POCKET_BACKPACK, function(inst)
-    return "gale_dolongaction_60"
+    return "gale_dolongaction_25"
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_UPDATE_POCKET_BACKPACK, function(inst)
-    return "gale_dolongaction_60"
+    return "dolongaction"
 end))

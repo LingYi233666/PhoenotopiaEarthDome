@@ -265,6 +265,10 @@ local states = {
             inst.SoundEmitter:PlaySound(inst.sounds.hit)
             inst.SoundEmitter:PlaySound(inst.sounds.defeat)
 
+            if inst.components.lootdropper then
+                inst.components.lootdropper:DropLoot()
+            end
+
             -- inst:SpawnChild("gale_normal_explode_vfx")
             inst:SpawnChild("gale_fire_explode_vfx")
 
@@ -641,8 +645,9 @@ local states = {
 
             -- inst.AnimState:PlayAnimation("atk_pre")
             -- inst.AnimState:PushAnimation("atk_lag",false)
-            inst.AnimState:OverrideSymbol("swap_object", "swap_galeboss_katash_blade",
-                                          "swap_galeboss_katash_blade_charge")
+
+            inst:EnableBladeAnim(true)
+
             inst.AnimState:PlayAnimation("multithrust")
             inst.SoundEmitter:PlaySound(inst.sounds.dash_pre)
 
@@ -715,8 +720,9 @@ local states = {
             inst.AnimState:SetDeltaTimeMultiplier(1)
             inst.AnimState:SetMultColour(1, 1, 1, 1)
             inst.AnimState:SetAddColour(0, 0, 0, 0)
-            inst.AnimState:OverrideSymbol("swap_object", "swap_gale_blaster_katash",
-                                          "swap_gale_blaster_katash")
+
+            inst:EnableBladeAnim(false)
+
             if inst.sg.statemem.task then
                 inst.sg.statemem.task:Cancel()
                 inst.sg.statemem.task = nil
@@ -734,8 +740,8 @@ local states = {
 
             inst.AnimState:SetDeltaTimeMultiplier(1)
 
-            inst.AnimState:OverrideSymbol("swap_object", "swap_galeboss_katash_blade",
-                                          "swap_galeboss_katash_blade_charge")
+
+            inst:EnableBladeAnim(true)
 
             local time = inst.AnimState:GetCurrentAnimationTime()
             inst.AnimState:PlayAnimation("multithrust")
@@ -879,8 +885,9 @@ local states = {
             inst.AnimState:SetDeltaTimeMultiplier(1)
             inst.AnimState:SetMultColour(1, 1, 1, 1)
             inst.AnimState:SetAddColour(0, 0, 0, 0)
-            inst.AnimState:OverrideSymbol("swap_object", "swap_gale_blaster_katash",
-                                          "swap_gale_blaster_katash")
+
+            inst:EnableBladeAnim(false)
+
             if inst.sg.statemem.task then
                 inst.sg.statemem.task:Cancel()
                 inst.sg.statemem.task = nil
@@ -936,6 +943,194 @@ local states = {
 
         onexit = function(inst)
             inst.AnimState:OverrideSymbol("swap_object", "swap_gale_blaster_katash", "swap_gale_blaster_katash")
+        end,
+    },
+
+    State {
+        name = "lightning_roll_pre",
+        tags = { "busy", "abouttoattack" },
+
+        onenter = function(inst, data)
+            inst.components.locomotor:Stop()
+
+            inst.AnimState:PlayAnimation("emote_fistshake")
+
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/galeboss_katash/howl")
+
+            inst.sg.statemem.target = data.target or inst.components.combat.target
+
+
+            inst:EnableBladeAnim(true)
+        end,
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                if not (inst.sg.statemem.target and inst.sg.statemem.target:IsValid()) then
+                    inst.sg.statemem.target = inst.components.combat.target
+                end
+                inst.sg:GoToState("lightning_roll", {
+                    target = inst.sg.statemem.target,
+                })
+            end),
+        },
+
+        onexit = function(inst)
+            inst:EnableBladeAnim(false)
+        end,
+    },
+
+    State {
+        name = "lightning_roll",
+        tags = { "busy", "attack" },
+
+        onenter = function(inst, data)
+            inst.components.locomotor:Stop()
+            inst.components.combat:SetPlayerStunlock(PLAYERSTUNLOCK.RARELY)
+
+
+
+            inst:EnableBladeAnim(true)
+
+            inst.AnimState:PlayAnimation("fangun_pre")
+            inst.AnimState:PushAnimation("fangun_loop", true)
+
+            inst.sg.statemem.fxs = {}
+            inst.sg.statemem.hitted_targst = {}
+
+            local s = 0.6
+            local fx_num = 3
+            for i = 1, fx_num do
+                local fx = inst:SpawnChild("cracklehitfx")
+                fx.Transform:SetScale(s, s, s)
+                fx.persists = false
+
+                fx.AnimState:PlayAnimation("crackle_loop")
+                fx.AnimState:SetTime((i - 1) * fx.AnimState:GetCurrentAnimationLength() / fx_num)
+                fx.AnimState:SetAddColour(0 / 255, 0 / 255, 255 / 255, 1)
+
+                fx:ListenForEvent("animover", function()
+                    if fx.perish then
+                        fx:Remove()
+                    else
+                        fx.AnimState:PlayAnimation("crackle_loop")
+                    end
+                end)
+
+                table.insert(inst.sg.statemem.fxs, fx)
+            end
+
+            -- inst.components.locomotor:SetExternalSpeedMultiplier(inst, "lightning_roll", 0.8)
+
+            if data.target and data.target:IsValid() then
+                inst.sg.statemem.target = data.target
+                inst:ForceFacePoint(data.target:GetPosition())
+            end
+
+
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/static_shocked", "static_shocked")
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/ElectricalBuzzLoop", "ElectricalBuzzLoop")
+
+            -- inst.sg.statemem.speed = inst.components.locomotor:GetRunSpeed()
+            inst.sg.statemem.speed = 6
+
+
+            inst.sg:SetTimeout(10)
+        end,
+
+        onupdate = function(inst)
+            if not (inst.sg.statemem.target and inst.sg.statemem.target:IsValid()) then
+                inst.sg.statemem.target = inst.components.combat.target
+            end
+
+            if not (inst.sg.statemem.target and inst.sg.statemem.target:IsValid()) then
+                inst.AnimState:PlayAnimation("fangun_pst")
+                inst.sg:GoToState("idle", true)
+                return
+            end
+
+            inst.sg.statemem.speed = inst.sg.statemem.speed + FRAMES * 6
+            inst.sg.statemem.speed = math.min(6, inst.sg.statemem.speed)
+
+            local moving_dir = (inst.sg.statemem.target:GetPosition() - inst:GetPosition()):GetNormalized()
+
+            if moving_dir ~= nil then
+                local cur_dir = GaleCommon.GetFaceVector(inst)
+                local new_dir = (cur_dir + moving_dir * FRAMES * 3):GetNormalized()
+
+                inst:ForceFacePoint(inst:GetPosition() + new_dir)
+            end
+
+            -- inst.sg.statemem.hitted_targst
+            local victims =
+                GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst:GetPhysicsRadius(0) + 2, function(inst, other)
+                                           local weapon, projectile, stimuli, instancemult, ignorehitrange
+                                           instancemult = 0.2
+                                           ignorehitrange = true
+
+                                           instancemult = instancemult *
+                                               math.clamp(other:GetPhysicsRadius(0) + 0.5, 1, 3)
+                                           if other:HasTag("largecreature") then
+                                               instancemult = instancemult * 1.2
+                                           end
+
+                                           --  stimuli = "electric"
+
+                                           return weapon, projectile, stimuli, instancemult, ignorehitrange
+                                       end, function(inst, other)
+                                           return inst.components.combat and inst.components.combat:CanTarget(other) and
+                                               not inst.components.combat:IsAlly(other) and
+                                               (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
+                                       end)
+
+            for k, v in pairs(victims) do
+                inst.sg.statemem.hitted_targst[v] = GetTime()
+            end
+            -- if dir ~= nil then
+            --     inst:ForceFacePoint(inst:GetPosition() + dir)
+            -- end
+
+
+            inst.Physics:SetMotorVel(inst.sg.statemem.speed, 0, 0)
+        end,
+
+
+        ontimeout = function(inst)
+            inst.AnimState:PlayAnimation("fangun_pst")
+            inst.sg:GoToState("idle", true)
+        end,
+
+        timeline =
+        {
+
+        },
+
+        events =
+        {
+            EventHandler("attacked", function(inst, data)
+                -- inst:ForceFacePoint(inst:GetPosition() + new_dir)
+                inst.sg.statemem.speed = inst.sg.statemem.speed -
+                    Remap(math.clamp(data.damage, 34, 120), 34, 120, 12, 20)
+                inst.sg.statemem.speed = math.max(inst.sg.statemem.speed, -8)
+                -- inst.sg.statemem.speed = inst.sg.statemem.speed - 12
+            end),
+        },
+
+
+        onexit = function(inst)
+            inst.Physics:Stop()
+            inst.SoundEmitter:KillSound("static_shocked")
+            inst.SoundEmitter:KillSound("ElectricalBuzzLoop")
+
+            -- inst.components.locomotor:RemoveExternalSpeedMultiplier(inst, "lightning_roll")
+            inst.components.combat:SetPlayerStunlock(PLAYERSTUNLOCK.ALWAYS)
+
+
+            inst:EnableBladeAnim(false)
+
+            for _, v in pairs(inst.sg.statemem.fxs) do
+                v.perish = true
+            end
         end,
     },
 
