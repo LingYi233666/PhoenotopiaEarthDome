@@ -147,9 +147,9 @@ end
 
 local function SteamAndFertilize(inst, workpos)
     if inst:IsAsleep() then
-        print(inst, "is steaming offscreen")
+        -- print(inst, "is steaming offscreen")
     else
-        print(inst, "is steaming activite")
+        -- print(inst, "is steaming activite")
     end
 
     local fxs = {}

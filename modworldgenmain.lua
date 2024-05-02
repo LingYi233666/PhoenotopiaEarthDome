@@ -13,7 +13,7 @@ local function GaleAddStaticLayout(name, path)
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE] = WORLD_TILES.GALE_JUNGLE
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE_DEEP] = WORLD_TILES.GALE_JUNGLE_DEEP
 	Layouts[name].ground_types[WORLD_TILES.GALE_SAVANNAH_DETAIL] = WORLD_TILES.GALE_SAVANNAH_DETAIL
-	Layouts[name].ground_types[WORLD_TILES.FARMING_SOIL] = WORLD_TILES.FARMING_SOIL
+	-- Layouts[name].ground_types[WORLD_TILES.FARMING_SOIL] = WORLD_TILES.FARMING_SOIL
 
 	return Layouts[name]
 end
@@ -21,6 +21,8 @@ end
 GaleAddStaticLayout("zophiel_statue", "layouts/zophiel_statue")
 GaleAddStaticLayout("katash_impact_zone", "layouts/katash_impact_zone")
 GaleAddStaticLayout("athetos_employee_farmland1", "layouts/athetos_employee_farmland1")
+GaleAddStaticLayout("athetos_employee_farmland2", "layouts/athetos_employee_farmland2")
+GaleAddStaticLayout("athetos_employee_farmland3", "layouts/athetos_employee_farmland3")
 
 local Boons = {
 	["AthetosStaffBoon_Security"] = StaticLayout.Get("map/static_layouts/small_boon", {
@@ -281,7 +283,9 @@ AddRoom("duri_forest_farmland1", {
 	required_prefabs = { "athetos_iron_slug" },
 	contents = {
 		countstaticlayouts = {
-			athetos_employee_farmland1 = 1,
+			-- athetos_employee_farmland1 = 1,
+			-- athetos_employee_farmland2 = 1,
+			athetos_employee_farmland3 = 1,
 		},
 		distributepercent = 0.5,
 		distributeprefabs = {

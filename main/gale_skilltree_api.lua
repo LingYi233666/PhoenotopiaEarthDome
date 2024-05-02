@@ -214,9 +214,22 @@ GLOBAL.GALE_SKILL_NODES = {
                 and not (inst.components.rider and inst.components.rider:IsRiding())
                 and not (inst.components.gale_skill_mimic and inst.components.gale_skill_mimic:IsMimic()) then
                 local last_cast_time = inst.components.gale_skiller.skillmem.LastRollingTime
-                local has_learn_shadow = inst.components.gale_skiller:IsLearned("dimension_jump")
+                local can_cast_shadow = inst.components.gale_skiller:IsLearned("dimension_jump") and
+                    inst.components.gale_skill_shadow_dodge:CoolDone()
 
                 if last_cast_time == nil or GetTime() - last_cast_time >= 1.0 then
+                    if inst.components.inventory:IsHeavyLifting() then
+                        if can_cast_shadow then
+                            inst.components.inventory:DropItem(
+                                inst.components.inventory:Unequip(EQUIPSLOTS.BODY),
+                                true,
+                                true
+                            )
+                        else
+                            inst.sg:GoToState("slip")
+                            return
+                        end
+                    end
                     if inst.sg:HasStateTag("gale_tired_low_stamina") then
                         if inst.components.gale_skiller:IsLearned("shou_shen") then
                             local buttom_delta = math.max(0, 12 - inst.components.gale_stamina.current)
@@ -250,7 +263,7 @@ GLOBAL.GALE_SKILL_NODES = {
                         )
                     inst.sg:GoToState("gale_dodge", {
                         targetpos = Vector3(x, y, z),
-                        is_shadow = has_learn_shadow and inst.components.gale_skill_shadow_dodge:CoolDone(),
+                        is_shadow = can_cast_shadow,
                         should_circle = should_circle,
                     })
                     inst.components.gale_skiller.skillmem.LastRollingTime = GetTime()
