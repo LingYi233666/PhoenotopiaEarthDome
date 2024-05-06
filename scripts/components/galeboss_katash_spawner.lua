@@ -1,398 +1,216 @@
-local GaleCommon = require("util/gale_common")
-
-local phase_desc = {
-    "treasurechest contains 3 cookies",
-    "treasurechest is locked(player can use hammer to break it), contains 2 cookies",
-    "treasurechest contains 1 cookies,some spidermines nearby",
-    "treasurechest contains nothing,when opened,is explodes,and summon katash",
-    "katash is defeated,he is going to hardware LAB(waitting for next update...)"
-}
-
-local function RandomDropContainerItems(chest)
-    for _, v in pairs(chest.components.container:GetAllItems()) do
-        local radius = GetRandomMinMax(10, 20)
-        local offset = FindWalkableOffset(chest:GetPosition(),
-                                          math.random() * TWOPI,
-                                          radius,
-                                          5,
-                                          nil,
-                                          false,
-                                          nil,
-                                          true,
-                                          true
-        ) or Vector3(0, 0, 0)
-
-        local x, y, z = (chest:GetPosition() + offset):Get()
-        chest.components.container:DropItemAt(v, x, y, z)
-    end
-end
-
-local init_items = {
-    {
-        gale_ckptfood_nutri_food = 3,
-    },
-
-    {
-        gale_ckptfood_nutri_food = 2,
-        gears = 1,
-    },
-
-    {
-        gale_ckptfood_nutri_food = 2,
-        gears = 1,
-        transistor = 1,
-        spider_warrior = 3,
-    },
-
-    {
-
-    },
-
-    {
-
-    },
-}
-
-local function GiveItemToChest(chest, tab, clear_old)
-    if clear_old then
-        chest.components.container:DestroyContents()
-    end
-    for name, num in pairs(tab) do
-        for i = 1, num do
-            chest.components.container:GiveItem(
-                SpawnAt(name, chest)
-            )
-        end
-    end
-end
-
-local phase_update_fn = {
-    function(self, onload)
-        local treasurechest = self.entities.treasurechest
-        if not onload then
-            GiveItemToChest(treasurechest, init_items[1], true)
-        end
-    end,
-    function(self, onload)
-        local treasurechest = self.entities.treasurechest
-
-        if not onload then
-            GiveItemToChest(treasurechest, init_items[2], true)
-            treasurechest:SetLocked(true)
-        end
-    end,
-    function(self, onload)
-        local treasurechest = self.entities.treasurechest
-
-        if not onload then
-            GiveItemToChest(treasurechest, init_items[3], true)
-            treasurechest:SetLocked(true)
-        end
-    end,
-    function(self, onload)
-        local treasurechest = self.entities.treasurechest
-
-        if not onload then
-            treasurechest.components.container:DestroyContents()
-            treasurechest:SetLocked(true)
-        end
-    end,
-
-    function(self, onload)
-        -- TODO:Respawn a safebox
-    end,
-}
-
-local function DoExplode(source, attacker)
-    attacker = attacker or source
-
-    local explo = SpawnAt("gale_bomb_projectile_explode", source)
-    explo.Transform:SetScale(1.5, 1.5, 1.5)
-    explo.SoundEmitter:PlaySound("gale_sfx/battle/p1_explode")
-    explo:SpawnChild("gale_normal_explode_vfx")
-
-    local ring = SpawnAt("gale_laser_ring_fx", source)
-    ring.Transform:SetScale(0.9, 0.9, 0.9)
-    ring.AnimState:SetFinalOffset(3)
-    ring.AnimState:SetLayer(LAYER_GROUND)
-    ring.AnimState:HideSymbol("circle")
-    ring.AnimState:HideSymbol("glow_2")
-    ring.AnimState:HideSymbol("lightning01")
-
-    ShakeAllCameras(CAMERASHAKE.FULL, .35, .02, 1, source, 40)
-
-    GaleCommon.AoeForEach(
-        attacker,
-        source:GetPosition(),
-        2.8,
-        nil,
-        { "INLIMBO" },
-        nil,
-        function(attacker, v)
-            if v.components.combat then
-                local basedamage = GetRandomMinMax(60, 120)
-
-                v.components.combat:GetAttacked(attacker, basedamage)
-                v:PushEvent("knockback", { knocker = explo, radius = GetRandomMinMax(1.2, 1.4) + v:GetPhysicsRadius(.5) })
-            elseif v.components.inventoryitem then
-                if v.Physics then
-                    GaleCommon.LaunchItem(v, source, 5)
-                end
-            elseif v.components.workable ~= nil
-                and v.components.workable:CanBeWorked()
-                and v.components.workable.action ~= ACTIONS.NET then
-                v.components.workable:WorkedBy(attacker, 5)
-            end
-        end,
-        function(inst, v)
-            local is_combat = v.components.combat and v.components.health and not v.components.health:IsDead()
-                and not (v.sg and v.sg:HasStateTag("dead"))
-                and not v:HasTag("playerghost")
-            local is_inventory = v.components.inventoryitem
-            return v and v:IsValid()
-                and (is_combat or is_inventory or v.components.workable)
-        end
-    )
-end
-
-local GaleBossKatashSpawner = Class(function(self, inst)
+local GalebossKatashSpawner = Class(function(self, inst)
     self.inst = inst
-
-    self.phase = 0
-    self.landing_day = -5
-    self.next_phase = 0
-    self.phase_update_clock = 0
-    -- self.phase_update_duration = TUNING.TOTAL_DAY_TIME * 5
-    self.phase_update_duration = 5
-    self.statemem = {}
-
+    self.phase = 1
     self.entities = {
-        spaceship = nil,
-        treasurechest = nil,
+        safebox = nil,
         katash = nil,
     }
+    self.statemem = {
+        box_opened = false,      -- change this in safebox entity code
+        katash_defeated = false, -- use Shard_SyncBossDefeated in galeboss_katash to change this
+        katash_returned_from_cave = false,
+        katash_dead = false,
+    }
 
-    self._on_katash_defeated = function(katash, data)
-        if self.phase < 5 then
-            print("Katash defeated ! Set next phase to 5...")
-            self:SetNextPhase(5)
+    self.OnForestKatashDefeated = function(src, data)
+        if data == nil then
+            return
+        end
+
+        if data.bossprefab == "galeboss_katash" and self.phase == self.Phase.BOX_WITH_KATASH then
+            self.statemem.katash_defeated = true
         end
     end
 
-    self._on_chest_open = function(chest, data)
-        self.statemem.chest_opened = true
-
-        print(chest, "_on_chest_open")
-
-        if self.phase == 4 and self.entities.katash == nil then
-            print("Spawn katash !!!!!")
-            local offset = FindWalkableOffset(
-                chest:GetPosition(),
-                math.random() * TWOPI,
-                5,
-                15,
-                nil,
-                false,
-                nil,
-                false,
-                false
-            ) or Vector3(0, 0, 0)
-
-
-            DoExplode(chest)
-            chest.components.container:DropEverything()
-            chest:Hide()
-
-            self.inst:DoTaskInTime(1, function()
-                local katash = self:SpawnKatash(chest:GetPosition() + offset, data.doer)
-                chest.components.container:DropEverything()
-                chest:Remove()
-                self:SetEntity("treasurechest", nil)
-            end)
-
-            -- SpawnAt("gale_fire_explode_vfx",chest)
-        end
-    end
-
-    self._start_phase_update_timer = function()
-        if self.phase == 1 then
-            if self.statemem.chest_opened then
-                self:SetNextPhase(2)
-            end
-        elseif self.phase == 2 then
-            if self.statemem.chest_opened then
-                self:SetNextPhase(3)
-            end
-        elseif self.phase == 3 then
-            if self.statemem.chest_opened then
-                self:SetNextPhase(4)
-            end
-        elseif self.phase == 4 then
-            -- Going to phase 5 is in self._on_katash_defeated
-        end
-
-        if self.phase < self.next_phase then
-            print(self.inst, "GaleBossKatashSpawner._start_phase_update_timer !")
-            self.inst:StartUpdatingComponent(self)
-        end
-    end
-
-    self._stop_phase_update_timer = function()
-        print(self.inst, "GaleBossKatashSpawner._stop_phase_update_timer !")
-        self.inst:StopUpdatingComponent(self)
-    end
-
-
-
-    inst:DoTaskInTime(5 * FRAMES, function()
-        print("[GaleBossKatashSpawner]list entities:")
-        print(self:GetDebugString())
-        print("statemem =")
-        dumptable(self.statemem)
-    end)
+    inst:ListenForEvent("master_shardbossdefeated", self.OnForestKatashDefeated, TheWorld)
 end)
 
-function GaleBossKatashSpawner:Init(spaceship, treasurechest)
-    self:SetEntity("spaceship", spaceship)
-    self:SetEntity("treasurechest", treasurechest)
-    self:SetPhase(1)
-    self:SetNextPhase(1)
-    self.landing_day = TheWorld.state.cycles - 5
+local phase_preset = {
+    "NONE",
+    "BOX_NORMAL",
+    "BOX_WITH_LOCK",
+    "BOX_WITH_DRONES",
+    "BOX_WITH_KATASH",
+    "KATASH_GO_TO_CAVE",
+    "KATASH_RETURN_FROM_CAVE",
+    "KATASH_DEAD",
+}
+-- key: name, value: number
+GalebossKatashSpawner.Phase = table.invert(phase_preset)
+-- for _, name in pairs(phase_preset) do
+--     GalebossKatashSpawner.Phase[name] = name
+-- end
+
+
+function GalebossKatashSpawner:SetSafeBox(ent)
+    self.entities.safebox = ent
 end
 
-function GaleBossKatashSpawner:SetEntity(name, ent)
-    self.entities[name] = ent
-    if ent then
-        if name == "treasurechest" then
-            self:InitListenerForTreasurechest(ent)
-        elseif name == "katash" then
-            self:InitListenerForKatash(ent)
-        end
-    end
+function GalebossKatashSpawner:Setkatash(ent)
+    assert(ent.prefab == "galeboss_katash")
+    self.entities.katash = ent
 end
 
-function GaleBossKatashSpawner:SetNextPhase(nextphase)
-    self.next_phase = nextphase
-end
-
-function GaleBossKatashSpawner:SetPhase(newphase, onload)
-    self.phase = newphase
-    self.next_phase = newphase
-
-    if phase_update_fn[newphase] then
-        phase_update_fn[newphase](self, onload)
-    end
-end
-
-function GaleBossKatashSpawner:SpawnKatash(pos, target)
+function GalebossKatashSpawner:Spawnkatash(pos)
     local katash = SpawnAt("galeboss_katash", pos)
-    katash.sg:GoToState("intro_teleportin", { target = target })
-    self:SetEntity("katash", katash)
-    return katash
+    self:Setkatash(katash)
 end
 
-function GaleBossKatashSpawner:InitListenerForTreasurechest(chest)
-    self.inst:ListenForEvent("onopen", self._on_chest_open, chest)
-    self.inst:ListenForEvent("entitysleep", self._start_phase_update_timer, chest)
-    self.inst:ListenForEvent("entitywake", self._stop_phase_update_timer, chest)
-end
+function GalebossKatashSpawner:SetPhase(phase, onload)
+    assert(phase_preset[phase] ~= nil)
+    local old_phase = self.phase
+    self.phase = phase
 
-function GaleBossKatashSpawner:InitListenerForKatash(katash)
-    self.inst:ListenForEvent("galeboss_katash_defeated", self._on_katash_defeated, katash)
-end
+    -- What should we do when galeboss_katash_spawner_phase_change triggered ?
+    -- safebox:
+    --  BOX_NORMAL:
+    --      Init container storage: dogfoodx3, notebook, random basic resources and tools.
+    --  BOX_WITH_LOCK:
+    --      Init container storage: dogfoodx2, notebook, random basic resources and tools.
+    --      Lock safebox.
+    --  BOX_WITH_DRONES:
+    --      Init container storage: dogfoodx2, notebook, random basic resources and tools.
+    --      Lock safebox.
+    --      Init drones.
+    --  BOX_WITH_KATASH:
+    --      When opened, spawn a bomb and summon katash.
+    --  KATASH_GO_TO_CAVE:
+    --      Init container storage: notebook.
+    if old_phase ~= self.phase then
+        -- TheWorld:PushEvent("galeboss_katash_spawner_phase_change", { old = old_phase, new = self.phase, onload = onload })
+        if not onload then
 
-function GaleBossKatashSpawner:TimeSinceLanding()
-    return TheWorld.state.cycles - self.landing_day
-end
-
-function GaleBossKatashSpawner:OnUpdate(dt)
-    if self.phase_update_clock < self.phase_update_duration then
-        self.phase_update_clock = self.phase_update_clock + dt
-        print(string.format("GaleBossKatashSpawner OnUpdate:%.2f%%",
-                            100 * self.phase_update_clock / self.phase_update_duration))
-        return
-    end
-
-    if self.entities.treasurechest and FindClosestPlayerToInst(self.entities.treasurechest, 40) == nil then
-        if self.phase < self.next_phase then
-            print(self.inst, "GaleBossKatashSpawner Go to next phase " .. tostring(self.next_phase))
-            self.statemem = {}
-            self:SetPhase(self.next_phase)
-        end
-        self.phase_update_clock = 0
-        self.inst:StopUpdatingComponent(self)
-    end
-end
-
-function GaleBossKatashSpawner:OnSave()
-    local data = {
-        entities = {},
-        phase = self.phase,
-        next_phase = self.next_phase,
-        phase_update_clock = self.phase_update_clock,
-        phase_update_duration = self.phase_update_duration,
-        landing_day = self.landing_day,
-        statemem = self.statemem,
-    }
-    local references = {}
-
-    for name, ent in pairs(self.entities) do
-        if ent and ent:IsValid() then
-            data.entities[name] = ent.GUID
-            table.insert(references, ent.GUID)
-        end
-    end
-
-    return data, references
-end
-
-function GaleBossKatashSpawner:OnLoad(data)
-    if data ~= nil then
-        if data.statemem ~= nil then
-            self.statemem = data.statemem
-        end
-        if data.phase ~= nil then
-            self:SetPhase(data.phase, true)
-        end
-        if data.next_phase ~= nil then
-            self:SetNextPhase(data.next_phase)
-        end
-        if data.phase_update_clock ~= nil then
-            self.phase_update_clock = data.phase_update_clock
-        end
-        -- if data.phase_update_duration ~= nil then
-        --     self.phase_update_duration = data.phase_update_duration
-        -- end
-        if data.landing_day ~= nil then
-            self.landing_day = data.landing_day
-        end
-
-        if self.next_phase > self.phase then
-            self.inst:StartUpdatingComponent(self)
         end
     end
 end
 
-function GaleBossKatashSpawner:LoadPostPass(newents, savedata)
-    if savedata.entities ~= nil then
-        for name, guid in pairs(savedata.entities) do
-            local ent = newents[guid]
-            if ent ~= nil then
-                self:SetEntity(name, ent.entity)
+function GalebossKatashSpawner:PopContainerItem(ent, count, must_drop_prefabs, cant_drop_prefabs, removed)
+    local success_count = 0
+    for i = 1, count do
+        local valid_slot_ids = {}
+        for slotid, item in pairs(ent.components.container.slots) do
+            if item
+                and (cant_drop_prefabs == nil or not table.contains(cant_drop_prefabs, item.prefab))
+                and (must_drop_prefabs == nil or table.contains(must_drop_prefabs, item.prefab)) then
+                table.insert(valid_slot_ids, slotid)
+            end
+        end
+        if #valid_slot_ids > 0 then
+            local lucky_slot = GetRandomItem(valid_slot_ids)
+            local pos = ent:GetPosition()
+            for radius = 30, 50 do
+                local offset = FindWalkableOffset(ent:GetPosition(), math.random() * TWOPI, radius, 5,
+                                                  nil, false, nil, true, true)
+                if offset then
+                    pos = pos + offset
+                    break
+                end
+            end
+
+            local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
+
+            if item ~= nil then
+                if removed then
+                    item:Remove()
+                end
+                success_count = success_count + 1
             end
         end
     end
+
+    return success_count
 end
 
-function GaleBossKatashSpawner:GetDebugString()
-    local result = ""
-    result = result .. "phase = " .. self.phase .. "," .. tostring(phase_desc[self.phase]) .. "\n"
-    result = result .. "next_phase = " .. self.next_phase .. "," .. tostring(phase_desc[self.next_phase]) .. "\n"
-    result = result .. "spaceship = " .. tostring(self.entities.spaceship) .. "\n"
-    result = result .. "treasurechest = " .. tostring(self.entities.treasurechest) .. "\n"
-    result = result .. "katash = " .. tostring(self.entities.katash)
+function GalebossKatashSpawner:OnSave()
+    local ents = {}
+    local refs = {}
+
+    for k, v in pairs(self.entities) do
+        if v ~= nil and v:IsValid() then
+            table.insert(ents, { name = k, GUID = v.GUID })
+            table.insert(refs, v.GUID)
+        end
+    end
+
+    local data = {
+        entities = ents,
+        phase = self.phase,
+        statemem = self.statemem,
+    }
+
+    return data, refs
+end
+
+function GalebossKatashSpawner:LoadPostPass(ents, data)
+    if data.entities ~= nil then
+        for i, v in ipairs(data.entities) do
+            local ent = ents[v.GUID]
+            if ent ~= nil then
+                if v.name == "safebox" then
+                    self:SetSafeBox(ent.entity)
+                end
+
+                if v.name == "katash" then
+                    self:Setkatash(ent.entity)
+                end
+            end
+        end
+    end
+
+    if data.statemem ~= nil then
+        self.statemem = deepcopy(data.statemem)
+    end
+
+    if data.phase ~= nil then
+        self:SetPhase(self.phase, true)
+    end
+end
+
+function GalebossKatashSpawner:TryPushStoryLine()
+    if self.phase == self.Phase.NONE then
+        if self.entities.safebox ~= nil and self.entities.safebox:IsValid() then
+            self.statemem.box_opened = false
+            self:SetPhase(self.phase + 1)
+        end
+    elseif self.Phase.BOX_NORMAL <= self.phase and self.phase <= self.Phase.BOX_WITH_DRONES then
+        if self.statemem.box_opened and not TheWorld.components.timer:TimerExists("galeboss_katash_spawner_phase_cd") then
+            self.statemem.box_opened = false
+            self:SetPhase(self.phase + 1)
+
+            TheWorld.components.timer:StartTimer("galeboss_katash_spawner_phase_cd",
+                                                 TUNING.TOTAL_DAY_TIME * GetRandomMinMax(1, 1.5))
+        end
+    elseif self.phase == self.Phase.BOX_WITH_KATASH then
+        if self.statemem.katash_defeated then
+            self:SetPhase(self.phase + 1)
+        end
+    elseif self.phase == self.Phase.KATASH_GO_TO_CAVE then
+        if self.statemem.katash_dead then
+            self:SetPhase(self.Phase.KATASH_DEAD)
+        elseif self.statemem.katash_returned_from_cave then
+            self:SetPhase(self.Phase.KATASH_RETURN_FROM_CAVE)
+        end
+    elseif self.phase == self.Phase.KATASH_RETURN_FROM_CAVE then
+        if self.statemem.katash_dead then
+            self:SetPhase(self.Phase.KATASH_DEAD)
+        end
+    elseif self.phase == self.Phase.KATASH_DEAD then
+
+    end
+end
+
+function GalebossKatashSpawner:GetDebugString()
+    local result = "Phase: " .. phase_preset[self.phase] .. ". Entities: "
+    for name, ent in pairs(self.entities) do
+        result = result .. name .. ": " .. tostring(ent) .. ", "
+    end
+
+    result = result + ". Statemem: "
+    for k, v in pairs(self.statemem) do
+        result = result .. k .. ": " .. tostring(v) .. ","
+    end
 
     return result
 end
 
-return GaleBossKatashSpawner
+return GalebossKatashSpawner
