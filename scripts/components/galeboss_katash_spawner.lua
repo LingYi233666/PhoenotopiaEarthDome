@@ -98,22 +98,28 @@ function GalebossKatashSpawner:PopContainerItem(ent, count, must_drop_prefabs, c
         if #valid_slot_ids > 0 then
             local lucky_slot = GetRandomItem(valid_slot_ids)
             local pos = ent:GetPosition()
-            for radius = 30, 50 do
-                local offset = FindWalkableOffset(ent:GetPosition(), math.random() * TWOPI, radius, 5,
-                                                  nil, false, nil, true, true)
-                if offset then
-                    pos = pos + offset
-                    break
-                end
-            end
 
-            local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
-
-            if item ~= nil then
-                if removed then
+            if removed then
+                local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
+                if item ~= nil then
                     item:Remove()
+                    success_count = success_count + 1
                 end
-                success_count = success_count + 1
+            else
+                for radius = 30, 50 do
+                    local offset = FindWalkableOffset(ent:GetPosition(), math.random() * TWOPI, radius, 5,
+                        nil, false, nil, true, true)
+                    if offset then
+                        pos = pos + offset
+                        break
+                    end
+                end
+
+                local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
+
+                if item ~= nil then
+                    success_count = success_count + 1
+                end
             end
         end
     end
@@ -178,7 +184,7 @@ function GalebossKatashSpawner:TryPushStoryLine()
             self:SetPhase(self.phase + 1)
 
             TheWorld.components.timer:StartTimer("galeboss_katash_spawner_phase_cd",
-                                                 TUNING.TOTAL_DAY_TIME * GetRandomMinMax(1, 1.5))
+                TUNING.TOTAL_DAY_TIME * GetRandomMinMax(1, 1.5))
         end
     elseif self.phase == self.Phase.BOX_WITH_KATASH then
         if self.statemem.katash_defeated then
