@@ -107,15 +107,15 @@ function GaleReadablePaper:Enter()
 end
 
 function GaleReadablePaper:Exit()
-    local scr_w, scr_h = TheSim:GetScreenSize()
-    -- self.close_button:Hide()
-    self:SetClickable(false)
-    self.hover:TintTo({ r = 0, g = 0, b = 0, a = self.hover.image.tint[4] }, { r = 0, g = 0, b = 0, a = 0 }, 1)
+    -- local scr_w, scr_h = TheSim:GetScreenSize()
+    -- -- self.close_button:Hide()
+    -- self:SetClickable(false)
+    -- self.hover:TintTo({ r = 0, g = 0, b = 0, a = self.hover.image.tint[4] }, { r = 0, g = 0, b = 0, a = 0 }, 1)
+    -- self.paper:MoveTo(self.paper:GetPosition(), Vector3(0, -scr_h), 1, function()
+    --     self:Kill()
+    -- end)
 
-    self.paper:MoveTo(self.paper:GetPosition(), Vector3(0, -scr_h), 1, function()
-        -- self:Kill()
-        TheFrontEnd:PopScreen(self)
-    end)
+    TheFrontEnd:PopScreen(self)
 end
 
 return GaleReadablePaper

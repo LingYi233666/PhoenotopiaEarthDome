@@ -172,6 +172,8 @@ STRINGS.CHARACTERS.GENERIC.ACTIONFAIL.GIVE.MUSHROOMFARM_NOATHETOSCAPALLOWED = "�
 STRINGS.ACTIONS.GALE_TALKTO = "交谈"
 
 STRINGS.ACTIONS.GALE_DISSECT = "解剖"
+
+STRINGS.ACTIONS.GALE_READ_PAPER = "阅读"
 -- //////////////////////////////////////////////////////////////////////
 --                              Entities
 -- //////////////////////////////////////////////////////////////////////
@@ -581,10 +583,10 @@ STRINGS.GALE_ITEM_DESC.ATHETOS_IRON_SLUG = {
 	"过去由阿瑟托斯工业研发，\n可用于战后修缮工作的魔像。\n侧面开有孔，能吸入空气，排出肥料。\n此举也可以净化有毒气体。\n阿瑟托斯工业的员工大多是难民，\n他们曾对地球抱有幻想：\n战争会在有生之年结束，\n届时大家可以重建家园。",
 }
 
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1 = "卡塔什日志1"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2 = "卡塔什日志2"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3 = "卡塔什日志3"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4 = "卡塔什日志4"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1 = "卡塔什日志 其一"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2 = "卡塔什日志 其二"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3 = "卡塔什日志 其三"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4 = "卡塔什日志 其四"
 
 
 -- Foods are below...
@@ -1490,15 +1492,15 @@ STRINGS.GALE_SKILL_CAST.FAILED = {
 -- //////////////////////////////////////////////////////////////////////
 STRINGS.GALE_UI.READABLE_PAPER = {}
 
-STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_1 = {
-	TITLE = "航行日志 139号",
-	CONTENT =
-	[=[    今天是我一生中最倒霉的一天。我被那个会挥棍子的小女孩狠狠打败，在撤退时，不知从哪里来的一只黑色大手把我的飞船紧紧拽住，然后把我连同飞船一起恶狠狠地扔到这片陌生的土地上。
-    飞船从中间折断，完全报废了！能活下来简直是奇迹！我只能尽力抢救还能用的物资，然后凑合着过了一夜。]=],
-}
+-- STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_1 = {
+-- 	TITLE = "航行日志 139号",
+-- 	CONTENT =
+-- 	[=[    今天是我一生中最倒霉的一天。我被那个会挥棍子的小女孩狠狠打败，在撤退时，不知从哪里来的一只黑色大手把我的飞船紧紧拽住，然后把我连同飞船一起恶狠狠地扔到这片陌生的土地上。
+--     飞船从中间折断，完全报废了！能活下来简直是奇迹！我只能尽力抢救还能用的物资，然后凑合着过了一夜。]=],
+-- }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_1 = {
-	TITLE = "生存日志 1号",
+	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1,
 	CONTENT =
 	[=[尝试修复飞船，但是失败了，看来我的航行日志要到头咯。但是，我作为科伯特的战士，绝不会被困难打倒！我从残骸中翻出了最后一些能用的材料，把它们和昨晚抢救出的物资放在一起，列了个清单：
 	备用零件2箱
@@ -1512,16 +1514,16 @@ STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_1 = {
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_2 = {
-	TITLE = "生存日志 2号",
+	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2,
 	CONTENT = "",
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_3 = {
-	TITLE = "生存日志 3号",
+	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3,
 	CONTENT = "",
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_4 = {
-	TITLE = "生存日志 4号",
+	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4,
 	CONTENT = "",
 }

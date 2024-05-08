@@ -9,15 +9,19 @@ local function batchfn(prefabname, index)
         prefabname = prefabname,
         assets = assets,
 
-        bank = "blueprint_tackle",
+        bank = "wagstaff_notes",
         build = "wagstaff_notes",
+        -- bank = "blueprint_tackle",
+        -- build = "blueprint_tackle",
         anim = "idle",
 
         inventoryitem_data = {
             floatable_param = { "med", nil, 0.75 },
             -- use_gale_item_desc = true,
             imagename = "wagstaff_mutations_note",
-            atlasname_override = "images/inventoryimages1.xml",
+            atlasname_override = "images/inventoryimages3.xml",
+            -- imagename = "tacklesketch",
+            -- atlasname_override = "images/inventoryimages2.xml",
         },
 
         tags = {},
