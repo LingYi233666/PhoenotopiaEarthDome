@@ -4,9 +4,12 @@ local GalebossKatashSpawner = Class(function(self, inst)
     self.entities = {
         safebox = nil,
         katash = nil,
+        -- spaceship = nil,
+        -- punchingbag = nil,
+        -- firepit = nil,
     }
     self.statemem = {
-        box_opened = false,      -- change this in safebox entity code
+        box_opened = false,      -- change this in safebox code
         katash_defeated = false, -- use Shard_SyncBossDefeated in galeboss_katash to change this
         katash_returned_from_cave = false,
         katash_dead = false,
@@ -22,7 +25,37 @@ local GalebossKatashSpawner = Class(function(self, inst)
         end
     end
 
+    self.OnDayPhaseChange = function()
+        if self.entities.safebox ~= nil and self.entities.safebox:IsValid() and
+            FindClosestPlayerToInst(self.entities.safebox, 66) == nil then
+            self:TryPushStoryLine()
+        end
+    end
+
     inst:ListenForEvent("master_shardbossdefeated", self.OnForestKatashDefeated, TheWorld)
+    inst:WatchWorldState("phase", self.OnDayPhaseChange)
+
+    inst:DoTaskInTime(FRAMES, function()
+        print("GalebossKatashSpawner init !")
+        local success = false
+        if self.entities.safebox == nil then
+            for k, v in pairs(Ents) do
+                if v.prefab == "galeboss_katash_safebox" then
+                    print("Find a", v)
+                    self:SetSafeBox(v)
+                    success = true
+                    break
+                end
+            end
+        end
+        if success then
+            print("GalebossKatashSpawner init success, run TryPushStoryLine()")
+            self:TryPushStoryLine()
+        else
+            print("GalebossKatashSpawner init failed !")
+        end
+        print(self:GetDebugString())
+    end)
 end)
 
 local phase_preset = {
@@ -42,6 +75,77 @@ GalebossKatashSpawner.Phase = table.invert(phase_preset)
 -- end
 
 
+-- What should we do when galeboss_katash_spawner_phase_change triggered ?
+-- safebox:
+--  BOX_NORMAL:
+--      Init container storage: dogfoodx3, notebook, random basic resources and tools.
+--  BOX_WITH_LOCK:
+--      Init container storage: dogfoodx2, notebook, random basic resources and tools.
+--      Lock safebox.
+--  BOX_WITH_DRONES:
+--      Init container storage: dogfoodx2, notebook, random basic resources and tools.
+--      Lock safebox.
+--      Init drones.
+--  BOX_WITH_KATASH:
+--      When opened, spawn a bomb and summon katash.
+--  KATASH_GO_TO_CAVE:
+--      Init container storage: notebook.
+
+local function GenerateBasicResources(count)
+    local loot_presets = {
+        cutgrass = 0.10,
+        twigs = 0.10,
+        log = 0.06,
+        rocks = 0.06,
+        goldnugget = 0.02,
+        gears = 0.01,
+    }
+
+    return weighted_random_choices(loot_presets, count)
+end
+
+local box_items = {
+    BOX_NORMAL = {
+        gale_ckptfood_dog_cookie = 3,
+        galeboss_katash_notebook_1 = 1,
+    },
+    BOX_WITH_LOCK = {
+        gale_ckptfood_dog_cookie = 3,
+        galeboss_katash_notebook_2 = 1,
+    },
+    BOX_WITH_DRONES = {
+        gale_ckptfood_dog_cookie = 2,
+        galeboss_katash_notebook_3 = 1,
+    },
+    BOX_WITH_KATASH = {
+
+    },
+    KATASH_GO_TO_CAVE = {
+        galeboss_katash_notebook_4 = 1,
+    },
+}
+
+local function OnPhaseChange(self, old_phase, new_phase, onload)
+    print(string.format("GalebossKatashSpawner phase change: %s --> %s%s", phase_preset[old_phase],
+        phase_preset[new_phase], onload and " (onload)" or ""))
+    print(self:GetDebugString())
+
+    if not onload then
+        if box_items[new_phase] ~= nil then
+            -- self.entities.safebox.components.container
+
+            self:PopContainerItem(self.entities.safebox, 9, nil, nil, true)
+
+            for prefab, count in pairs(JoinArrays(GenerateBasicResources(4), box_items[new_phase])) do
+                for i = 1, count do
+                    local item = SpawnAt(prefab, self.entities.safebox)
+                    self.entities.safebox.components.container:GiveItem(item, nil, nil, true)
+                end
+            end
+        end
+    end
+end
+
 function GalebossKatashSpawner:SetSafeBox(ent)
     self.entities.safebox = ent
 end
@@ -51,8 +155,9 @@ function GalebossKatashSpawner:Setkatash(ent)
     self.entities.katash = ent
 end
 
-function GalebossKatashSpawner:Spawnkatash(pos)
+function GalebossKatashSpawner:Spawnkatash(pos, target)
     local katash = SpawnAt("galeboss_katash", pos)
+    katash.sg:GoToState("intro_teleportin", { target = target })
     self:Setkatash(katash)
 end
 
@@ -61,26 +166,11 @@ function GalebossKatashSpawner:SetPhase(phase, onload)
     local old_phase = self.phase
     self.phase = phase
 
-    -- What should we do when galeboss_katash_spawner_phase_change triggered ?
-    -- safebox:
-    --  BOX_NORMAL:
-    --      Init container storage: dogfoodx3, notebook, random basic resources and tools.
-    --  BOX_WITH_LOCK:
-    --      Init container storage: dogfoodx2, notebook, random basic resources and tools.
-    --      Lock safebox.
-    --  BOX_WITH_DRONES:
-    --      Init container storage: dogfoodx2, notebook, random basic resources and tools.
-    --      Lock safebox.
-    --      Init drones.
-    --  BOX_WITH_KATASH:
-    --      When opened, spawn a bomb and summon katash.
-    --  KATASH_GO_TO_CAVE:
-    --      Init container storage: notebook.
+
     if old_phase ~= self.phase then
         -- TheWorld:PushEvent("galeboss_katash_spawner_phase_change", { old = old_phase, new = self.phase, onload = onload })
-        if not onload then
 
-        end
+        OnPhaseChange(self, old_phase, self.phase, onload)
     end
 end
 
@@ -98,9 +188,10 @@ function GalebossKatashSpawner:PopContainerItem(ent, count, must_drop_prefabs, c
         if #valid_slot_ids > 0 then
             local lucky_slot = GetRandomItem(valid_slot_ids)
             local pos = ent:GetPosition()
+            local item = ent.components.container.slots[lucky_slot]
 
-            if removed then
-                local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
+            if removed and not item:HasTag("irreplaceable") then
+                item = ent.components.container:DropItemBySlot(lucky_slot, pos)
                 if item ~= nil then
                     item:Remove()
                     success_count = success_count + 1
@@ -115,12 +206,14 @@ function GalebossKatashSpawner:PopContainerItem(ent, count, must_drop_prefabs, c
                     end
                 end
 
-                local item = ent.components.container:DropItemBySlot(lucky_slot, pos)
+                item = ent.components.container:DropItemBySlot(lucky_slot, pos)
 
                 if item ~= nil then
                     success_count = success_count + 1
                 end
             end
+        else
+            break
         end
     end
 

@@ -15,6 +15,7 @@ local function batchfn(prefabname, index)
         -- build = "blueprint_tackle",
         anim = "idle",
 
+
         inventoryitem_data = {
             floatable_param = { "med", nil, 0.75 },
             -- use_gale_item_desc = true,
@@ -24,7 +25,7 @@ local function batchfn(prefabname, index)
             -- atlasname_override = "images/inventoryimages2.xml",
         },
 
-        tags = {},
+        tags = { "galeboss_katash_notebook", },
 
 
         clientfn = function(inst)
@@ -32,6 +33,8 @@ local function batchfn(prefabname, index)
         end,
 
         serverfn = function(inst)
+            inst:AddComponent("erasablepaper")
+
             inst:AddComponent("gale_readable_paper")
             inst.components.gale_readable_paper.index = index
         end

@@ -25,7 +25,7 @@ end
 
 containers_params["galeboss_katash_safebox"] = galeboss_katash_safebox
 
-local function SetLocked(inst,locked)
+local function SetLocked(inst, locked)
     inst.locked = locked
     if locked and inst.components.container:IsOpen() then
         inst.components.container:Close()
@@ -33,16 +33,43 @@ local function SetLocked(inst,locked)
     inst.components.container.canbeopened = not locked
 end
 
-local function OnOpen(inst)
+local function OnOpen(inst, data)
     inst.AnimState:PlayAnimation("open")
-
     inst.SoundEmitter:PlaySound("dontstarve/wilson/chest_open")
+
+    if TheWorld.components.galeboss_katash_spawner then
+        local phase_normal          = TheWorld.components.galeboss_katash_spawner.Phase.BOX_NORMAL
+        local phase_box_with_drones = TheWorld.components.galeboss_katash_spawner.Phase.BOX_WITH_DRONES
+        local phase_box_with_katash = TheWorld.components.galeboss_katash_spawner.Phase.BOX_WITH_KATASH
+        local phase                 = TheWorld.components.galeboss_katash_spawner.phase
+
+        if phase_normal <= phase and phase <= phase_box_with_drones then
+            TheWorld.components.galeboss_katash_spawner.statemem.box_opened = true
+        elseif phase == phase_box_with_katash
+            and data.doer
+            and not inst.trigger_katash
+            and TheWorld.components.galeboss_katash_spawner.statemem.katash == nil
+        then
+            inst.trigger_katash = true
+            local grenade = SpawnAt("athetos_grenade_elec", inst)
+            grenade.components.complexprojectile:Launch(inst:GetPosition(), inst)
+
+            inst:DoTaskInTime(2, function()
+                local pos = inst:GetPosition()
+                local offset = FindWalkableOffset(pos, math.random() * TWOPI, 5, 33, nil, false, nil, false, false)
+                if offset then
+                    pos = pos + offset
+                end
+                TheWorld.components.galeboss_katash_spawner:Spawnkatash(pos, data.doer)
+            end)
+        end
+    end
 end
 
 local function OnClose(inst)
     if inst.locked then
         inst.AnimState:PlayAnimation("closed")
-    else 
+    else
         inst.AnimState:PlayAnimation("close")
         inst.AnimState:PushAnimation("idle_unlock", false)
     end
@@ -52,7 +79,7 @@ end
 
 local function OnHammered(inst, worker)
     if inst.locked then
-        print(inst,"is hammered to be unlocked by",worker)
+        print(inst, "is hammered to be unlocked by", worker)
         inst:SetLocked(false)
     end
     inst.components.workable:SetWorkLeft(5)
@@ -63,7 +90,7 @@ local function OnHit(inst, worker)
     if inst.locked then
         inst.AnimState:PlayAnimation("hit")
         inst.AnimState:PushAnimation("closed", false)
-    else 
+    else
         inst.AnimState:PlayAnimation("hit_unlocked")
         inst.AnimState:PushAnimation("idle_unlock", false)
         inst.components.workable:SetWorkLeft(5)
@@ -71,7 +98,7 @@ local function OnHit(inst, worker)
 end
 
 local function OnSave(inst, data)
-    data.locked = inst.locked 
+    data.locked = inst.locked
 end
 
 local function OnLoad(inst, data)
@@ -88,7 +115,7 @@ return GaleEntity.CreateNormalEntity({
         Asset("ANIM", "anim/quagmire_safe.zip"),
     },
 
-    tags = {"structure","chest"},
+    tags = { "structure", "chest" },
 
     bank = "quagmire_safe",
     build = "quagmire_safe",
@@ -96,18 +123,15 @@ return GaleEntity.CreateNormalEntity({
 
 
     clientfn = function(inst)
-        MakeSnowCoveredPristine(inst)    
+        MakeSnowCoveredPristine(inst)
     end,
 
     serverfn = function(inst)
-        inst.locked = false 
+        inst.locked = false
         inst.SetLocked = SetLocked
 
-        inst.OnSave = OnSave 
+        inst.OnSave = OnSave
         inst.OnLoad = OnLoad
-
-
-
 
         inst:AddComponent("inspectable")
 
@@ -123,7 +147,6 @@ return GaleEntity.CreateNormalEntity({
         inst.components.workable:SetWorkLeft(5)
         inst.components.workable:SetOnFinishCallback(OnHammered)
         inst.components.workable:SetOnWorkCallback(OnHit)
-
 
         MakeSnowCovered(inst)
     end,
