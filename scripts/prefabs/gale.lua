@@ -30,7 +30,7 @@ local start_inv = {
 	"gale_cookpot_item",
 	"gale_bombbox",
 	-- "gale_spear",
-	"gale_blaster_katash",
+	-- "gale_blaster_katash",
 }
 
 -- 当人物复活的时候

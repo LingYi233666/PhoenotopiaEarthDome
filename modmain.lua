@@ -148,6 +148,11 @@ PrefabFiles = {
 	"typhon_phantom_spawn_smoke_vfx",
 	"typhon_phantom_spike_vfx",
 	"typhon_weaver",
+
+
+	"gale_punchingbag",
+	"galeboss_katash_firepit",
+	"galeboss_katash_skymine",
 }
 ---对比老版本 主要是增加了names图片 人物检查图标 还有人物的手臂修复（增加了上臂）
 --人物动画里面有个SWAP_ICON 里面的图片是在检查时候人物头像那里显示用的
@@ -254,7 +259,7 @@ GLOBAL.TUNING.GAMEMODE_STARTING_ITEMS.DEFAULT.GALE = {
 	"gale_cookpot_item",
 	"gale_bombbox",
 	-- "gale_spear",
-	"gale_blaster_katash",
+	-- "gale_blaster_katash",
 	-- "backpack",
 	"gale_pocket_backpack_lv4",
 }

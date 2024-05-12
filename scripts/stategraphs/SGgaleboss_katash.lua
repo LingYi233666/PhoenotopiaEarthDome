@@ -31,6 +31,13 @@ local events = {
     end),
 }
 
+local function SetVel(inst, vel)
+    local predict_pos = inst:GetPosition() + vel
+    local lx, ly, lz = inst.entity:WorldToLocalSpace(predict_pos.x, 0, predict_pos.z)
+    inst.Physics:SetMotorVel(lx, 0, lz)
+end
+
+
 -- c_spawn("galeboss_katash").sg:GoToState("intro_teleportin",{target=ThePlayer})
 local states = {
     State {
@@ -89,9 +96,9 @@ local states = {
                         shadow.AnimState:SetPercent(anim_data.anim, anim_data.percent)
                         shadow.Physics:SetVel((speed_base * 12 * (1 - percent)):Get())
                         GaleCommon.FadeTo(shadow, FRAMES * 7, nil,
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 1), Vector4(0, 0, 0, 0) },
-                            shadow.Remove)
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 1), Vector4(0, 0, 0, 0) },
+                                          shadow.Remove)
 
                         inst.sg.statemem.last_shadow_pt = inst:GetPosition()
                     end
@@ -247,7 +254,8 @@ local states = {
         tags = { "busy", "defeated" },
 
         onenter = function(inst)
-            Shard_SyncBossDefeated("galeboss_katash")
+            -- Shard_SyncBossDefeated("galeboss_katash")
+            TheWorld:PushEvent("forest_katash_defeated")
 
             inst.persists = false
 
@@ -674,9 +682,9 @@ local states = {
                         shadow.AnimState:SetPercent(anim_data.anim, anim_data.percent)
                         shadow.Physics:SetVel((speed_base * 12 * (1 - percent)):Get())
                         GaleCommon.FadeTo(shadow, FRAMES * 7, nil,
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 1), Vector4(0, 0, 0, 0) },
-                            shadow.Remove)
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 1), Vector4(0, 0, 0, 0) },
+                                          shadow.Remove)
 
                         inst.sg.statemem.last_shadow_pt = inst:GetPosition()
                     end
@@ -772,9 +780,9 @@ local states = {
                         shadow.AnimState:SetPercent(anim_data.anim, anim_data.percent)
                         shadow.Physics:SetVel((speed_base * 12 * (1 - percent)):Get())
                         GaleCommon.FadeTo(shadow, FRAMES * 7, nil,
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
-                            { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
-                            shadow.Remove)
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
+                                          { Vector4(77 / 255, 0 / 255, 205 / 255, 0.66), Vector4(0, 0, 0, 0) },
+                                          shadow.Remove)
 
                         inst.sg.statemem.last_shadow_pt = inst:GetPosition()
                     end
@@ -785,8 +793,8 @@ local states = {
                     local stealing = inst.sg.statemem.steal_victim == nil
                         and inst.sg.statemem.steal_food == nil
                     local targets, steal_victim, steal_food = inst:AOEAttackAndStealFood(2, damage,
-                        inst.sg.statemem.hitted_targets,
-                        stealing)
+                                                                                         inst.sg.statemem.hitted_targets,
+                                                                                         stealing)
 
                     for _, v in pairs(targets) do
                         inst.sg.statemem.hitted_targets[v] = true
@@ -836,14 +844,14 @@ local states = {
 
                         if steal_victim:HasTag("player") and steal_victim.userid then
                             SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], steal_victim.userid,
-                                string.format(STRINGS.GALE_UI.ANNOUNCE_GALEBOSS_KATASH_STEAL_FOOD,
-                                    steal_food:GetDisplayName(),
-                                    inst:GetDisplayName())
+                                               string.format(STRINGS.GALE_UI.ANNOUNCE_GALEBOSS_KATASH_STEAL_FOOD,
+                                                             steal_food:GetDisplayName(),
+                                                             inst:GetDisplayName())
 
                             )
 
                             SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["play_clientside_sound"], steal_victim.userid,
-                                "gale_sfx/cooking/item_stolen", true, true)
+                                               "gale_sfx/cooking/item_stolen", true, true)
                         end
 
                         print(inst, "steal", steal_food, "from", steal_victim)
@@ -990,8 +998,6 @@ local states = {
             inst.components.locomotor:Stop()
             inst.components.combat:SetPlayerStunlock(PLAYERSTUNLOCK.RARELY)
 
-
-
             inst:EnableBladeAnim(true)
 
             inst.AnimState:PlayAnimation("fangun_pre")
@@ -999,6 +1005,7 @@ local states = {
 
             inst.sg.statemem.fxs = {}
             inst.sg.statemem.hitted_targst = {}
+            inst.sg.statemem.target = data.target
 
             local s = 0.6
             local fx_num = 3
@@ -1024,20 +1031,14 @@ local states = {
 
             -- inst.components.locomotor:SetExternalSpeedMultiplier(inst, "lightning_roll", 0.8)
 
-            if data.target and data.target:IsValid() then
-                inst.sg.statemem.target = data.target
-                inst:ForceFacePoint(data.target:GetPosition())
-            end
-
 
             inst.SoundEmitter:PlaySound("gale_sfx/battle/static_shocked", "static_shocked")
             inst.SoundEmitter:PlaySound("gale_sfx/battle/ElectricalBuzzLoop", "ElectricalBuzzLoop")
 
-            -- inst.sg.statemem.speed = inst.components.locomotor:GetRunSpeed()
-            inst.sg.statemem.speed = 6
-
 
             inst.sg:SetTimeout(10)
+
+            inst:StopBrain()
         end,
 
         onupdate = function(inst)
@@ -1051,39 +1052,27 @@ local states = {
                 return
             end
 
-            inst.sg.statemem.speed = inst.sg.statemem.speed + FRAMES * 6
-            inst.sg.statemem.speed = math.min(6, inst.sg.statemem.speed)
-
-            local moving_dir = (inst.sg.statemem.target:GetPosition() - inst:GetPosition()):GetNormalized()
-
-            if moving_dir ~= nil then
-                local cur_dir = GaleCommon.GetFaceVector(inst)
-                local new_dir = (cur_dir + moving_dir * FRAMES * 3):GetNormalized()
-
-                inst:ForceFacePoint(inst:GetPosition() + new_dir)
-            end
-
             -- inst.sg.statemem.hitted_targst
             local victims =
                 GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst:GetPhysicsRadius(0) + 2, function(inst, other)
-                    local weapon, projectile, stimuli, instancemult, ignorehitrange
-                    instancemult = 0.2
-                    ignorehitrange = true
+                                           local weapon, projectile, stimuli, instancemult, ignorehitrange
+                                           instancemult = 0.2
+                                           ignorehitrange = true
 
-                    instancemult = instancemult *
-                        math.clamp(other:GetPhysicsRadius(0) + 0.5, 1, 3)
-                    if other:HasTag("largecreature") then
-                        instancemult = instancemult * 1.2
-                    end
+                                           instancemult = instancemult *
+                                               math.clamp(other:GetPhysicsRadius(0) + 0.5, 1, 3)
+                                           if other:HasTag("largecreature") then
+                                               instancemult = instancemult * 1.2
+                                           end
 
-                    --  stimuli = "electric"
+                                           --  stimuli = "electric"
 
-                    return weapon, projectile, stimuli, instancemult, ignorehitrange
-                end, function(inst, other)
-                    return inst.components.combat and inst.components.combat:CanTarget(other) and
-                        not inst.components.combat:IsAlly(other) and
-                        (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
-                end)
+                                           return weapon, projectile, stimuli, instancemult, ignorehitrange
+                                       end, function(inst, other)
+                                           return inst.components.combat and inst.components.combat:CanTarget(other) and
+                                               not inst.components.combat:IsAlly(other) and
+                                               (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
+                                       end)
 
             for k, v in pairs(victims) do
                 inst.sg.statemem.hitted_targst[v] = GetTime()
@@ -1093,7 +1082,32 @@ local states = {
             -- end
 
 
-            inst.Physics:SetMotorVel(inst.sg.statemem.speed, 0, 0)
+            local target = inst.sg.statemem.target
+
+            inst:ForceFacePoint(target:GetPosition())
+
+            local cur_vel = Vector3(inst.Physics:GetVelocity())
+            local towards = (target:GetPosition() - inst:GetPosition()):GetNormalized()
+            local dist = (target:GetPosition() - inst:GetPosition()):Length()
+            local speed = Remap(math.clamp(dist, 1, 8), 1, 8, 25, 15)
+
+            if GetTime() - (inst.components.combat.lastwasattackedtime or 0) <= 1 then
+                speed = speed * 0.1
+            end
+
+            local next_vel = cur_vel + towards * FRAMES * speed
+
+            if next_vel:Dot(towards) > 0 then
+                if next_vel:Length() >= 8 then
+                    next_vel = next_vel:GetNormalized() * 8
+                end
+            else
+                if next_vel:Length() >= 8 then
+                    next_vel = next_vel:GetNormalized() * 8
+                end
+            end
+
+            SetVel(inst, next_vel)
         end,
 
 
@@ -1110,11 +1124,11 @@ local states = {
         events =
         {
             EventHandler("attacked", function(inst, data)
-                -- inst:ForceFacePoint(inst:GetPosition() + new_dir)
-                inst.sg.statemem.speed = inst.sg.statemem.speed -
-                    Remap(math.clamp(data.damage, 34, 120), 34, 120, 12, 20)
-                inst.sg.statemem.speed = math.max(inst.sg.statemem.speed, -8)
-                -- inst.sg.statemem.speed = inst.sg.statemem.speed - 12
+                if data.attacker then
+                    local towards = (data.attacker:GetPosition() - inst:GetPosition()):GetNormalized()
+                    inst.Physics:Stop()
+                    SetVel(inst, -towards * Remap(math.clamp(data.damage, 1, 100), 1, 100, 3, 10))
+                end
             end),
         },
 
@@ -1133,6 +1147,8 @@ local states = {
             for _, v in pairs(inst.sg.statemem.fxs) do
                 v.perish = true
             end
+
+            inst:RestartBrain()
         end,
     },
 
@@ -1357,40 +1373,40 @@ CommonStates.AddRunStates(states, {
 --     stopwalk = "careful_walk_pst",
 -- })
 CommonStates.AddCombatStates(states, {
-        -- hittimeline =
-        -- {
-        --     TimeEvent(0*FRAMES, function(inst)
+                                 -- hittimeline =
+                                 -- {
+                                 --     TimeEvent(0*FRAMES, function(inst)
 
-        --     end),
-        -- },
+                                 --     end),
+                                 -- },
 
-        attacktimeline =
-        {
+                                 attacktimeline =
+                                 {
 
-            TimeEvent(0 * FRAMES, function(inst)
-                local target = inst.components.combat.target
-                inst.sg.statemem.targetpos = target and target:GetPosition() or
-                    (inst:GetPosition() + GaleCommon.GetFaceVector(inst))
-            end),
+                                     TimeEvent(0 * FRAMES, function(inst)
+                                         local target = inst.components.combat.target
+                                         inst.sg.statemem.targetpos = target and target:GetPosition() or
+                                             (inst:GetPosition() + GaleCommon.GetFaceVector(inst))
+                                     end),
 
-            TimeEvent(17 * FRAMES, function(inst)
-                -- inst.components.combat:DoAttack(inst.sg.statemem.target)
+                                     TimeEvent(17 * FRAMES, function(inst)
+                                         -- inst.components.combat:DoAttack(inst.sg.statemem.target)
 
 
-                inst:LaunchFanProjectiles(inst.sg.statemem.targetpos)
+                                         inst:LaunchFanProjectiles(inst.sg.statemem.targetpos)
 
-                inst.sg:AddStateTag("canchangetodash")
+                                         inst.sg:AddStateTag("canchangetodash")
 
-                -- inst.sg:RemoveStateTag("abouttoattack")
-            end),
-            TimeEvent(20 * FRAMES, function(inst)
-                -- inst.sg:RemoveStateTag("attack")
-            end),
-        },
-    },
-    {
-        attack = "hand_shoot",
-    }
+                                         -- inst.sg:RemoveStateTag("abouttoattack")
+                                     end),
+                                     TimeEvent(20 * FRAMES, function(inst)
+                                         -- inst.sg:RemoveStateTag("attack")
+                                     end),
+                                 },
+                             },
+                             {
+                                 attack = "hand_shoot",
+                             }
 )
 
 return StateGraph("SGgaleboss_katash", states, events, "idle")

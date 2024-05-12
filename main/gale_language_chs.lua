@@ -492,101 +492,122 @@ STRINGS.GALE_ITEM_DESC.ATHETOS_GRENADE_ELEC = {
 }
 
 
-STRINGS.NAMES.ATHETOS_ZOPHIEL_STATUE = "佐菲尔雕像"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_ZOPHIEL_STATUE = "在雕像旁边，我能感受到一丝温暖。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_ZOPHIEL_STATUE = "村里的人认为她会给我们带来好运！"
+STRINGS.NAMES.ATHETOS_ZOPHIEL_STATUE                            = "佐菲尔雕像"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_ZOPHIEL_STATUE      = "在雕像旁边，我能感受到一丝温暖。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_ZOPHIEL_STATUE         = "村里的人认为她会给我们带来好运！"
 
-STRINGS.NAMES.ATHETOS_PORTABLE_TURRET = "毁灭者炮塔"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_PORTABLE_TURRET = "这些嘀嘀咕咕的炮塔对我们帮助很小。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_PORTABLE_TURRET = "和焦土大陆上的那些有些不一样。"
+STRINGS.NAMES.ATHETOS_PORTABLE_TURRET                           = "毁灭者炮塔"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_PORTABLE_TURRET     = "这些嘀嘀咕咕的炮塔对我们帮助很小。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_PORTABLE_TURRET        = "和焦土大陆上的那些有些不一样。"
 
-STRINGS.NAMES.ATHETOS_PORTABLE_TURRET_ITEM = STRINGS.NAMES.ATHETOS_PORTABLE_TURRET
-STRINGS.RECIPE_DESC.ATHETOS_PORTABLE_TURRET_ITEM = "脆弱但易于部署的行动炮塔。"
-STRINGS.GALE_ITEM_DESC.ATHETOS_PORTABLE_TURRET_ITEM = {
+STRINGS.NAMES.ATHETOS_PORTABLE_TURRET_ITEM                      = STRINGS.NAMES.ATHETOS_PORTABLE_TURRET
+STRINGS.RECIPE_DESC.ATHETOS_PORTABLE_TURRET_ITEM                = "脆弱但易于部署的行动炮塔。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_PORTABLE_TURRET_ITEM             = {
 	SIMPLE = "阿瑟托斯工业沦陷前的最后一道防线。",
 	COMPLEX =
 	"为了机动性而牺牲防御性能的激光炮塔。\n会自动侦测敌人，并以较快速度向其发射激光。\n由于配备有心灵探测器，也能识别出风暴恶魔。\n将此物体拖动到合适的地点，鼠标右键部署炮塔。\n对已经部署的炮塔，也可以通过鼠标右键回收。",
 }
 
-STRINGS.NAMES.ATHETOS_PSYCHOSTATIC_CUTTER = "心灵静滞刀"
-STRINGS.RECIPE_DESC.ATHETOS_PSYCHOSTATIC_CUTTER = "有违道德伦理的武器。"
+STRINGS.NAMES.ATHETOS_PSYCHOSTATIC_CUTTER                       = "心灵静滞刀"
+STRINGS.RECIPE_DESC.ATHETOS_PSYCHOSTATIC_CUTTER                 = "有违道德伦理的武器。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_PSYCHOSTATIC_CUTTER = "这把武器让我感到不安。"
 STRINGS.CHARACTERS.WAXWELL.DESCRIBE.ATHETOS_PSYCHOSTATIC_CUTTER = "到底是谁发明它的？肯定不是我，也不是查理！"
-STRINGS.GALE_ITEM_DESC.ATHETOS_PSYCHOSTATIC_CUTTER = {
+STRINGS.GALE_ITEM_DESC.ATHETOS_PSYCHOSTATIC_CUTTER              = {
 	SIMPLE = "有违道德伦理的武器。",
 	COMPLEX =
 	"刀柄内镶嵌有脑组织的武器。\n脑组织取自活生生的不死鸟失败克隆体，\n有将精神化为实体刀刃的能力。\n是有违道德伦理的武器。\n阿瑟托斯为了破解不死鸟的基因锁，\n不分昼夜地开展克隆实验，\n此武器大概是他逐渐失去理智的证明。\n战技·强袭：\n猛力挥动武器，射出光束。\n光束是由精神力量组成的，因此可以穿透障碍和敌人。",
 }
 
-STRINGS.NAMES.ATHETOS_MAGIC_POTION = "灵能兴奋剂"
-STRINGS.RECIPE_DESC.ATHETOS_MAGIC_POTION = "精神兴奋剂，注射后可以恢复生命，精神以及灵能值。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_MAGIC_POTION = "我觉得里面就是蓝蘑菇汁。"
-STRINGS.GALE_ITEM_DESC.ATHETOS_MAGIC_POTION = {
+STRINGS.NAMES.ATHETOS_MAGIC_POTION                              = "灵能兴奋剂"
+STRINGS.RECIPE_DESC.ATHETOS_MAGIC_POTION                        = "精神兴奋剂，注射后可以恢复生命，精神以及灵能值。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_MAGIC_POTION        = "我觉得里面就是蓝蘑菇汁。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_MAGIC_POTION                     = {
 	SIMPLE = "可以恢复生命，精神以及灵能值。",
 	COMPLEX = "心灵电子所生产的一种精神兴奋剂，\n注射后可以恢复生命，精神以及灵能值。\n虽然普通人也能使用,\n但只有注射过人造神经元的超能圣者才懂得它真正的价值。",
 }
 
-STRINGS.NAMES.TYPHON_MIMIC = "拟态"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_MIMIC = "跑的真快！"
-STRINGS.CHARACTERS.WAXWELL.DESCRIBE.TYPHON_MIMIC = "我没有料到他们已经演化出了这种形态。"
+STRINGS.NAMES.TYPHON_MIMIC                                      = "拟态"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_MIMIC                = "跑的真快！"
+STRINGS.CHARACTERS.WAXWELL.DESCRIBE.TYPHON_MIMIC                = "我没有料到他们已经演化出了这种形态。"
 
-STRINGS.NAMES.TYPHON_PHANTOM = "幻影"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_PHANTOM = "你还好吗？"
-STRINGS.CHARACTERS.WAXWELL.DESCRIBE.TYPHON_PHANTOM = "步了他们的后尘。"
+STRINGS.NAMES.TYPHON_PHANTOM                                    = "幻影"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_PHANTOM              = "你还好吗？"
+STRINGS.CHARACTERS.WAXWELL.DESCRIBE.TYPHON_PHANTOM              = "步了他们的后尘。"
 
-STRINGS.NAMES.TYPHON_CYSTOID = "囊状体"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_CYSTOID = "随时有可能爆炸。"
+STRINGS.NAMES.TYPHON_CYSTOID                                    = "囊状体"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_CYSTOID              = "随时有可能爆炸。"
 
-STRINGS.NAMES.TYPHON_WEAVER = "编织魔"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_WEAVER = "光是盯着它就让我眼花缭乱。"
+STRINGS.NAMES.TYPHON_WEAVER                                     = "编织魔"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_WEAVER               = "光是盯着它就让我眼花缭乱。"
 
-STRINGS.NAMES.ATHETOS_OPERATOR_CORRUPT = "(被腐化)"
+STRINGS.NAMES.ATHETOS_OPERATOR_CORRUPT                          = "(被腐化)"
 
-STRINGS.NAMES.ATHETOS_OPERATOR_MEDICAL = "医疗无人机"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_OPERATOR_MEDICAL = "无人机，敬请见证。"
+STRINGS.NAMES.ATHETOS_OPERATOR_MEDICAL                          = "医疗无人机"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_OPERATOR_MEDICAL    = "无人机，敬请见证。"
 
-STRINGS.NAMES.GALEBOSS_KATASH = "科伯特的卡塔什"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH = "是狼人？还是狗头人？"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH = "很爱吃狗狗饼干的外星人。"
+STRINGS.NAMES.GALEBOSS_KATASH                                   = "科伯特的卡塔什"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH             = "是狼人？还是狗头人？"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH                = "很爱吃狗狗饼干的外星人。"
 
-STRINGS.NAMES.TYPHON_MIMIC_CANCER = "拟态瘤"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_MIMIC_CANCER = "脏兮兮的一团。"
-STRINGS.GALE_ITEM_DESC.TYPHON_MIMIC_CANCER = {
+STRINGS.NAMES.TYPHON_MIMIC_CANCER                               = "拟态瘤"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_MIMIC_CANCER         = "脏兮兮的一团。"
+STRINGS.GALE_ITEM_DESC.TYPHON_MIMIC_CANCER                      = {
 	SIMPLE = "从拟态的尸体上找到的肿瘤。",
 	COMPLEX =
 	"从拟态的尸体上找到的肿瘤。\n内部混杂着一些随机物质，可能是拟态变形的副作用。\n通过解剖，可能获得以下物品：\n    ·噩梦燃料\n    ·纯粹恐惧\n除此之外，还可以获得草、树枝、木头等基础物资。\n可爱娇小的拟态，是一切风暴恶魔的起点。\n据说它们的荚孢会在不同位面中穿行，\n为至高无上的“他”寻找可供吞噬的世界。",
 }
 
-STRINGS.NAMES.TYPHON_PHANTOM_ORGAN = "风暴恶魔类人器官"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_PHANTOM_ORGAN = "这是····肝脏吗？"
-STRINGS.GALE_ITEM_DESC.TYPHON_PHANTOM_ORGAN = {
+STRINGS.NAMES.TYPHON_PHANTOM_ORGAN                              = "风暴恶魔类人器官"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_PHANTOM_ORGAN        = "这是····肝脏吗？"
+STRINGS.GALE_ITEM_DESC.TYPHON_PHANTOM_ORGAN                     = {
 	SIMPLE = "从幻影的尸体上找到的器官。",
 	COMPLEX =
 	"从幻影的尸体上找到的器官，\n被覆着腹膜，依稀能够辨认出人类的痕迹。\n通过解剖，可能获得以下物品：\n    ·噩梦燃料\n    ·纯粹恐惧\n据说大多数幻影曾是阿瑟托斯工业的员工，\n他们研究乙太物质，最后犯下大错，\n佝偻的模样便是后果。",
 }
 
-STRINGS.NAMES.GALEBOSS_KATASH_BLADE = "科伯特动力剑"
-STRINGS.RECIPE_DESC.GALEBOSS_KATASH_BLADE = "科伯特佣兵狩猎时可能会使用。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_BLADE = "偶尔用用外星人的武器也不错。"
-STRINGS.GALE_ITEM_DESC.GALEBOSS_KATASH_BLADE = {
+STRINGS.NAMES.GALEBOSS_KATASH_BLADE                             = "科伯特动力剑"
+STRINGS.RECIPE_DESC.GALEBOSS_KATASH_BLADE                       = "科伯特佣兵狩猎时可能会使用。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_BLADE       = "偶尔用用外星人的武器也不错。"
+STRINGS.GALE_ITEM_DESC.GALEBOSS_KATASH_BLADE                    = {
 	SIMPLE = "科伯特首领持有的动力剑。能够电晕敌人。",
 	COMPLEX =
 	"科伯特的首领才有资格佩戴的动力剑，拥有电属性攻击力。\n能够将敌人电至眩晕，然后趁虚而入，发动卑鄙偷袭。\n是与卡塔什作风十分相符的武器。\n战技·雷电狼球：\n效仿科伯特祖先狩猎姿态的战技。\n能发出狼嚎，缠绕电浆向前滚动。\n滚动会持续10秒，期间可以通过方向键稍微改变方向。",
 }
 
-STRINGS.NAMES.ATHETOS_IRON_SLUG = "潮虫"
-STRINGS.RECIPE_DESC.ATHETOS_IRON_SLUG = "战后修缮工作中可以使用的魔像。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_IRON_SLUG = "铁皮毛毛虫，咕泳蛄蛹。"
-STRINGS.GALE_ITEM_DESC.ATHETOS_IRON_SLUG = {
+STRINGS.NAMES.ATHETOS_IRON_SLUG                                 = "潮虫"
+STRINGS.RECIPE_DESC.ATHETOS_IRON_SLUG                           = "战后修缮工作中可以使用的魔像。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_IRON_SLUG           = "铁皮毛毛虫，咕泳蛄蛹。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_IRON_SLUG                        = {
 	SIMPLE = "形似毛毛虫的奇怪魔像，十分坚固。",
 	COMPLEX =
 	"过去由阿瑟托斯工业研发，\n可用于战后修缮工作的魔像。\n侧面开有孔，能吸入空气，排出肥料。\n此举也可以净化有毒气体。\n阿瑟托斯工业的员工大多是难民，\n他们曾对地球抱有幻想：\n战争会在有生之年结束，\n届时大家可以重建家园。",
 }
 
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1 = "卡塔什日志 其一"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2 = "卡塔什日志 其二"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3 = "卡塔什日志 其三"
-STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4 = "卡塔什日志 其四"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1                        = "卡塔什日志 其一"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2                        = "卡塔什日志 其二"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3                        = "卡塔什日志 其三"
+STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4                        = "亲切问候"
+
+STRINGS.NAMES.GALEBOSS_KATASH_SPACESHIP                         = "坠毁的飞船"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_SPACESHIP   = "它与哈姆雷特的热气球有着异曲同工之妙！"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH_SPACESHIP      = "我认识这个飞船！它属于科伯特的卡塔什！"
+
+STRINGS.NAMES.GALEBOSS_KATASH_SAFEBOX                           = "卡塔什的保险箱"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_SAFEBOX     = {
+	GENERIC = "里面藏着什么东西呢？",
+	LOCKED = "它锁住了，也许能把它砸开？",
+}
+
+STRINGS.NAMES.GALEBOSS_KATASH_FIREPIT                           = "废料火堆"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_FIREPIT     = "里面满是铁屑。"
+
+STRINGS.NAMES.GALE_PUNCHINGBAG                                  = "意图明显的拳击袋"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_PUNCHINGBAG            = "它不怎么像我。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_PUNCHINGBAG               = "制作它的人应该非常不喜欢我。"
+
+STRINGS.NAMES.GALEBOSS_KATASH_SKYMINE                           = "空雷"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_SKYMINE     = "这又是什么机械造物？"
+STRINGS.CHARACTERS.WX78.DESCRIBE.GALEBOSS_KATASH_SKYMINE        = "警告：该机器人随时有可能爆炸。"
 
 
 -- Foods are below...
@@ -1502,28 +1523,35 @@ STRINGS.GALE_UI.READABLE_PAPER = {}
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_1 = {
 	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_1,
 	CONTENT =
-	[=[尝试修复飞船，但是失败了，看来我的航行日志要到头咯。但是，我作为科伯特的战士，绝不会被困难打倒！我从残骸中翻出了最后一些能用的材料，把它们和昨晚抢救出的物资放在一起，列了个清单：
-	备用零件2箱
-	完好无损的保险箱1个（质量真好）
-	感应手雷3颗（估计很快就会用完了）
-	镭射炮管1个
-	饼干6块（需要省着吃）
-	纸笔若干
-	爆能枪1把
-	动力剑1把]=],
+	[=[今天是我一生中最倒霉的一天。我被那个会挥棍子的小女孩狠狠打败，在撤退时，不知从哪里来的一只黑色大手把我的飞船紧紧拽住，然后把我连同飞船一起恶狠狠地扔到这片陌生的土地上。
+飞船从中间折断，完全报废了！我能活下来简直是奇迹！我抢救出了大多数还能用的物资，然后凑合着过了第一夜。]=],
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_2 = {
 	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_2,
-	CONTENT = "",
+	CONTENT = [=[我来到这片陌生的土地也有一段时间了。今天我尝试了一下蜘蛛肉，无论是生吃，煮熟，或者烘干都有一股怪味。
+但是如果把它做成饼干，就没有那讨厌的味道了，尝起来也很不错。
+我一口气吃了好多，剩下的就放在箱子里以备不时之需吧。
+另外，我在箱子周围闻到了陌生的气味，有什么人趁我不在，来营地里翻了我的箱子。
+很有可能是猪人干的，在我打猎的时候他们总是对我手上的肉馋的要死。
+以防万一，就把箱子锁起来吧。]=],
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_3 = {
 	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_3,
-	CONTENT = "",
+	CONTENT = [=[箱子上的锁居然被破坏掉了!
+根据痕迹看好像是锤子砸开的，难道猪人也会使用工具吗？
+今晚我得抽出时间来做一些炸药，如果明天那些猪人还敢来，就让自爆无人机向他们问好吧！]=],
 }
 
 STRINGS.GALE_UI.READABLE_PAPER.GALEBOSS_KATASH_NOTEBOOK_4 = {
 	TITLE = STRINGS.NAMES.GALEBOSS_KATASH_NOTEBOOK_4,
-	CONTENT = "",
+	CONTENT = [=[致亲爱的小偷：
+
+箱子里没有好东西给你了！不仅如此，我在地洞里找到了个不错的藏身处，你暂时也别想找到我！
+科伯特的战士绝不会放跑自己的猎物！等我把伤养好以后，咱们走着瞧！！！
+
+
+																		祝你好死，
+																		卡塔什]=],
 }

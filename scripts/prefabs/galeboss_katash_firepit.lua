@@ -23,27 +23,19 @@ local function onupdatefueled(inst)
     if inst.components.burnable ~= nil and inst.components.fueled ~= nil then
         updatefuelrate(inst)
         inst.components.burnable:SetFXLevel(inst.components.fueled:GetCurrentSection(),
-            inst.components.fueled:GetSectionPercent())
+                                            inst.components.fueled:GetSectionPercent())
     end
 end
 
 local function onfuelchange(newsection, oldsection, inst, doer)
     if newsection <= 0 then
         inst.components.burnable:Extinguish()
-        if inst.queued_charcoal then
-            inst.components.lootdropper:SpawnLootPrefab("charcoal")
-            inst.queued_charcoal = nil
-        end
     else
         if not inst.components.burnable:IsBurning() then
             updatefuelrate(inst)
             inst.components.burnable:Ignite(nil, nil, doer)
         end
         inst.components.burnable:SetFXLevel(newsection, inst.components.fueled:GetSectionPercent())
-
-        if newsection == inst.components.fueled.sections then
-            inst.queued_charcoal = not inst.disable_charcoal
-        end
     end
 end
 
@@ -102,7 +94,7 @@ local function fn()
 
     MakeObstaclePhysics(inst, .3)
 
-    inst:SetPrefabNameOverride("firepit")
+    -- inst:SetPrefabNameOverride("firepit")
 
     inst.entity:SetPristine()
 
@@ -140,7 +132,7 @@ local function fn()
     -----------------------------
 
     inst:AddComponent("inspectable")
-    inst.components.inspectable.getstatus = getstatus
+    -- inst.components.inspectable.getstatus = getstatus
 
 
     inst:DoTaskInTime(0, OnInit)

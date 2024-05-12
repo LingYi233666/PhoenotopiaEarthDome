@@ -8,6 +8,5 @@ AddPrefabPostInit("forest", function(inst)
 	end
 
 	inst:AddComponent("galeboss_ruinforce_spawner")
-
-	-- inst:AddComponent("galeboss_katash_spawner")
+	inst:AddComponent("galeboss_katash_spawner")
 end)

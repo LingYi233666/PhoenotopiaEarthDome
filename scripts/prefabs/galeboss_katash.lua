@@ -5,6 +5,16 @@ local assets = {
     Asset("ANIM", "anim/galeboss_katash.zip"),
 }
 
+SetSharedLootTable("galeboss_katash", {
+    { "gale_blaster_katash_blueprint",   1.00 },
+    { "gale_blaster_katash_blueprint",   1.00 },
+    { "galeboss_katash_blade_blueprint", 1.00 },
+    { "galeboss_katash_blade_blueprint", 1.00 },
+})
+
+
+
+
 local function SelectTargetFn(inst)
     return FindEntity(inst, 20,
                       function(guy)
@@ -185,13 +195,14 @@ local function EnableStunFX(inst, enable)
             Vector4(1, 1, 1, 1),
         })
     elseif not enable and inst.stun_fx then
-        GaleCommon.FadeTo(inst.stun_fx, duration, nil, {
+        local fx = inst.stun_fx
+        GaleCommon.FadeTo(fx, duration, nil, {
                               Vector4(1, 1, 1, 1),
                               Vector4(0, 0, 0, 0),
                           }, nil, function()
-                              inst.stun_fx:Remove()
+                              fx:Remove()
                           end)
-        inst.stun_fx:DoTaskInTime(duration, inst.stun_fx.Remove)
+        fx:DoTaskInTime(duration, fx.Remove)
         inst.stun_fx = nil
     end
 end
@@ -443,6 +454,7 @@ local function KatashServerFn(inst)
     inst.components.inventory.maxslots = 1
 
     inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetChanceLootTable("galeboss_katash")
 
 
     inst:SetStateGraph("SGgaleboss_katash")

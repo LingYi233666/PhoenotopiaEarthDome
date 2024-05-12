@@ -317,10 +317,32 @@ AddRoom("duri_forest_farmland1", {
 AddRoom("katash_impact_zone_room", {
 	colour = { r = 0, g = 1, b = 0, a = 1 },
 	value = WORLD_TILES.FOREST,
-	required_prefabs = { "galeboss_katash_spaceship" },
+	required_prefabs = {
+		"galeboss_katash_spaceship",
+		"galeboss_katash_safebox",
+		"galeboss_katash_firepit",
+		"gale_punchingbag",
+	},
 	contents = {
 		countstaticlayouts = {
 			katash_impact_zone = 1,
+		},
+		distributepercent = .3,
+		distributeprefabs =
+		{
+			fireflies = 0.2,
+			--evergreen = 6,
+			rock1 = 0.05,
+			grass = .05,
+			sapling = .8,
+			twiggytree = 0.8,
+			ground_twigs = 0.06,
+			--rabbithole=.05,
+			berrybush = .03,
+			berrybush_juicy = 0.015,
+			red_mushroom = .03,
+			green_mushroom = .02,
+			trees = { weight = 6, prefabs = { "evergreen", "evergreen_sparse" } }
 		},
 	},
 
@@ -381,7 +403,7 @@ end)
 
 AddTaskPreInit("For a nice walk", function(tasksetdata)
 	tasksetdata.room_choices = tasksetdata.room_choices or {}
-	-- tasksetdata.room_choices.katash_impact_zone_room = 1
+	tasksetdata.room_choices.katash_impact_zone_room = 1
 end)
 
 AddLevelPreInitAny(function(level)

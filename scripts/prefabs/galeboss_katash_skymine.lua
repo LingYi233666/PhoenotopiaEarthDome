@@ -22,7 +22,25 @@ end
 
 local function KeepTargetFn(inst, target)
     return inst.components.combat:CanTarget(target)
-        and inst:IsNear(target, 15)
+        and inst:IsNear(target, 33)
+end
+
+local function OnAttacked(inst, data)
+    inst.components.combat:SuggestTarget(data.attacker)
+end
+
+local function SetVel(inst, vel)
+    local predict_pos = inst:GetPosition() + vel
+    local lx, ly, lz = inst.entity:WorldToLocalSpace(predict_pos.x, 0, predict_pos.z)
+    inst.Physics:SetMotorVel(lx, 0, lz)
+end
+
+local function AddVelocity(inst, vel)
+    local cur_vel = Vector3(inst.Physics:GetVelocity())
+    local next_vel = cur_vel + vel
+    inst:SetVel(next_vel)
+
+    return next_vel
 end
 
 return GaleEntity.CreateNormalEntity({
@@ -48,6 +66,9 @@ return GaleEntity.CreateNormalEntity({
     end,
 
     serverfn = function(inst)
+        inst.SetVel = SetVel
+        inst.AddVelocity = AddVelocity
+
         inst:AddComponent("inspectable")
 
         inst:AddComponent("lootdropper")
@@ -61,17 +82,30 @@ return GaleEntity.CreateNormalEntity({
 
         inst:AddComponent("combat")
         inst.components.combat.playerdamagepercent = 0.5
-        inst.components.combat:SetRange(2, 6)
-        inst.components.combat:SetDefaultDamage(33)
+        inst.components.combat:SetRange(0.5, 3)
+        inst.components.combat:SetDefaultDamage(70)
         inst.components.combat:SetAttackPeriod(1)
         inst.components.combat:SetRetargetFunction(3, RetargetFn)
         inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
+        inst.components.combat:SetHurtSound("gale_sfx/battle/hit_metal")
 
         inst:AddComponent("health")
-        inst.components.health:SetMaxHealth(50)
+        inst.components.health:SetMaxHealth(100)
 
         inst:SetStateGraph("SGgaleboss_katash_skymine")
 
         GaleCondition.AddCondition(inst, "condition_metallic")
+
+
+        inst.sounds = {
+            turn_on = "gale_sfx/battle/galeboss_katash_skymine/turn_on",
+            turn_off = "gale_sfx/battle/galeboss_katash_skymine/turn_off",
+            fail = "gale_sfx/battle/galeboss_katash_skymine/fail",
+            spin = "gale_sfx/battle/galeboss_katash_skymine/spin",
+            explo = "gale_sfx/battle/explode",
+            -- explo = "gale_sfx/battle/p1_explode",
+        }
+
+        inst:ListenForEvent("attacked", OnAttacked)
     end,
 })

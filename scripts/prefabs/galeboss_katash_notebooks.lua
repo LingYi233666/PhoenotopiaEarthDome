@@ -35,6 +35,9 @@ local function batchfn(prefabname, index)
         serverfn = function(inst)
             inst:AddComponent("erasablepaper")
 
+            inst:AddComponent("fuel")
+            inst.components.fuel.fuelvalue = TUNING.SMALL_FUEL
+
             inst:AddComponent("gale_readable_paper")
             inst.components.gale_readable_paper.index = index
         end

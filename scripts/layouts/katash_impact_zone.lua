@@ -36,8 +36,8 @@ return {
       properties = {},
       encoding = "lua",
       data = {
-        4, 0, 0, 0, 0,
-        4, 4, 7, 4, 0,
+        4, 7, 7, 7, 7,
+        4, 4, 7, 4, 7,
         7, 4, 7, 7, 7,
         7, 7, 7, 4, 7,
         7, 4, 7, 7, 4
@@ -63,7 +63,7 @@ return {
         },
         {
           name = "",
-          type = "galeboss_katash_safebox",
+          type = "galeboss_katash_firepit",
           shape = "rectangle",
           x = 125,
           y = 248,
@@ -74,7 +74,7 @@ return {
         },
         {
           name = "",
-          type = "firepit",
+          type = "gale_punchingbag",
           shape = "rectangle",
           x = 233,
           y = 219,
@@ -85,7 +85,7 @@ return {
         },
         {
           name = "",
-          type = "cookpot",
+          type = "galeboss_katash_safebox",
           shape = "rectangle",
           x = 36,
           y = 211,

@@ -44,15 +44,19 @@ local function OnOpen(inst, data)
         local phase                 = TheWorld.components.galeboss_katash_spawner.phase
 
         if phase_normal <= phase and phase <= phase_box_with_drones then
+            print(inst, "is opened by", data.doer, "set galeboss_katash_spawner.statemem.box_opened to true")
             TheWorld.components.galeboss_katash_spawner.statemem.box_opened = true
         elseif phase == phase_box_with_katash
             and data.doer
             and not inst.trigger_katash
-            and TheWorld.components.galeboss_katash_spawner.statemem.katash == nil
+            and TheWorld.components.galeboss_katash_spawner.entities.katash == nil
+            and not TheWorld.components.galeboss_katash_spawner.statemem.katash_defeated
         then
             inst.trigger_katash = true
             local grenade = SpawnAt("athetos_grenade_elec", inst)
             grenade.components.complexprojectile:Launch(inst:GetPosition(), inst)
+
+            print(inst, "is opened by", data.doer, "summon grenade and katash")
 
             inst:DoTaskInTime(2, function()
                 local pos = inst:GetPosition()
@@ -97,6 +101,10 @@ local function OnHit(inst, worker)
     end
 end
 
+local function GetStatus(inst)
+    return inst.locked and "LOCKED" or "GENERIC"
+end
+
 local function OnSave(inst, data)
     data.locked = inst.locked
 end
@@ -134,6 +142,7 @@ return GaleEntity.CreateNormalEntity({
         inst.OnLoad = OnLoad
 
         inst:AddComponent("inspectable")
+        inst.components.inspectable.getstatus = GetStatus
 
         inst:AddComponent("container")
         inst.components.container:WidgetSetup("galeboss_katash_safebox")
