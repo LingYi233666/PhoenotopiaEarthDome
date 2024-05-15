@@ -15,7 +15,7 @@ local function RetargetFn(inst)
             return inst.components.combat:CanTarget(guy)
         end,
         { "_combat", "_health" },
-        { "INLIMBO", "prey", },
+        { "INLIMBO", "prey", "katash" },
         { "character", }
     )
 end
@@ -26,7 +26,9 @@ local function KeepTargetFn(inst, target)
 end
 
 local function OnAttacked(inst, data)
-    inst.components.combat:SuggestTarget(data.attacker)
+    if data.attacker and not data.attacker:HasTag("katash") then
+        inst.components.combat:SuggestTarget(data.attacker)
+    end
 end
 
 local function SetVel(inst, vel)
@@ -41,6 +43,34 @@ local function AddVelocity(inst, vel)
     inst:SetVel(next_vel)
 
     return next_vel
+end
+
+local function EnableBeep(inst, period)
+    if inst.beep_task then
+        inst.beep_task:Cancel()
+        inst.beep_task = nil
+    end
+    if inst.not_red_task then
+        inst.not_red_task:Cancel()
+        inst.not_red_task = nil
+    end
+    inst.AnimState:SetAddColour(0, 0, 0, 0)
+
+    if period and period >= 0 then
+        local red_keep_time = 2 * FRAMES
+        period = math.max(period, red_keep_time + FRAMES)
+        inst.beep_task = inst:DoPeriodicTask(period, function()
+            inst.SoundEmitter:PlaySound(inst.sounds.beep)
+            inst.AnimState:SetAddColour(1, 0, 0, 1)
+            if inst.not_red_task then
+                inst.not_red_task:Cancel()
+            end
+            inst.not_red_task = inst:DoTaskInTime(red_keep_time, function()
+                inst.AnimState:SetAddColour(0, 0, 0, 0)
+                inst.not_red_task = nil
+            end)
+        end)
+    end
 end
 
 return GaleEntity.CreateNormalEntity({
@@ -68,6 +98,7 @@ return GaleEntity.CreateNormalEntity({
     serverfn = function(inst)
         inst.SetVel = SetVel
         inst.AddVelocity = AddVelocity
+        inst.EnableBeep = EnableBeep
 
         inst:AddComponent("inspectable")
 
@@ -104,6 +135,7 @@ return GaleEntity.CreateNormalEntity({
             spin = "gale_sfx/battle/galeboss_katash_skymine/spin",
             explo = "gale_sfx/battle/explode",
             -- explo = "gale_sfx/battle/p1_explode",
+            beep = "gale_sfx/battle/galeboss_katash_skymine/beep",
         }
 
         inst:ListenForEvent("attacked", OnAttacked)

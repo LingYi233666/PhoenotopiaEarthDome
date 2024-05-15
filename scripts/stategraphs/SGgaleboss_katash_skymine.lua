@@ -241,10 +241,28 @@ local states = {
             end
         end,
 
+        timeline = {
+            TimeEvent(2, function(inst)
+                inst:EnableBeep(0.5)
+            end),
+
+            TimeEvent(6, function(inst)
+                inst:EnableBeep(0.25)
+            end),
+
+            TimeEvent(8, function(inst)
+                inst:EnableBeep(0.1)
+            end),
+        },
+
         events =
         {
 
         },
+
+        onexit = function(inst)
+            inst:EnableBeep(false)
+        end,
     },
 
     State {
@@ -279,7 +297,7 @@ local states = {
 
     State {
         name = "death",
-        tags = { "busy", "dead" },
+        tags = { "busy", "dead", "invisible" },
 
         onenter = function(inst)
             inst.DynamicShadow:Enable(false)

@@ -6,30 +6,30 @@ local function onpercent(self, percent)
 end
 
 local GaleWeaponCharge = Class(function(self, inst)
-								   self.inst = inst
-								   self.cur_time = 0
-								   self.state = "RELEASED"
-								   self.percent = 0
-								   self.attack_keys = {
-									   [CONTROL_PRIMARY] = false,
-									   [CONTROL_SECONDARY] = false,
-									   [CONTROL_ATTACK] = false,
-									   [CONTROL_CONTROLLER_ATTACK] = false,
-								   }
+		self.inst = inst
+		self.cur_time = 0
+		self.state = "RELEASED"
+		self.percent = 0
+		self.attack_keys = {
+			[CONTROL_PRIMARY] = false,
+			[CONTROL_SECONDARY] = false,
+			[CONTROL_ATTACK] = false,
+			[CONTROL_CONTROLLER_ATTACK] = false,
+		}
 
 
-								   self.charge_speed_mult = SourceModifierList(self.inst)
+		self.charge_speed_mult = SourceModifierList(self.inst)
 
-								   inst:ListenForEvent("newstate", function(inst, data)
-									   if not inst.sg:HasStateTag("charging_attack") then
-										   self:Release()
-									   end
-								   end)
-							   end,
-							   nil,
-							   {
-								   percent = onpercent,
-							   }
+		inst:ListenForEvent("newstate", function(inst, data)
+			if not inst.sg:HasStateTag("charging_attack") then
+				self:Release()
+			end
+		end)
+	end,
+	nil,
+	{
+		percent = onpercent,
+	}
 )
 
 function GaleWeaponCharge:SetKey(key, pressed)
@@ -85,8 +85,11 @@ function GaleWeaponCharge:DoAttack(target, target_pos)
 	local weapon = self.inst.components.combat and self.inst.components.combat:GetWeapon()
 
 	if weapon and weapon.components.gale_chargeable_weapon and weapon.components.gale_chargeable_weapon.do_attack_fn then
-		weapon.components.gale_chargeable_weapon.do_attack_fn(weapon, self.inst, target, target_pos, self.percent)
+		weapon.components.gale_chargeable_weapon:OnAttack(self.inst, target, target_pos, self.percent)
+		self.inst:PushEvent("gale_weaponcharge_doattack",
+			{ weapon = weapon, target = target, target_pos = target_pos, percent = self.percent })
 	end
+
 	self:Release()
 
 
