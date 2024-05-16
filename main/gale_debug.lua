@@ -21,6 +21,13 @@ GLOBAL.galetestmen = {}
 
 
 -- for x=-1000,1000,30 do for y=-1000,1000,30 do ThePlayer.player_classified.MapExplorer:RevealArea(x ,0, y) end end
+function GLOBAL.RevealAllMap()
+    for x = -1000, 1000, 30 do
+        for y = -1000, 1000, 30 do
+            ThePlayer.player_classified.MapExplorer:RevealArea(x, 0, y)
+        end
+    end
+end
 
 -- ThePlayer.components.locomotor:GoToEntity(c_findnext("galeboss_dragon_snare"))
 -- c_findnext("galeboss_ruinforce").sg:GoToState("roar")
@@ -42,3 +49,18 @@ GLOBAL.GALE_LOREM_IPSUM_CHS_1200 =
 
 GLOBAL.GALE_LOREM_IPSUM_CHS_NO_UPDATE =
 [=[我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！我好想每天更新啊啊啊啊啊！]=]
+
+
+-- HyperBurn(ThePlayer:GetPosition(),TheInput:GetWorldPosition())
+function GLOBAL.HyperBurn(start_pos, end_pos)
+    local towards = end_pos - start_pos
+    local towards_norm = towards:GetNormalized()
+    local towards_len = towards:Length()
+
+    local step = 3
+    for i = 0, towards_len, step do
+        local cur_pos = start_pos + towards_norm * i
+        local segment = SpawnAt("gale_skill_hyperburn_line_segment", cur_pos)
+        segment.vfx:DoEmit(towards_norm * 0.1)
+    end
+end
