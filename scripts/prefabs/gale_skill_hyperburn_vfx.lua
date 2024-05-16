@@ -28,52 +28,79 @@ local function IntColour(r, g, b, a)
 end
 
 local function InitEnvelope()
-    local envs = {}
-    local t = 0
-    local step = .15
-    while t + step + .01 < 1 do
-        table.insert(envs, { t, IntColour(255, 255, 150, 255) })
-        t = t + step
-        table.insert(envs, { t, IntColour(255, 255, 150, 0) })
-        t = t + .01
-    end
-    table.insert(envs, { 1, IntColour(255, 255, 150, 0) })
-
     EnvelopeManager:AddColourEnvelope(COLOUR_ENVELOPE_NAME_SMOKE_YELLOW, {
-        { 0,   IntColour(255, 255, 0, 0) },
-        { 0.1, IntColour(255, 255, 0, 1) },
-        { 0.9, IntColour(255, 255, 0, 1) },
-        { 1,   IntColour(255, 255, 0, 0) },
+        { 0,  IntColour(255, 240, 0, 0) },
+        { .2, IntColour(255, 253, 0, 120) },
+        { .3, IntColour(200, 255, 0, 30) },
+        { .6, IntColour(230, 245, 0, 20) },
+        { .9, IntColour(255, 240, 0, 10) },
+        { 1,  IntColour(255, 240, 0, 0) },
     })
 
-    local scale_factor = 4
+    EnvelopeManager:AddColourEnvelope(COLOUR_ENVELOPE_NAME_SMOKE_RED, {
+        { 0,  IntColour(255, 0, 0, 0) },
+        { .2, IntColour(255, 0, 0, 120) },
+        { .3, IntColour(200, 0, 0, 30) },
+        { .6, IntColour(230, 0, 0, 20) },
+        { .9, IntColour(255, 0, 0, 10) },
+        { 1,  IntColour(255, 0, 0, 0) },
+    })
+
+    local scale_factor = 1.5
     EnvelopeManager:AddVector2Envelope(
         SCALE_ENVELOPE_NAME_SMOKE_THIN,
         {
-            { 0,   { scale_factor * 0.2, scale_factor } },
-            { 0.2, { scale_factor * 0.2, scale_factor } },
-            { 1,   { scale_factor * .02, scale_factor * 0.9 } },
+            { 0,   { scale_factor * 0.075, scale_factor } },
+            { 0.2, { scale_factor * 0.075, scale_factor } },
+            { 1,   { scale_factor * .005, scale_factor * 0.6 } },
         }
     )
+
+    scale_factor = 2
+    EnvelopeManager:AddVector2Envelope(
+        SCALE_ENVELOPE_NAME_SMOKE,
+        {
+            { 0,   { scale_factor * 0.1, scale_factor } },
+            { 0.2, { scale_factor * 0.1, scale_factor } },
+            { 1,   { scale_factor * .01, scale_factor * 0.6 } },
+        }
+    )
+
 
     InitEnvelope = nil
     IntColour = nil
 end
 
 --------------------------------------------------------------------------
-local MAX_LIFETIME = 1.75
+local MAX_LIFETIME = 0.66
+local sphere_emitter = CreateSphereEmitter(0.1)
 
 local function emit_line_thin(effect, velocity)
     local vx, vy, vz = velocity:Get()
-    local lifetime = (MAX_LIFETIME * (.9 + UnitRand() * .1))
+    local px, py, pz = sphere_emitter()
+    local lifetime = (MAX_LIFETIME * (.6 + UnitRand() * .4))
 
     effect:AddParticle(
         0,
-        lifetime,  -- lifetime
-        0, 0, 0,   -- position
-        vx, vy, vz -- velocity
+        lifetime,   -- lifetime
+        px, py, pz, -- position
+        vx, vy, vz  -- velocity
     )
 end
+
+local function emit_line(effect, velocity)
+    local vx, vy, vz = velocity:Get()
+    local px, py, pz = sphere_emitter()
+    local lifetime = (MAX_LIFETIME * (.6 + UnitRand() * .4))
+
+    effect:AddParticle(
+        1,
+        lifetime,   -- lifetime
+        px, py, pz, -- position
+        vx, vy, vz  -- velocity
+    )
+end
+
 
 local function linevfxfn()
     local inst = CreateEntity()
@@ -92,6 +119,7 @@ local function linevfxfn()
     inst._velocity_y = net_float(inst.GUID, "inst._velocity_y")
     inst._velocity_z = net_float(inst.GUID, "inst._velocity_z")
     inst._event = net_event(inst.GUID, "inst._event")
+    inst._depth = net_bool(inst.GUID, "inst._depth", "depthdirty")
 
     inst.DoEmit = function(inst, x_or_pos, y, z)
         local x = x_or_pos
@@ -116,9 +144,8 @@ local function linevfxfn()
     end
 
     local effect = inst.entity:AddVFXEffect()
-    effect:InitEmitters(1)
+    effect:InitEmitters(2)
 
-    --SPARKLE
     effect:SetRenderResources(0, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
     effect:SetRotateOnVelocity(0, true)
     effect:SetMaxNumParticles(0, 1)
@@ -127,17 +154,40 @@ local function linevfxfn()
     effect:SetScaleEnvelope(0, SCALE_ENVELOPE_NAME_SMOKE_THIN)
     effect:SetBlendMode(0, BLENDMODE.AlphaBlended)
     effect:EnableBloomPass(0, true)
-    -- effect:SetSortOrder(0, 0)
-    -- effect:SetSortOffset(0, 2)
+    -- effect:EnableDepthTest(0, true)
+    effect:SetRadius(0, 1)
+    effect:SetSortOrder(0, 1)
+
+
+
+    effect:SetRenderResources(1, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    effect:SetRotateOnVelocity(1, true)
+    effect:SetMaxNumParticles(1, 1)
+    effect:SetMaxLifetime(1, MAX_LIFETIME)
+    effect:SetColourEnvelope(1, COLOUR_ENVELOPE_NAME_SMOKE_RED)
+    effect:SetScaleEnvelope(1, SCALE_ENVELOPE_NAME_SMOKE)
+    effect:SetBlendMode(1, BLENDMODE.AlphaBlended)
+    effect:EnableBloomPass(1, true)
+    -- effect:EnableDepthTest(1, true)
+    effect:SetRadius(1, 1)
+    effect:SetSortOrder(1, 0)
 
     -----------------------------------------------------
 
     inst:ListenForEvent("inst._event", function()
-        emit_line_thin(effect, Vector3(inst._velocity_x:value(), inst._velocity_y:value(), inst._velocity_z:value()))
+        local pos = Vector3(inst._velocity_x:value(), inst._velocity_y:value(), inst._velocity_z:value())
+        emit_line_thin(effect, pos)
+        emit_line(effect, pos)
+    end)
+
+    inst:ListenForEvent("depthdirty", function()
+        effect:EnableDepthTest(0, inst._depth:value())
+        effect:EnableDepthTest(1, inst._depth:value())
     end)
 
     return inst
 end
+
 
 local function segmentfn()
     local inst = CreateEntity()
