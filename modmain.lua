@@ -311,6 +311,7 @@ AddModCharacter("gale", "FEMALE")
 
 
 modimport("main/gale_spdamage_api.lua")
+modimport("main/gale_atlas_build_api.lua")
 modimport("main/gale_qte_cooker_api.lua")
 modimport("main/gale_attack_api.lua")
 modimport("main/gale_conditions_api.lua")

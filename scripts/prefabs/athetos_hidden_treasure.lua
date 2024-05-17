@@ -368,29 +368,29 @@ local function TreasureOnHit(inst, worker)
     -- inst.AnimState:PushAnimation("idle")
 end
 
-local addition_assets_client_dict = {}
-local addition_assets_server_dict = {}
+-- local addition_assets_client_dict = {}
+-- local addition_assets_server_dict = {}
 
-local function AutoAddAtlasBuild(xml_path, search_dict)
-    if search_dict[xml_path] then
-        return
-    end
-    search_dict[xml_path] = true
+-- local function AutoAddAtlasBuild(xml_path, search_dict)
+--     if search_dict[xml_path] then
+--         return
+--     end
+--     search_dict[xml_path] = true
 
-    print("AutoAddAtlasBuild:", xml_path)
+--     print("AutoAddAtlasBuild:", xml_path)
 
-    local prefabname = TheWorld.ismastersim and "ATHETOS_REVEALED_TREASURE_ATLAS_BUILD_ADD_SERVER_" or
-        "ATHETOS_REVEALED_TREASURE_ATLAS_BUILD_ADD_CLIENT_"
-    prefabname = prefabname .. xml_path:gsub("/", "-")
+--     local prefabname = TheWorld.ismastersim and "ATHETOS_REVEALED_TREASURE_ATLAS_BUILD_ADD_SERVER_" or
+--         "ATHETOS_REVEALED_TREASURE_ATLAS_BUILD_ADD_CLIENT_"
+--     prefabname = prefabname .. xml_path:gsub("/", "-")
 
-    local add_assets = {
-        Asset("ATLAS_BUILD", xml_path, 256),
-    }
+--     local add_assets = {
+--         Asset("ATLAS_BUILD", xml_path, 256),
+--     }
 
-    local prefab = Prefab(prefabname, nil, add_assets, nil, true)
-    RegisterPrefabs(prefab)
-    TheSim:LoadPrefabs({ prefabname })
-end
+--     local prefab = Prefab(prefabname, nil, add_assets, nil, true)
+--     RegisterPrefabs(prefab)
+--     TheSim:LoadPrefabs({ prefabname })
+-- end
 
 local function TreasureClientFn(inst)
     -- MakeObstaclePhysics(inst,0.5,2)
@@ -416,7 +416,7 @@ local function TreasureClientFn(inst)
     inst.Transform:SetScale(1.8, 1.8, 1.8)
 
 
-    inst._update_xml_path = net_string(inst.GUID, "inst._update_xml_path", "gale_update_xml_path")
+    -- inst._update_xml_path = net_string(inst.GUID, "inst._update_xml_path", "gale_update_xml_path")
 
     if not TheNet:IsDedicated() then
         local groundfx = GaleEntity.CreateClientAnim({
@@ -440,10 +440,10 @@ local function TreasureClientFn(inst)
         inst.groundfx = groundfx
 
 
-        inst:ListenForEvent("gale_update_xml_path", function()
-            local xml_path = inst._update_xml_path:value()
-            AutoAddAtlasBuild(xml_path, addition_assets_client_dict)
-        end)
+        -- inst:ListenForEvent("gale_update_xml_path", function()
+        --     local xml_path = inst._update_xml_path:value()
+        --     AutoAddAtlasBuild(xml_path, addition_assets_client_dict)
+        -- end)
     end
 
 
@@ -527,8 +527,9 @@ local function TreasureServerFn(inst)
             -- print("xml_path is",xml_path,"tex_filename is",tex_filename)
             -- Is mod inventoryitem
             if resolvefilepath(xml_path):find("../mods/") then
-                inst._update_xml_path:set(xml_path)
-                AutoAddAtlasBuild(xml_path, addition_assets_server_dict)
+                -- inst._update_xml_path:set(xml_path)
+                -- AutoAddAtlasBuild(xml_path, addition_assets_server_dict)
+                AutoAddAtlasBuild(xml_path)
             end
 
             inst.AnimState:OverrideSymbol("item" .. slot, resolvefilepath(xml_path), tex_filename)

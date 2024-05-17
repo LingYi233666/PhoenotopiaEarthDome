@@ -10,6 +10,22 @@ local GalebossKatashSpawner = Class(function(self, inst)
         print(string.format("katash_should_in_cave_dirty%s: %s", TheWorld.ismastershard and "(mastershard)" or "",
             tostring(self:GetKatashShouldInCave())))
     end)
+
+    if TheWorld.ismastershard then
+        function self:OnSave()
+            return {
+                katash_should_in_cave = self:GetKatashShouldInCave(),
+            }
+        end
+
+        function self:OnLoad(data)
+            if data == nil then
+                return
+            end
+
+            self:SetKatashShouldInCave(data.katash_should_in_cave)
+        end
+    end
 end)
 
 function GalebossKatashSpawner:SetKatashShouldInCave(val)
