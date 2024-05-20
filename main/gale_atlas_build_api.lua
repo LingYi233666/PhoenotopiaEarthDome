@@ -28,9 +28,6 @@ local function AutoAddAtlasBuild_Internal(xml_path, search_dict, add_to_client_a
     end
 end
 
-function AutoAddAtlasBuild(xml_path)
-    AutoAddAtlasBuild_Internal(xml_path, addition_assets_server_dict, true)
-end
 
 AddClientModRPCHandler("gale_rpc", "auto_add_atlas_build", function(xml_path)
     AutoAddAtlasBuild_Internal(xml_path, addition_assets_client_dict)
@@ -55,3 +52,8 @@ AddPrefabPostInit("world", function(inst)
         SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["auto_add_atlas_build_sync"], player.GUID, str_zipped)
     end)
 end)
+
+
+function GLOBAL.AutoAddAtlasBuild(xml_path)
+    AutoAddAtlasBuild_Internal(xml_path, addition_assets_server_dict, true)
+end

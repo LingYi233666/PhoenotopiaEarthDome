@@ -1,3 +1,6 @@
+local GaleCommon = require("util/gale_common")
+local GaleEntity = require("util/gale_entity")
+
 local SPARKLE_TEXTURE = "fx/sparkle.tex"
 local ANIM_SMOKE_TEXTURE = "fx/animsmoke.tex"
 local ARROW_TEXTURE = "fx/spark.tex"
@@ -11,8 +14,11 @@ local namespace = "gale_skill_hyperburn_vfx"
 
 local COLOUR_ENVELOPE_NAME_SMOKE_RED = namespace .. "_colourenvelope_smoke_red"
 local COLOUR_ENVELOPE_NAME_SMOKE_YELLOW = namespace .. "_colourenvelope_smoke_yellow"
+local COLOUR_ENVELOPE_NAME_ARROW = namespace .. "_colourenvelope_arrow"
 local SCALE_ENVELOPE_NAME_SMOKE_THIN = namespace .. "_scaleenvelope_smoke_thin"
+local SCALE_ENVELOPE_NAME_SMOKE_VERY_THIN = namespace .. "_scaleenvelope_smoke_very_thin"
 local SCALE_ENVELOPE_NAME_SMOKE = namespace .. "_scaleenvelope_smoke"
+local SCALE_ENVELOPE_NAME_ARROW = namespace .. "_scaleenvelope_arrow"
 
 local assets =
 {
@@ -34,28 +40,35 @@ end
 local function InitEnvelope()
     EnvelopeManager:AddColourEnvelope(COLOUR_ENVELOPE_NAME_SMOKE_YELLOW, {
         { 0,  IntColour(255, 240, 0, 0) },
-        { .2, IntColour(255, 253, 0, 120) },
-        { .3, IntColour(200, 255, 0, 30) },
-        { .6, IntColour(230, 245, 0, 20) },
-        { .9, IntColour(255, 240, 0, 10) },
+        { .2, IntColour(255, 253, 0, 200) },
+        { .3, IntColour(200, 255, 0, 110) },
+        { .6, IntColour(230, 245, 0, 180) },
+        { .9, IntColour(255, 240, 0, 100) },
         { 1,  IntColour(255, 240, 0, 0) },
     })
 
     EnvelopeManager:AddColourEnvelope(COLOUR_ENVELOPE_NAME_SMOKE_RED, {
         { 0,  IntColour(255, 0, 0, 0) },
-        { .2, IntColour(255, 0, 0, 120) },
-        { .3, IntColour(200, 0, 0, 30) },
-        { .6, IntColour(230, 0, 0, 20) },
-        { .9, IntColour(255, 0, 0, 10) },
+        { .2, IntColour(255, 0, 0, 240) },
+        { .3, IntColour(200, 0, 0, 180) },
+        { .6, IntColour(230, 0, 0, 150) },
+        { .9, IntColour(255, 0, 0, 110) },
         { 1,  IntColour(255, 0, 0, 0) },
     })
 
-    local scale_factor = 1.5
+    EnvelopeManager:AddColourEnvelope(COLOUR_ENVELOPE_NAME_ARROW, {
+        { 0,  IntColour(150, 0, 19, 255) },
+        { .2, IntColour(255, 10, 19, 255) },
+        { .8, IntColour(230, 10, 19, 255) },
+        { 1,  IntColour(150, 0, 19, 255) },
+    })
+
+    local scale_factor = 1.2
     EnvelopeManager:AddVector2Envelope(
         SCALE_ENVELOPE_NAME_SMOKE_THIN,
         {
-            { 0,   { scale_factor * 0.075, scale_factor } },
-            { 0.2, { scale_factor * 0.075, scale_factor } },
+            { 0,   { scale_factor * 0.07, scale_factor } },
+            { 0.2, { scale_factor * 0.07, scale_factor } },
             { 1,   { scale_factor * .005, scale_factor * 0.6 } },
         }
     )
@@ -64,9 +77,31 @@ local function InitEnvelope()
     EnvelopeManager:AddVector2Envelope(
         SCALE_ENVELOPE_NAME_SMOKE,
         {
-            { 0,   { scale_factor * 0.15, scale_factor } },
-            { 0.2, { scale_factor * 0.15, scale_factor } },
+            { 0,   { scale_factor * 0.07, scale_factor } },
+            { 0.2, { scale_factor * 0.07, scale_factor } },
             { 1,   { scale_factor * .01, scale_factor * 0.6 } },
+        }
+    )
+
+
+    scale_factor = 1.0
+    EnvelopeManager:AddVector2Envelope(
+        SCALE_ENVELOPE_NAME_SMOKE_VERY_THIN,
+        {
+            { 0,   { scale_factor * 0.07, scale_factor } },
+            { 0.2, { scale_factor * 0.07, scale_factor } },
+            { 1,   { scale_factor * .01, scale_factor * 0.6 } },
+        }
+    )
+
+
+
+    local arrow_max_scale = 5
+    EnvelopeManager:AddVector2Envelope(
+        SCALE_ENVELOPE_NAME_ARROW,
+        {
+            { 0, { arrow_max_scale * 0.2, arrow_max_scale } },
+            { 1, { arrow_max_scale * .001, arrow_max_scale * .001 } },
         }
     )
 
@@ -76,13 +111,12 @@ local function InitEnvelope()
 end
 
 --------------------------------------------------------------------------
-local MAX_LIFETIME = 0.66
+local MAX_LIFETIME = 0.6
 local MAX_LIFETIME_ARROW = 1.0
-local sphere_emitter = CreateSphereEmitter(0.1)
 
-local function emit_line_thin(effect, velocity)
+local function emit_line_thin(effect, pos, velocity)
     local vx, vy, vz = velocity:Get()
-    local px, py, pz = sphere_emitter()
+    local px, py, pz = pos:Get()
     local lifetime = (MAX_LIFETIME * (.6 + UnitRand() * .4))
 
     effect:AddParticle(
@@ -93,9 +127,9 @@ local function emit_line_thin(effect, velocity)
     )
 end
 
-local function emit_line(effect, velocity)
+local function emit_line(effect, pos, velocity)
     local vx, vy, vz = velocity:Get()
-    local px, py, pz = sphere_emitter()
+    local px, py, pz = pos:Get()
     local lifetime = (MAX_LIFETIME * (.6 + UnitRand() * .4))
 
     effect:AddParticle(
@@ -106,46 +140,23 @@ local function emit_line(effect, velocity)
     )
 end
 
-local function emit_arrow(effect, emitter, velocity)
+local function emit_arrow(effect, pos, velocity)
     local vx, vy, vz = velocity:Get()
-    local px, py, pz = emitter()
+    local px, py, pz = pos:Get()
     local lifetime = (MAX_LIFETIME_ARROW * (.6 + UnitRand() * .4))
 
-    effect:AddParticle(
+    local uv_offset = math.random(0, 3) * .25
+
+    effect:AddParticleUV(
         2,
-        lifetime,   -- lifetime
-        px, py, pz, -- position
-        vx, vy, vz  -- velocity
+        lifetime,    -- lifetime
+        px, py, pz,  -- position
+        vx, vy, vz,  -- velocity
+        uv_offset, 0 -- uv offset
     )
 end
 
-local function InitCommonVFX(inst, effect)
-    -- Thin yellow line in the flame middle
-    effect:SetRenderResources(0, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
-    effect:SetRotateOnVelocity(0, true)
-    effect:SetMaxNumParticles(0, 1)
-    effect:SetMaxLifetime(0, MAX_LIFETIME)
-    effect:SetColourEnvelope(0, COLOUR_ENVELOPE_NAME_SMOKE_YELLOW)
-    effect:SetScaleEnvelope(0, SCALE_ENVELOPE_NAME_SMOKE_THIN)
-    effect:SetBlendMode(0, BLENDMODE.AlphaBlended)
-    effect:EnableBloomPass(0, true)
-    -- effect:EnableDepthTest(0, true)
-    effect:SetRadius(0, 1)
-    effect:SetSortOrder(0, 1)
 
-    -- Fat red line of the flame
-    effect:SetRenderResources(1, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
-    effect:SetRotateOnVelocity(1, true)
-    effect:SetMaxNumParticles(1, 1)
-    effect:SetMaxLifetime(1, MAX_LIFETIME)
-    effect:SetColourEnvelope(1, COLOUR_ENVELOPE_NAME_SMOKE_RED)
-    effect:SetScaleEnvelope(1, SCALE_ENVELOPE_NAME_SMOKE)
-    effect:SetBlendMode(1, BLENDMODE.AlphaBlended)
-    effect:EnableBloomPass(1, true)
-    -- effect:EnableDepthTest(1, true)
-    effect:SetRadius(1, 1)
-    effect:SetSortOrder(1, 0)
-end
 
 local function linevfxfn()
     local inst = CreateEntity()
@@ -195,28 +206,56 @@ local function linevfxfn()
     local effect = inst.entity:AddVFXEffect()
     effect:InitEmitters(3)
 
-    InitCommonVFX(inst, effect)
+    -- Thin yellow line in the flame middle
+    effect:SetRenderResources(0, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    effect:SetRotateOnVelocity(0, true)
+    effect:SetMaxNumParticles(0, 1)
+    effect:SetMaxLifetime(0, MAX_LIFETIME)
+    effect:SetColourEnvelope(0, COLOUR_ENVELOPE_NAME_SMOKE_YELLOW)
+    effect:SetScaleEnvelope(0, SCALE_ENVELOPE_NAME_SMOKE_THIN)
+    effect:SetBlendMode(0, BLENDMODE.AlphaBlended)
+    effect:EnableBloomPass(0, true)
+    -- effect:EnableDepthTest(0, true)
+    effect:SetRadius(0, 1)
+    effect:SetSortOffset(0, 1)
 
-    effect:SetRenderResources(2, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    -- Fat red line of the flame
+    effect:SetRenderResources(1, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    effect:SetRotateOnVelocity(1, true)
+    effect:SetMaxNumParticles(1, 1)
+    effect:SetMaxLifetime(1, MAX_LIFETIME)
+    effect:SetColourEnvelope(1, COLOUR_ENVELOPE_NAME_SMOKE_RED)
+    effect:SetScaleEnvelope(1, SCALE_ENVELOPE_NAME_SMOKE)
+    effect:SetBlendMode(1, BLENDMODE.AlphaBlended)
+    effect:EnableBloomPass(1, true)
+    -- effect:EnableDepthTest(1, true)
+    effect:SetRadius(1, 1)
+    effect:SetSortOffset(1, 0)
+
+    effect:SetRenderResources(2, ARROW_TEXTURE, ADD_SHADER)
     effect:SetRotateOnVelocity(2, true)
-    effect:SetMaxNumParticles(2, 8)
+    effect:SetMaxNumParticles(2, 32)
+    effect:SetUVFrameSize(2, .25, 1)
     effect:SetMaxLifetime(2, MAX_LIFETIME_ARROW)
-    effect:SetColourEnvelope(2, COLOUR_ENVELOPE_NAME_SMOKE_RED)
-    effect:SetScaleEnvelope(2, SCALE_ENVELOPE_NAME_SMOKE)
-    effect:SetBlendMode(2, BLENDMODE.AlphaBlended)
+    effect:SetColourEnvelope(2, COLOUR_ENVELOPE_NAME_ARROW)
+    effect:SetScaleEnvelope(2, SCALE_ENVELOPE_NAME_ARROW)
+    effect:SetBlendMode(2, BLENDMODE.Additive)
     effect:EnableBloomPass(2, true)
-    effect:SetSortOrder(2, 0)
-    effect:SetDragCoefficient(2, 0.05)
+    effect:SetSortOffset(2, 2)
+    effect:SetDragCoefficient(2, 0.1)
 
     -----------------------------------------------------
-    local arrow_sphere_emitter = CreateSphereEmitter(0.1)
-    inst:ListenForEvent("inst._event", function()
-        local pos = Vector3(inst._velocity_x:value(), inst._velocity_y:value(), inst._velocity_z:value())
-        emit_line_thin(effect, pos)
-        emit_line(effect, pos)
+    local line_sphere_emitter = CreateSphereEmitter(0.1)
+    local arrow_sphere_emitter = CreateSphereEmitter(0.2)
 
-        for i = 1, math.random(6, 8) do
-            emit_arrow(effect, arrow_sphere_emitter, pos)
+    inst:ListenForEvent("inst._event", function()
+        local velocity = Vector3(inst._velocity_x:value(), inst._velocity_y:value(), inst._velocity_z:value())
+        emit_line_thin(effect, Vector3(line_sphere_emitter()), velocity)
+        emit_line(effect, Vector3(line_sphere_emitter()), velocity)
+
+        for i = 1, 8 do
+            emit_arrow(effect, Vector3(arrow_sphere_emitter()) + velocity * GetRandomMinMax(-2, 2), velocity)
+            -- print(effect:GetNumLiveParticles(2))
         end
     end)
 
@@ -253,18 +292,40 @@ local function explovfxfn()
     local effect = inst.entity:AddVFXEffect()
     effect:InitEmitters(2)
 
-    InitCommonVFX(inst, effect)
+    -- vERY thin yellow line in the flame middle
+    effect:SetRenderResources(0, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    effect:SetRotateOnVelocity(0, true)
     effect:SetMaxNumParticles(0, 8)
+    effect:SetMaxLifetime(0, MAX_LIFETIME)
+    effect:SetColourEnvelope(0, COLOUR_ENVELOPE_NAME_SMOKE_YELLOW)
+    effect:SetScaleEnvelope(0, SCALE_ENVELOPE_NAME_SMOKE_VERY_THIN)
+    effect:SetBlendMode(0, BLENDMODE.AlphaBlended)
+    effect:EnableBloomPass(0, true)
+    effect:SetRadius(0, 1)
+    effect:SetSortOffset(0, 1)
+
+    -- Thin red line of the flame
+    effect:SetRenderResources(1, ANIM_SMOKE_TEXTURE, REVEAL_SHADER)
+    effect:SetRotateOnVelocity(1, true)
     effect:SetMaxNumParticles(1, 8)
+    effect:SetMaxLifetime(1, MAX_LIFETIME)
+    effect:SetColourEnvelope(1, COLOUR_ENVELOPE_NAME_SMOKE_RED)
+    effect:SetScaleEnvelope(1, SCALE_ENVELOPE_NAME_SMOKE_THIN)
+    effect:SetBlendMode(1, BLENDMODE.AlphaBlended)
+    effect:EnableBloomPass(1, true)
+    effect:SetRadius(1, 1)
+    effect:SetSortOffset(1, 0)
 
     -----------------------------------------------------
     local norm_sphere_emitter = CreateSphereEmitter(1)
     EmitterManager:AddEmitter(inst, FRAMES * 3, function()
         for i = 1, 8 do
-            local pos = Vector3(norm_sphere_emitter()) * 0.4
-            pos.y = math.abs(pos.y)
-            emit_line_thin(effect, pos)
-            emit_line(effect, pos)
+            local velocity = Vector3(norm_sphere_emitter()) * 0.3
+            velocity.y = math.abs(velocity.y)
+            -- local pos = Vector3(line_sphere_emitter())
+            local pos = velocity:GetNormalized() * 0.66
+            emit_line_thin(effect, pos, velocity)
+            emit_line(effect, pos, velocity)
         end
     end)
 
@@ -312,7 +373,35 @@ local function explofxfn()
     return inst
 end
 
+
+
 return Prefab("gale_skill_hyperburn_line_vfx", linevfxfn, assets),
     Prefab("gale_skill_hyperburn_explo_vfx", explovfxfn, assets),
     Prefab("gale_skill_hyperburn_line_fx", linefxfn),
-    Prefab("gale_skill_hyperburn_explo_fx", explofxfn)
+    Prefab("gale_skill_hyperburn_explo_fx", explofxfn),
+    GaleEntity.CreateNormalFx({
+        prefabname = "gale_skill_hyperburn_burntground",
+        assets = {
+            Asset("ANIM", "anim/burntground.zip"),
+        },
+
+        bank = "burntground",
+        build = "burntground",
+        anim = "idle",
+        animover_remove = false,
+
+        clientfn = function(inst)
+            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+            inst.AnimState:SetLayer(LAYER_BACKGROUND)
+            inst.AnimState:SetSortOrder(3)
+        end,
+
+        serverfn = function(inst)
+            inst.Transform:SetRotation(math.random() * 360)
+
+            inst:DoTaskInTime(GetRandomMinMax(3, 5), function()
+                GaleCommon.FadeTo(inst, 1, nil, { Vector4(1, 1, 1, 1), Vector4(0, 0, 0, 0) }, nil, inst.Remove)
+            end)
+        end,
+
+    })
