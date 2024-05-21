@@ -403,5 +403,42 @@ return Prefab("gale_skill_hyperburn_line_vfx", linevfxfn, assets),
                 GaleCommon.FadeTo(inst, 1, nil, { Vector4(1, 1, 1, 1), Vector4(0, 0, 0, 0) }, nil, inst.Remove)
             end)
         end,
+    }),
 
+    GaleEntity.CreateNormalFx({
+        prefabname = "gale_skill_hyperburn_ping_fx",
+        assets = {
+            Asset("ANIM", "anim/deerclops_mutated_actions.zip"),
+            Asset("ANIM", "anim/deerclops_mutated.zip"),
+            Asset("ANIM", "anim/deer_ice_circle.zip"),
+        },
+
+        bank = "deerclops",
+        build = "deerclops_mutated",
+        animover_remove = false,
+
+        clientfn = function(inst)
+            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+            inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)
+            inst.AnimState:SetSortOrder(3)
+            inst.AnimState:SetFinalOffset(1)
+
+            inst.AnimState:PlayAnimation("target_fx_pre")
+            inst.AnimState:PushAnimation("target_fx", true)
+
+            inst.AnimState:SetMultColour(1, 0, 0, 1)
+
+            local ICE_LANCE_RADIUS = 5.5
+            local my_dist = 2.5
+            local s = my_dist / ICE_LANCE_RADIUS
+
+            inst.Transform:SetScale(s, s, s)
+        end,
+
+        serverfn = function(inst)
+            inst.KillFX = function(inst)
+                inst.AnimState:PlayAnimation("target_fx_pst")
+                inst:ListenForEvent("animover", inst.Remove)
+            end
+        end,
     })
