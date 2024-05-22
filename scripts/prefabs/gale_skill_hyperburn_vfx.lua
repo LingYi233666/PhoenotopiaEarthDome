@@ -255,7 +255,6 @@ local function linevfxfn()
 
         for i = 1, 8 do
             emit_arrow(effect, Vector3(arrow_sphere_emitter()) + velocity * GetRandomMinMax(-2, 2), velocity)
-            -- print(effect:GetNumLiveParticles(2))
         end
     end)
 
@@ -318,14 +317,18 @@ local function explovfxfn()
 
     -----------------------------------------------------
     local norm_sphere_emitter = CreateSphereEmitter(1)
-    EmitterManager:AddEmitter(inst, FRAMES * 3, function()
-        for i = 1, 8 do
-            local velocity = Vector3(norm_sphere_emitter()) * 0.3
-            velocity.y = math.abs(velocity.y)
-            -- local pos = Vector3(line_sphere_emitter())
-            local pos = velocity:GetNormalized() * 0.66
-            emit_line_thin(effect, pos, velocity)
-            emit_line(effect, pos, velocity)
+    local remain_time = FRAMES * 3
+    EmitterManager:AddEmitter(inst, nil, function()
+        if remain_time > 0 then
+            for i = 1, 8 do
+                local velocity = Vector3(norm_sphere_emitter()) * 0.3
+                velocity.y = math.abs(velocity.y)
+                -- local pos = Vector3(line_sphere_emitter())
+                local pos = velocity:GetNormalized() * 0.66
+                emit_line_thin(effect, pos, velocity)
+                emit_line(effect, pos, velocity)
+            end
+            remain_time = remain_time - FRAMES
         end
     end)
 
@@ -369,6 +372,31 @@ local function explofxfn()
     inst.vfx = inst:SpawnChild("gale_skill_hyperburn_explo_vfx")
 
     inst:DoTaskInTime(10 * FRAMES, inst.Remove)
+
+    return inst
+end
+
+local function ping_CreateDisc(r, g, b, a)
+    local inst = CreateEntity()
+
+    inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+    --[[Non-networked entity]]
+    --inst.entity:SetCanSleep(false) --use parent sleep
+    inst.persists = false
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+
+    inst.AnimState:SetBank("deerclops")
+    inst.AnimState:SetBuild("deerclops_mutated")
+    inst.AnimState:PlayAnimation("target_fx_ring")
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:SetLayer(LAYER_WORLD_BACKGROUND)
+    inst.AnimState:SetSortOrder(3)
+    inst.AnimState:SetAddColour(r, g, b, a)
+    inst.AnimState:SetMultColour(r, g, b, a)
+    inst.AnimState:SetLightOverride(1)
 
     return inst
 end
@@ -426,17 +454,33 @@ return Prefab("gale_skill_hyperburn_line_vfx", linevfxfn, assets),
             inst.AnimState:PlayAnimation("target_fx_pre")
             inst.AnimState:PushAnimation("target_fx", true)
 
-            inst.AnimState:SetMultColour(1, 0, 0, 1)
+            local r, g, b, a = 1, 0, 0, 1
+            inst.AnimState:SetAddColour(r, g, b, a)
+            inst.AnimState:SetMultColour(r, g, b, a)
+            inst.AnimState:SetLightOverride(1)
 
             local ICE_LANCE_RADIUS = 5.5
-            local my_dist = 2.5
+            local my_dist = 3
             local s = my_dist / ICE_LANCE_RADIUS
 
             inst.Transform:SetScale(s, s, s)
+
+            inst._remove_dist_event = net_event(inst.GUID, "inst._remove_dist_event")
+
+            --Dedicated server does not need to spawn the local fx
+            if not TheNet:IsDedicated() then
+                inst.disc = ping_CreateDisc(r, g, b, a)
+                inst.disc.entity:SetParent(inst.entity)
+
+                inst:ListenForEvent("inst._remove_dist_event", function()
+                    inst.disc:Remove()
+                end)
+            end
         end,
 
         serverfn = function(inst)
             inst.KillFX = function(inst)
+                inst._remove_dist_event:push()
                 inst.AnimState:PlayAnimation("target_fx_pst")
                 inst:ListenForEvent("animover", inst.Remove)
             end

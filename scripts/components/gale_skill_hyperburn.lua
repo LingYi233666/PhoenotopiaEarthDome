@@ -3,7 +3,7 @@ local GaleCommon = require("util/gale_common")
 local GaleSkillHyperBurn = Class(function(self, inst)
     self.inst = inst
     self.data_list = {}
-    self.period = 8 * FRAMES
+    self.period = 4 * FRAMES
     self.task = nil
     self.launch_offset = Vector3(0, 1, 0)
 end)
@@ -56,48 +56,51 @@ function GaleSkillHyperBurn:Launch(end_pos)
         end
     end
 
-    local x, y, z = self.inst.Transform:GetWorldPosition()
-    local onocean = TheWorld.Map:IsOceanAtPoint(x, y, z)
+    local onocean = TheWorld.Map:IsOceanAtPoint(end_pos.x, 0, end_pos.z)
     local attack_dist = onocean and 2 or 3
     local fire_damage_multi = onocean and 0.25 or 1
 
     GaleCommon.AoeForEach(self.inst, end_pos, attack_dist, nil, { "INLIMBO", "FX" }, nil,
-        function(attacker, target)
-            if target.components.combat and target.components.health then
-                if attacker.components.combat:CanTarget(target) and
-                    not attacker.components.combat:IsAlly(target) then
-                    if target.components.burnable then
-                        target.components.burnable:Ignite(true, nil, attacker)
-                    end
+                          function(attacker, target)
+                              if target.components.combat and target.components.health then
+                                  if attacker.components.combat:CanTarget(target) and
+                                      not attacker.components.combat:IsAlly(target) then
+                                      if target.components.burnable then
+                                          target.components.burnable:Ignite(true, nil, attacker)
+                                      end
 
-                    if not target.components.health:IsDead() then
-                        target.components.combat:GetAttacked(attacker, GetRandomMinMax(16, 20), nil,
-                            "electric")
-                    end
+                                      if not target.components.health:IsDead() then
+                                          target.components.combat:GetAttacked(attacker, GetRandomMinMax(16, 20), nil,
+                                                                               "electric")
+                                      end
 
-                    if not target.components.health:IsDead() then
-                        target.components.health:DoFireDamage(fire_damage_multi * GetRandomMinMax(16, 20), attacker,
-                            true)
-                    end
-                end
-            elseif target.components.burnable then
-                if target:HasTag("campfire") and target.components.fueled then
-                    target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
-                else
-                    target.components.burnable:Ignite(true, nil, attacker)
-                end
-            end
-        end,
-        function(attacker, target)
-            return (target.components.combat and target.components.health)
-                or target.components.burnable
-        end
+                                      if not target.components.health:IsDead() then
+                                          target.components.health:DoFireDamage(
+                                              fire_damage_multi * GetRandomMinMax(16, 20), attacker,
+                                              true)
+                                      end
+                                  end
+                              elseif target.components.burnable then
+                                  if target:HasTag("campfire") and target.components.fueled then
+                                      target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
+                                  else
+                                      target.components.burnable:Ignite(true, nil, attacker)
+                                  end
+                              elseif target.components.perishable and target:HasTag("frozen") then
+                                  target.components.perishable:AddTime(-TUNING.PERISH_SUPERFAST)
+                              end
+                          end,
+                          function(attacker, target)
+                              return (target.components.combat and target.components.health)
+                                  or target.components.burnable
+                                  or (target.components.perishable and target:HasTag("frozen"))
+                          end
     )
 
 
     if onocean then
         local splashfx = SpawnAt("crab_king_waterspout", end_pos)
-        splashfx.Transform:SetScale(1, 0.7, 0.7)
+        splashfx.Transform:SetScale(1, 1, 1)
     else
         local groundfx = SpawnAt("gale_skill_hyperburn_burntground", end_pos, { 1.2, 1.2, 1.2 })
         local explofx = SpawnAt("gale_skill_hyperburn_explo_fx", end_pos)
