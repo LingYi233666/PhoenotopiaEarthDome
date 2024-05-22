@@ -292,6 +292,7 @@ local master_postinit = function(inst)
 	inst:AddComponent("gale_skill_phantom_create")
 	inst:AddComponent("gale_skill_linkage")
 	inst:AddComponent("gale_skill_parry")
+	inst:AddComponent("gale_skill_hyperburn")
 
 
 

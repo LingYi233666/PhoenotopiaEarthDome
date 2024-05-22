@@ -5,6 +5,7 @@ local GaleSkillHyperBurn = Class(function(self, inst)
     self.data_list = {}
     self.period = 8 * FRAMES
     self.task = nil
+    self.launch_offset = Vector3(0, 1, 0)
 end)
 
 function GaleSkillHyperBurn:ClearList()
@@ -32,7 +33,7 @@ function GaleSkillHyperBurn:GetListSize()
 end
 
 function GaleSkillHyperBurn:Launch(end_pos)
-    local start_pos = self.inst:GetPosition() + Vector3(0, 1, 0)
+    local start_pos = self.inst:GetPosition() + self.launch_offset
     local towards = end_pos - start_pos
     local towards_norm = towards:GetNormalized()
     local towards_len = towards:Length()
@@ -125,6 +126,7 @@ function GaleSkillHyperBurn:PopAndLaunch()
     if data.fx and data.fx:IsValid() then
         data.fx:KillFX()
     end
+    self.inst:ForceFacePoint(data.pos)
     self:Launch(data.pos)
 end
 

@@ -460,7 +460,10 @@ GLOBAL.GALE_SKILL_NODES = {
             Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
-            if not inst.sg:HasStateTag("dead")
+            local tar_pos = Vector3(x, y, z)
+            if inst.sg.currentstate.name == "gale_skill_hyperburn_pre" then
+                inst.components.gale_skill_hyperburn:AddPos(tar_pos)
+            elseif not inst.sg:HasStateTag("dead")
                 and not inst.sg:HasStateTag("busy")
                 and not IsEntityDeadOrGhost(inst)
                 and not (inst.components.rider and inst.components.rider:IsRiding())
@@ -474,8 +477,7 @@ GLOBAL.GALE_SKILL_NODES = {
 
                 -- inst.components.gale_magic:DoDelta(-20)
 
-                local tar_pos = Vector3(x, y, z)
-                HyperBurn(inst, inst:GetPosition() + Vector3(0, 1.0, 0), tar_pos)
+                inst.sg:GoToState("gale_skill_hyperburn_pre", { first_pos = tar_pos })
             end
         end,
     }),
@@ -1602,8 +1604,8 @@ AddStategraphState("wilson", State {
 })
 
 AddStategraphState("wilson", State {
-    name = "gale_skill_hyperburn",
-    tags = { "doing", "busy", "nopredict", "accept_new_pos" },
+    name = "gale_skill_hyperburn_pre",
+    tags = { "busy", "nopredict" },
 
     onenter = function(inst, data)
         data = data or {}
@@ -1615,37 +1617,57 @@ AddStategraphState("wilson", State {
         inst.components.gale_skill_hyperburn:ClearList()
 
         if data.first_pos then
+            inst:ForceFacePoint(data.first_pos)
             inst.components.gale_skill_hyperburn:AddPos(data.first_pos)
         end
 
-        inst.sg:SetTimeout(3)
+        inst.sg:SetTimeout(1)
     end,
 
     timeline =
     {
-        TimeEvent(7 * FRAMES, function(inst)
-            inst.sg:RemoveStateTag("busy")
+        TimeEvent(0 * FRAMES, function(inst)
+
         end),
-        TimeEvent(9 * FRAMES, function(inst)
-            inst:PerformBufferedAction()
+    },
+
+    ontimeout = function(inst)
+        inst.sg:GoToState("gale_skill_hyperburn")
+    end,
+
+    onexit = function()
+
+    end,
+})
+
+AddStategraphState("wilson", State {
+    name = "gale_skill_hyperburn",
+    tags = { "busy", "nopredict" },
+
+    onenter = function(inst)
+        inst.AnimState:PushAnimation("channel_loop", true)
+
+        local timeout = inst.components.gale_skill_hyperburn:GetTimeRemain()
+        inst.sg:SetTimeout(timeout)
+
+        inst.components.gale_skill_hyperburn:StartPeriodicLaunch()
+    end,
+
+    timeline =
+    {
+        TimeEvent(0 * FRAMES, function(inst)
+
         end),
     },
 
     ontimeout = function(inst)
         inst.AnimState:PlayAnimation("channel_pst")
+        inst.sg:GoToState("idle", true)
     end,
 
-    events =
-    {
-        EventHandler("animqueueover", function(inst)
-            if inst.AnimState:AnimDone() then
-                inst.sg:GoToState("idle")
-            end
-        end),
-    },
-
-    onexit = function()
-
+    onexit = function(inst)
+        inst.components.gale_skill_hyperburn:StopPeriodicLaunch()
+        inst.components.gale_skill_hyperburn:ClearList()
     end,
 })
 
