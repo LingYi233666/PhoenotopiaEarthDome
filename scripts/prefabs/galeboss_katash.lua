@@ -287,6 +287,15 @@ local function GenerateDashPosList(inst, target)
     return start_pos, final_pos
 end
 
+local function FoodScore(inst, food)
+    if not food.components.edible then
+        return -999
+    end
+    return food.components.edible:GetHealth(inst) * 1.0
+        + food.components.edible:GetSanity(inst) * 0.5
+        + food.components.edible:GetHunger(inst) * 0.25
+end
+
 local function AOEAttackAndStealFood(inst, radius, damage, ignore_victims, stealing)
     local steal_food_victim_tab = {}
     local function TempCallback(_, data)
@@ -296,13 +305,14 @@ local function AOEAttackAndStealFood(inst, radius, damage, ignore_victims, steal
                 return not item:HasTag("nosteal") and inst.components.eater:CanEat(item)
             end)
 
-            table.sort(steal_foods, function(a, b)
-                return a.components.edible:GetHealth(inst) > b.components.edible:GetHealth(inst)
-                    or a.components.edible:GetSanity(inst) > b.components.edible:GetSanity(inst)
-                    or a.components.edible:GetHunger(inst) > b.components.edible:GetHunger(inst)
-            end)
-
             if steal_foods and #steal_foods > 0 then
+                table.sort(steal_foods, function(a, b)
+                    -- return a.components.edible:GetHealth(inst) > b.components.edible:GetHealth(inst)
+                    --     or a.components.edible:GetSanity(inst) > b.components.edible:GetSanity(inst)
+                    --     or a.components.edible:GetHunger(inst) > b.components.edible:GetHunger(inst)
+                    return FoodScore(inst, a) > FoodScore(inst, b)
+                end)
+
                 table.insert(steal_food_victim_tab, {
                     data.target, steal_foods[1]
                 })

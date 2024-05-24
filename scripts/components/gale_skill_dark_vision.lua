@@ -89,7 +89,7 @@ function GaleSkillDarkVision:Enable(enable)
     if enable then
         self.inst:AddTag("crazy")
         self.inst.components.grue:AddImmunity(DARK_VISION_GRUEIMMUNITY_NAME)
-        self.inst.components.gale_magic:AddDeltaTask("gale_skill_dark_vision", -1)
+        self.inst.components.gale_magic:AddDeltaTask("gale_skill_dark_vision", -0.2)
 
         self.inst:ListenForEvent("death", self._client_disable)
         self.inst:ListenForEvent("onremove", self._client_disable)

@@ -429,16 +429,16 @@ GLOBAL.GALE_SKILL_NODES = {
                 and not (inst.components.gale_skill_mimic and inst.components.gale_skill_mimic:IsMimic()) then
                 local last_cast_time = inst.components.gale_skiller.skillmem.LastKineticBlastTime
                 local cooldown = 4
-
+                local mgaic_cost = 10
                 if last_cast_time == nil or GetTime() - last_cast_time >= cooldown then
                     if not (inst.components.gale_magic
-                            and inst.components.gale_magic:CanUseMagic(20)) then
+                            and inst.components.gale_magic:CanUseMagic(mgaic_cost)) then
                         SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
                             STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_MAGIC)
                         return
                     end
 
-                    inst.components.gale_magic:DoDelta(-20)
+                    inst.components.gale_magic:DoDelta(-mgaic_cost)
 
                     local tar_pos = Vector3(x, y, z)
                     inst.sg:GoToState("gale_skill_kinetic_blast", tar_pos)
@@ -461,25 +461,46 @@ GLOBAL.GALE_SKILL_NODES = {
         },
         OnPressed = function(inst, x, y, z, ent)
             local tar_pos = Vector3(x, y, z)
+
+            if inst.sg.currentstate.name ~= "gale_skill_hyperburn_pre" then
+                local cooldown = 2
+                local last_cast_time = inst.components.gale_skiller.skillmem.LastHyperBurnTime
+                if GetTime() - last_cast_time < cooldown then
+                    SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
+                        string.format(STRINGS.GALE_SKILL_CAST.FAILED.COOLING_DOWN,
+                            STRINGS.GALE_UI.SKILL_NODES.HYPER_BURN.NAME,
+                            cooldown - (GetTime() - last_cast_time)))
+
+                    return
+                end
+            end
+
+            local magic_cost = 5
+            if not (inst.components.gale_magic
+                    and inst.components.gale_magic:CanUseMagic(magic_cost)) then
+                SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
+                    STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_MAGIC)
+                return
+            end
+
+            local cast_success = false
             if inst.sg.currentstate.name == "gale_skill_hyperburn_pre" then
                 if inst.components.gale_skill_hyperburn:GetListSize() < 5 then
                     inst.components.gale_skill_hyperburn:AddPos(tar_pos)
+                    cast_success = true
                 end
             elseif not inst.sg:HasStateTag("dead")
                 and not inst.sg:HasStateTag("busy")
                 and not IsEntityDeadOrGhost(inst)
                 and not (inst.components.rider and inst.components.rider:IsRiding())
                 and not (inst.components.gale_skill_mimic and inst.components.gale_skill_mimic:IsMimic()) then
-                -- if not (inst.components.gale_magic
-                --         and inst.components.gale_magic:CanUseMagic(20)) then
-                --     SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
-                --                        STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_MAGIC)
-                --     return
-                -- end
-
-                -- inst.components.gale_magic:DoDelta(-20)
-
+                cast_success = true
                 inst.sg:GoToState("gale_skill_hyperburn_pre", { first_pos = tar_pos })
+            end
+
+            if cast_success then
+                inst.components.gale_skiller.skillmem.LastHyperBurnTime = GetTime()
+                inst.components.gale_magic:DoDelta(-magic_cost)
             end
         end,
     }),
@@ -607,15 +628,15 @@ GLOBAL.GALE_SKILL_NODES = {
                     return
                 end
 
-
+                local magic_cost = 3
                 if not inst.components.gale_skill_linkage:IsLinked(ent) then
                     if not (inst.components.gale_magic
-                            and inst.components.gale_magic:CanUseMagic(3)) then
+                            and inst.components.gale_magic:CanUseMagic(magic_cost)) then
                         SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
                             STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_MAGIC)
                         return
                     end
-                    inst.components.gale_magic:DoDelta(-3)
+                    inst.components.gale_magic:DoDelta(-magic_cost)
                     inst.components.gale_skill_linkage:Add(ent)
                 else
                     inst.components.gale_skill_linkage:Remove(ent)

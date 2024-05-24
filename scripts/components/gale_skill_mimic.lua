@@ -187,7 +187,7 @@ function GaleSkillMimic:Start(target)
     --     end
     -- end)
     self.inst.components.gale_magic:AddDeltaTask("gale_skill_mimic", function()
-        return (self.mimic:HasTag("moving") or self.mimic:HasTag("busy")) and -1 or -0.1
+        return (self.mimic:HasTag("moving") or self.mimic:HasTag("busy")) and -0.2 or -0.005
     end)
 
     self.mimic.components.combat.redirectdamagefn = function()
