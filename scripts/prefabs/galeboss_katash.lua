@@ -17,16 +17,16 @@ SetSharedLootTable("galeboss_katash", {
 
 local function SelectTargetFn(inst)
     return FindEntity(inst, 20,
-        function(guy)
-            return guy ~= inst
-                and inst.components.combat:CanTarget(guy)
-                and (
-                    guy.components.combat:TargetIs(inst)
-                    or inst:IsNear(guy, 15)
-                )
-        end,
-        { "_combat", "_health" },
-        { "INLIMBO" }
+                      function(guy)
+                          return guy ~= inst
+                              and inst.components.combat:CanTarget(guy)
+                              and (
+                                  guy.components.combat:TargetIs(inst)
+                                  or inst:IsNear(guy, 15)
+                              )
+                      end,
+                      { "_combat", "_health" },
+                      { "INLIMBO" }
     )
 end
 
@@ -197,11 +197,11 @@ local function EnableStunFX(inst, enable)
     elseif not enable and inst.stun_fx then
         local fx = inst.stun_fx
         GaleCommon.FadeTo(fx, duration, nil, {
-            Vector4(1, 1, 1, 1),
-            Vector4(0, 0, 0, 0),
-        }, nil, function()
-            fx:Remove()
-        end)
+                              Vector4(1, 1, 1, 1),
+                              Vector4(0, 0, 0, 0),
+                          }, nil, function()
+                              fx:Remove()
+                          end)
         fx:DoTaskInTime(duration, fx.Remove)
         inst.stun_fx = nil
     end
@@ -256,26 +256,26 @@ local function GenerateDashPosList(inst, target)
     local targetpos = target:GetPosition()
     local distsq_thres = 8 * 8
     local offset = FindWalkableOffset(targetpos, math.random() * TWOPI, 7, 66, nil, false, function(pp)
-        if (pp - mypos):LengthSq() < distsq_thres then
-            return false
-        end
+                                          if (pp - mypos):LengthSq() < distsq_thres then
+                                              return false
+                                          end
 
 
 
-        if TheWorld.Map:IsOceanAtPoint(pp.x, 0, pp.z, true) then
-            return false
-        end
+                                          if TheWorld.Map:IsOceanAtPoint(pp.x, 0, pp.z, true) then
+                                              return false
+                                          end
 
-        local cur_offset = pp - targetpos
+                                          local cur_offset = pp - targetpos
 
-        local p2 = targetpos - cur_offset
+                                          local p2 = targetpos - cur_offset
 
-        if TheWorld.Map:IsOceanAtPoint(p2.x, 0, p2.z, true) then
-            return false
-        end
+                                          if TheWorld.Map:IsOceanAtPoint(p2.x, 0, p2.z, true) then
+                                              return false
+                                          end
 
-        return true
-    end, false, true)
+                                          return true
+                                      end, false, true)
 
     if offset == nil then
         return
@@ -301,21 +301,34 @@ local function AOEAttackAndStealFood(inst, radius, damage, ignore_victims, steal
     local function TempCallback(_, data)
         if data.redirected == nil
             and data.target.components.inventory then
-            local steal_foods = data.target.components.inventory:FindItems(function(item)
-                return not item:HasTag("nosteal") and inst.components.eater:CanEat(item)
+            local cookie = data.target.components.inventory:FindItem(function(item)
+                return item.prefab == "gale_ckptfood_dog_cookie"
             end)
 
-            if steal_foods and #steal_foods > 0 then
-                table.sort(steal_foods, function(a, b)
-                    -- return a.components.edible:GetHealth(inst) > b.components.edible:GetHealth(inst)
-                    --     or a.components.edible:GetSanity(inst) > b.components.edible:GetSanity(inst)
-                    --     or a.components.edible:GetHunger(inst) > b.components.edible:GetHunger(inst)
-                    return FoodScore(inst, a) > FoodScore(inst, b)
+            if cookie ~= nil then
+                table.insert(steal_food_victim_tab, {
+                    data.target, cookie
+                })
+            else
+                local steal_foods = data.target.components.inventory:FindItems(function(item)
+                    return not item:HasTag("nosteal") and inst.components.eater:CanEat(item)
                 end)
 
-                table.insert(steal_food_victim_tab, {
-                    data.target, steal_foods[1]
-                })
+
+                if steal_foods and #steal_foods > 1 then
+                    table.sort(steal_foods, function(a, b)
+                        -- return a.components.edible:GetHealth(inst) > b.components.edible:GetHealth(inst)
+                        --     or a.components.edible:GetSanity(inst) > b.components.edible:GetSanity(inst)
+                        --     or a.components.edible:GetHunger(inst) > b.components.edible:GetHunger(inst)
+                        return FoodScore(inst, a) > FoodScore(inst, b)
+                    end)
+                end
+
+                if steal_foods and #steal_foods > 0 then
+                    table.insert(steal_food_victim_tab, {
+                        data.target, steal_foods[1]
+                    })
+                end
             end
         end
     end
@@ -325,12 +338,12 @@ local function AOEAttackAndStealFood(inst, radius, damage, ignore_victims, steal
     end
 
     local targets = GaleCommon.AoeGetAttacked(inst, inst:GetPosition(), radius, damage,
-        function(inst, other)
-            return inst.components.combat and
-                inst.components.combat:CanTarget(other) and
-                not inst.components.combat:IsAlly(other) and
-                ignore_victims[other] == nil
-        end)
+                                              function(inst, other)
+                                                  return inst.components.combat and
+                                                      inst.components.combat:CanTarget(other) and
+                                                      not inst.components.combat:IsAlly(other) and
+                                                      ignore_victims[other] == nil
+                                              end)
 
     if stealing then
         inst:RemoveEventCallback("onhitother", TempCallback)

@@ -25,7 +25,10 @@ function GaleSkillHyperBurn:AddPos(pos)
 end
 
 function GaleSkillHyperBurn:SpawnFX(pos)
-    return SpawnAt("gale_skill_hyperburn_ping_fx", pos)
+    local onocean = TheWorld.Map:IsOceanAtPoint(pos.x, 0, pos.z)
+
+    return onocean and SpawnAt("gale_skill_hyperburn_ping_fx_ocean", pos) or
+        SpawnAt("gale_skill_hyperburn_ping_fx_ground", pos)
 end
 
 function GaleSkillHyperBurn:GetListSize()
@@ -62,41 +65,47 @@ function GaleSkillHyperBurn:Launch(end_pos)
     local damage_mult = onocean and 0.25 or 1
 
     GaleCommon.AoeForEach(self.inst, end_pos, attack_dist, nil, { "INLIMBO", "FX" }, nil,
-        function(attacker, target)
-            if target.components.combat and target.components.health then
-                if attacker.components.combat:CanTarget(target) and
-                    not attacker.components.combat:IsAlly(target) then
-                    if target.components.burnable then
-                        target.components.burnable:Ignite(true, nil, attacker)
-                    end
+                          function(attacker, target)
+                              if target.components.combat and target.components.health then
+                                  if attacker.components.combat:CanTarget(target) and
+                                      not attacker.components.combat:IsAlly(target) then
+                                      if target.components.burnable then
+                                          target.components.burnable:Ignite(true, nil, attacker)
+                                      end
 
-                    if not target.components.health:IsDead() then
-                        target.components.combat:GetAttacked(attacker, damage_mult * GetRandomMinMax(16, 20))
-                    end
+                                      if not target.components.health:IsDead() then
+                                          target.components.combat:GetAttacked(attacker,
+                                                                               damage_mult * GetRandomMinMax(16, 20))
+                                      end
 
-                    if not target.components.health:IsDead() then
-                        target.components.health:DoFireDamage(
-                            damage_mult * GetRandomMinMax(16, 20), attacker,
-                            true)
-                    end
-                end
-            elseif target.components.burnable then
-                if target:HasTag("campfire") and target.components.fueled then
-                    target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
-                else
-                    target.components.burnable:Ignite(true, nil, attacker)
-                end
-            elseif target.components.perishable and target:HasTag("frozen") then
-                target.components.perishable:AddTime(-TUNING.PERISH_SUPERFAST)
-            end
-        end,
-        function(attacker, target)
-            return (target.components.combat and target.components.health)
-                or target.components.burnable
-                or (target.components.perishable and target:HasTag("frozen"))
-        end
+                                      if not target.components.health:IsDead() then
+                                          target.components.health:DoFireDamage(
+                                              damage_mult * GetRandomMinMax(16, 20), attacker,
+                                              true)
+                                      end
+                                  end
+                              elseif target.components.burnable then
+                                  if target:HasTag("campfire") and target.components.fueled then
+                                      target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
+                                  else
+                                      target.components.burnable:Ignite(true, nil, attacker)
+                                  end
+                              elseif target.components.perishable and target:HasTag("frozen") then
+                                  target.components.perishable:AddTime(-TUNING.PERISH_SUPERFAST)
+                              end
+                          end,
+                          function(attacker, target)
+                              return (target.components.combat and target.components.health)
+                                  or target.components.burnable
+                                  or (target.components.perishable and target:HasTag("frozen"))
+                          end
     )
 
+    local explofx = SpawnAt("gale_skill_hyperburn_explo_fx", end_pos)
+    local explofx2 = SpawnAt("gale_bomb_projectile_explode", end_pos)
+
+    self.inst.SoundEmitter:PlaySound("gale_sfx/battle/active_grenade_fire")
+    explofx2.SoundEmitter:PlaySound("dontstarve/common/blackpowder_explo")
 
     if onocean then
         local splashfx = SpawnAt("crab_king_waterspout", end_pos)
@@ -104,18 +113,14 @@ function GaleSkillHyperBurn:Launch(end_pos)
         splashfx.Transform:SetScale(s, s, s)
     else
         local groundfx = SpawnAt("gale_skill_hyperburn_burntground", end_pos, { 1.2, 1.2, 1.2 })
-        local explofx = SpawnAt("gale_skill_hyperburn_explo_fx", end_pos)
-        local explofx2 = SpawnAt("gale_bomb_projectile_explode", end_pos)
-
-        explofx2.SoundEmitter:PlaySound("dontstarve/common/blackpowder_explo")
         -- explofx2.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
         -- explofx2.SoundEmitter:PlaySound("gale_sfx/battle/explode")
         -- explofx2.SoundEmitter:PlaySound("dontstarve/creatures/slurtle/explode")
         -- explofx2.SoundEmitter:PlaySound("gale_sfx/battle/p1_explode")
     end
 
-    -- self.inst.SoundEmitter:PlaySound("gale_sfx/battle/active_grenade_fire")
-    self.inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
+
+    -- self.inst.SoundEmitter:PlaySound("dontstarve/common/fireAddFuel")
     -- self.inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_explo")
 
     ShakeAllCameras(CAMERASHAKE.FULL, .35, .015, 0.8, end_pos, 33)

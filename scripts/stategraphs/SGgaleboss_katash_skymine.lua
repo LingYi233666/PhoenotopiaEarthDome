@@ -242,16 +242,16 @@ local states = {
         end,
 
         timeline = {
-            TimeEvent(2, function(inst)
-                inst:EnableBeep(0.5)
+            TimeEvent(1, function(inst)
+                inst:EnableBeep(0.4)
             end),
 
-            TimeEvent(6, function(inst)
+            TimeEvent(4.5, function(inst)
                 inst:EnableBeep(0.25)
             end),
 
             TimeEvent(8, function(inst)
-                inst:EnableBeep(0.1)
+                inst:EnableBeep(0.15)
             end),
         },
 
