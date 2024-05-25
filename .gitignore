@@ -2,8 +2,7 @@ gale_exported
 gale_images
 resources
 tiled
-gale_sfx_back
-gale_sound_pack_old
+unused_sound
 *.txt
 *.log
 *.png
