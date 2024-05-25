@@ -2,6 +2,8 @@ gale_exported
 gale_images
 resources
 tiled
+gale_sfx_back
+gale_sound_pack_old
 *.txt
 *.log
 *.png
@@ -21,3 +23,4 @@ tiled
 .vscode
 .idea
 .fsbcache
+*.bash
