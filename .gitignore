@@ -21,4 +21,5 @@ tiled
 .vscode
 .idea
 .fsbcache
+.git
 *.bash
