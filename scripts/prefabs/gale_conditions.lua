@@ -271,7 +271,7 @@ local data_lists = {
             inst:SetCanShow(false)
             target:AddTag("gale_skill_carry_charge_trigger")
 
-            target.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge_carry")
+            -- target.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge_carry")
             -- target.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge_carry")
 
             -- inst._on_owner_new_state = function(owner,data)
@@ -314,7 +314,7 @@ local data_lists = {
                     target:SpawnChild("condition_dread_fx")
                     -- target.components.health:Kill()
                     target.components.health:DoDelta(-target.components.health.currenthealth, nil, inst.prefab, nil, nil,
-                                                     true)
+                        true)
                 end
             end
             -- If dead,it will be removed automatically
@@ -411,12 +411,12 @@ local function NormalConditionFn(data)
         if inst.condition_data.shown then
             if target:HasTag("player") then
                 SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["update_buff"], target.userid,
-                                   inst.prefab,
-                                   inst.condition_data.stacks,
-                                   inst.condition_data.buff_name,
-                                   inst.condition_data.addition_tip,
-                                   inst.condition_data.image_name,
-                                   inst.condition_data.dtype
+                    inst.prefab,
+                    inst.condition_data.stacks,
+                    inst.condition_data.buff_name,
+                    inst.condition_data.addition_tip,
+                    inst.condition_data.image_name,
+                    inst.condition_data.dtype
                 )
             end
         end
