@@ -173,7 +173,7 @@ return GaleEntity.CreateNormalEntity({
             inst.AnimState:HideSymbol("beefalo_furpatch")
 
             for i = 1, 4 do
-                inst.AnimState:SetSymbolMultColour("ice_spike" .. i, 255 / 255, 29 / 255, 9 / 255, 1)
+                -- inst.AnimState:SetSymbolMultColour("ice_spike" .. i, 255 / 255, 29 / 255, 9 / 255, 1)
                 -- inst.AnimState:HideSymbol("ice_spike" .. i)
             end
 
