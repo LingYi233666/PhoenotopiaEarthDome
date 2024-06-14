@@ -289,11 +289,18 @@ local master_postinit = function(inst)
 	inst.components.gale_status_bonus.base_value.gale_stamina = 100
 
 	inst:AddComponent("gale_skill_mimic")
+
 	inst:AddComponent("gale_skill_phantom_create")
+
 	inst:AddComponent("gale_skill_linkage")
+
 	inst:AddComponent("gale_skill_parry")
+
 	inst:AddComponent("gale_skill_hyperburn")
 
+	inst:AddComponent("gale_skill_electric_punch")
+	inst.components.gale_skill_electric_punch:CreateWeapon()
+	-- inst.components.gale_skill_electric_punch:SetEnabled(true)
 
 
 

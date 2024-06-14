@@ -1,20 +1,26 @@
 local SpDamageUtil = require("components/spdamageutil")
 
+local function IsMindless(ent)
+    if ent:HasTag("player") then
+        return false
+    end
 
--- ThePlayer.components.combat:GetAttacked(ThePlayer, 0, nil, nil, {planar = 5,gale_mental=1})
--- 心灵伤害
--- TODO: Finish gale_mental_damage_handler component
-SpDamageUtil.DefineSpType("gale_mental", {
+    return ent.brain == nil or ent:HasTag("soulless") or
+        ent:HasTag("chess") or ent:HasTag("mech")
+end
+-- ThePlayer.components.combat:GetAttacked(ThePlayer, 0, nil, nil, {planar = 5,gale_psychic=1})
+SpDamageUtil.DefineSpType("gale_psychic", {
     GetDamage = function(ent)
-        return ent.components.gale_mental_damage_handler ~= nil and ent.components.gale_mental_damage_handler:GetDamage() or
+        return ent.components.gale_spdamage_psychic ~= nil and ent.components.gale_spdamage_psychic:GetDamage() or
             0
     end,
     GetDefense = function(ent)
         local basedef = 0
-        if ent.brain == nil and not ent:HasTag("player") then
-            basedef = basedef + 10
+        if IsMindless(ent) then
+            basedef = basedef + 51
         end
-        return (ent.components.gale_mental_damage_handler ~= nil and
-            ent.components.gale_mental_damage_handler:GetDefense() or 0) + basedef
+
+        return (ent.components.gale_spdefense_psychic ~= nil and
+            ent.components.gale_spdefense_psychic:GetDefense() or 0) + basedef
     end,
 })
