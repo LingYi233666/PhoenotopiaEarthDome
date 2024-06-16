@@ -125,6 +125,8 @@ local common_postinit = function(inst)
 	inst.AnimState:HideSymbol("shadow_2")
 	inst.AnimState:HideSymbol("shadow_3")
 
+	inst.AnimState:AddOverrideBuild("gale_phantom_add")
+	inst.AnimState:SetSymbolMultColour("handswipes_fx", 0, 0, 0, 1)
 
 
 	inst:AddComponent("gale_skill_shadow_dodge")
@@ -301,6 +303,7 @@ local master_postinit = function(inst)
 	inst:AddComponent("gale_skill_electric_punch")
 	inst.components.gale_skill_electric_punch:CreateWeapon()
 	-- inst.components.gale_skill_electric_punch:SetEnabled(true)
+	-- ThePlayer.components.gale_skill_electric_punch:SetEnabled(true)
 
 
 
