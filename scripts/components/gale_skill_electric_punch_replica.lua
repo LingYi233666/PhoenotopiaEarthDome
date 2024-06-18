@@ -24,7 +24,11 @@ end
 
 function GaleSkillElectricPunch:CanPunch(target)
     if self.inst.components.gale_skill_electric_punch then
-        return self.inst.components.gale_skill_electric_punch:CanPunch()
+        return self.inst.components.gale_skill_electric_punch:CanPunch(target)
+    end
+
+    if not (target and target:IsValid()) then
+        return false
     end
 
     local range = target:GetPhysicsRadius(0) + PUNCH_RANGE_BASE

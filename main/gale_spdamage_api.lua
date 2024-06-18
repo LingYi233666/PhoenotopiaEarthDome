@@ -1,11 +1,7 @@
 local SpDamageUtil = require("components/spdamageutil")
 
 local function IsMindless(ent)
-    if ent:HasTag("player") then
-        return false
-    end
-
-    return ent.brain == nil or ent:HasTag("soulless") or
+    return (not ent:HasTag("player") and ent.brain == nil) or ent:HasTag("soulless") or
         ent:HasTag("chess") or ent:HasTag("mech")
 end
 -- ThePlayer.components.combat:GetAttacked(ThePlayer, 0, nil, nil, {planar = 5,gale_psychic=1})

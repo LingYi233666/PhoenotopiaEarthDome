@@ -453,7 +453,7 @@ table.insert(SERVER_SG, State {
             inst.AnimState:PlayAnimation("atk_prop")
             inst.SoundEmitter:PlaySound("gale_sfx/character/p1_gale_charge_atk_shout")
             inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
-                { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1) })
+                                                             { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1) })
         end),
 
         TimeEvent(10 * FRAMES, function(inst)
@@ -564,7 +564,7 @@ table.insert(SERVER_SG, State {
     timeline = {
         TimeEvent(12 * FRAMES, function(inst)
             inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
-                { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1) })
+                                                             { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1) })
             inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke", nil, nil, true)
         end),
 
@@ -856,31 +856,31 @@ table.insert(SERVER_SG, State {
 -- })
 
 table.insert(SERVER_SG,
-    State
-    {
-        name = "gale_carry_charge_pst",
-        tags = { "busy", "nopredict", "nointerrupt", "gale_carry_charge_pst" },
+             State
+             {
+                 name = "gale_carry_charge_pst",
+                 tags = { "busy", "nopredict", "nointerrupt", "gale_carry_charge_pst" },
 
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            -- inst:ClearBufferedAction()
-            inst.AnimState:PlayAnimation("pickup_pst")
-            inst.sg:SetTimeout(2)
-        end,
+                 onenter = function(inst)
+                     inst.components.locomotor:Stop()
+                     -- inst:ClearBufferedAction()
+                     inst.AnimState:PlayAnimation("pickup_pst")
+                     inst.sg:SetTimeout(2)
+                 end,
 
-        ontimeout = function(inst)
-            inst.sg:GoToState("idle")
-        end,
+                 ontimeout = function(inst)
+                     inst.sg:GoToState("idle")
+                 end,
 
-        events = {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
+                 events = {
+                     EventHandler("animover", function(inst)
+                         if inst.AnimState:AnimDone() then
+                             inst.sg:GoToState("idle")
+                         end
+                     end),
+                 },
 
-    }
+             }
 )
 
 table.insert(SERVER_SG, State {
@@ -952,27 +952,27 @@ table.insert(SERVER_SG, State {
                 shadow.AnimState:Show("ARM_carry")
                 shadow.AnimState:Hide("ARM_normal")
                 shadow.AnimState:OverrideSymbol("swap_object", "swap_gale_sky_striker_blade_fire",
-                    "swap_gale_sky_striker_blade_fire")
+                                                "swap_gale_sky_striker_blade_fire")
                 shadow.AnimState:SetPercent("multithrust", anim_data.percent)
 
                 GaleCommon.FadeTo(shadow, 0.6, nil, {
-                    Vector4(1, 1, 0, 1),
-                    Vector4(0, 0, 0, 0),
-                }, {
-                    Vector4(1, 1, 0, 1),
-                    Vector4(0, 0, 0, 0),
-                }, shadow.Remove)
+                                      Vector4(1, 1, 0, 1),
+                                      Vector4(0, 0, 0, 0),
+                                  }, {
+                                      Vector4(1, 1, 0, 1),
+                                      Vector4(0, 0, 0, 0),
+                                  }, shadow.Remove)
 
 
                 local hit_ents = GaleCommon.AoeDoAttack(inst, inst:GetPosition(), 2.2, {
-                    ignorehitrange = true,
-                    instancemult = 2.5,
-                }, function(inst, other)
-                    return not inst.sg.statemem.hitted_targets[other]
-                        and inst.components.combat
-                        and inst.components.combat:CanTarget(other)
-                        and not inst.components.combat:IsAlly(other)
-                end)
+                                                            ignorehitrange = true,
+                                                            instancemult = 2.5,
+                                                        }, function(inst, other)
+                                                            return not inst.sg.statemem.hitted_targets[other]
+                                                                and inst.components.combat
+                                                                and inst.components.combat:CanTarget(other)
+                                                                and not inst.components.combat:IsAlly(other)
+                                                        end)
 
                 -- When attack charged lightninggoat,it will go to electrocute SG,
                 -- and if you do,the inst.sg.statemem.hitted_targets will be nil here
@@ -1077,7 +1077,7 @@ table.insert(SERVER_SG, State {
     timeline = {
         TimeEvent(12 * FRAMES, function(inst)
             inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
-                { Vector4(1, 1, 0, 1), Vector4(0, 0, 0, 1) })
+                                                             { Vector4(1, 1, 0, 1), Vector4(0, 0, 0, 1) })
             inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke", nil, nil, true)
         end),
 
@@ -1096,15 +1096,15 @@ table.insert(SERVER_SG, State {
                 local radius = 0.1
                 while radius < 5 do
                     local hit_ents = GaleCommon.AoeDoAttack(inst, world_pos, radius, {
-                        ignorehitrange = true,
-                        instancemult = 3.5,
-                    }, function(inst, other)
-                        return not inst._gale_fire_dash_addition_hitted_targets
-                            [other]
-                            and inst.components.combat
-                            and inst.components.combat:CanTarget(other)
-                            and not inst.components.combat:IsAlly(other)
-                    end)
+                                                                ignorehitrange = true,
+                                                                instancemult = 3.5,
+                                                            }, function(inst, other)
+                                                                return not inst._gale_fire_dash_addition_hitted_targets
+                                                                    [other]
+                                                                    and inst.components.combat
+                                                                    and inst.components.combat:CanTarget(other)
+                                                                    and not inst.components.combat:IsAlly(other)
+                                                            end)
 
                     for k, v in pairs(hit_ents) do
                         inst._gale_fire_dash_addition_hitted_targets[v] = true
@@ -1249,21 +1249,21 @@ table.insert(SERVER_SG, State {
         -- inst.sg.statemem.hitted_targst
         local victims =
             GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst:GetPhysicsRadius(0) + 2, function(inst, other)
-                local weapon, projectile, stimuli, instancemult, ignorehitrange
-                instancemult = 0.2
-                ignorehitrange = true
+                                       local weapon, projectile, stimuli, instancemult, ignorehitrange
+                                       instancemult = 0.2
+                                       ignorehitrange = true
 
-                instancemult = instancemult * math.clamp(other:GetPhysicsRadius(0) + 0.5, 1, 3)
-                if other:HasTag("largecreature") then
-                    instancemult = instancemult * 1.2
-                end
+                                       instancemult = instancemult * math.clamp(other:GetPhysicsRadius(0) + 0.5, 1, 3)
+                                       if other:HasTag("largecreature") then
+                                           instancemult = instancemult * 1.2
+                                       end
 
-                return weapon, projectile, stimuli, instancemult, ignorehitrange
-            end, function(inst, other)
-                return inst.components.combat and inst.components.combat:CanTarget(other) and
-                    not inst.components.combat:IsAlly(other) and
-                    (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
-            end)
+                                       return weapon, projectile, stimuli, instancemult, ignorehitrange
+                                   end, function(inst, other)
+                                       return inst.components.combat and inst.components.combat:CanTarget(other) and
+                                           not inst.components.combat:IsAlly(other) and
+                                           (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
+                                   end)
 
         for k, v in pairs(victims) do
             inst.sg.statemem.hitted_targst[v] = GetTime()
@@ -1334,6 +1334,8 @@ table.insert(SERVER_SG, State {
         inst.AnimState:PlayAnimation(anims[anim_index])
 
         inst.sg.statemem.attack = (bufferedaction and bufferedaction.action == ACTIONS.ATTACK)
+
+        inst.sg:SetTimeout(12 * FRAMES)
     end,
     timeline = {
         TimeEvent(6 * FRAMES, function(inst)
@@ -1352,15 +1354,21 @@ table.insert(SERVER_SG, State {
             else
                 inst:ClearBufferedAction()
             end
-        end),
-
-        TimeEvent(12 * FRAMES, function(inst)
             inst.sg:RemoveStateTag("abouttoattack")
-            inst.sg:RemoveStateTag("attack")
         end),
     },
 
+    ontimeout = function(inst)
+        inst.sg:RemoveStateTag("attack")
+        inst.sg:AddStateTag("idle")
+        inst.sg:GoToState("idle", true)
+    end,
+
+
     events = {
+        EventHandler("equip", function(inst)
+            inst.sg:GoToState("idle")
+        end),
         EventHandler("unequip", function(inst)
             inst.sg:GoToState("idle")
         end),
@@ -1839,31 +1847,31 @@ table.insert(CLIENT_SG, State {
 -- })
 
 table.insert(CLIENT_SG,
-    State
-    {
-        name = "gale_carry_charge_pst",
-        tags = { "busy", "nointerrupt", "gale_carry_charge_pst" },
+             State
+             {
+                 name = "gale_carry_charge_pst",
+                 tags = { "busy", "nointerrupt", "gale_carry_charge_pst" },
 
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst:ClearBufferedAction()
-            inst.AnimState:PlayAnimation("pickup_pst")
-            inst.sg:SetTimeout(2)
-        end,
+                 onenter = function(inst)
+                     inst.components.locomotor:Stop()
+                     inst:ClearBufferedAction()
+                     inst.AnimState:PlayAnimation("pickup_pst")
+                     inst.sg:SetTimeout(2)
+                 end,
 
-        ontimeout = function(inst)
-            inst.sg:GoToState("idle")
-        end,
+                 ontimeout = function(inst)
+                     inst.sg:GoToState("idle")
+                 end,
 
-        events = {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
+                 events = {
+                     EventHandler("animover", function(inst)
+                         if inst.AnimState:AnimDone() then
+                             inst.sg:GoToState("idle")
+                         end
+                     end),
+                 },
 
-    }
+             }
 )
 
 table.insert(CLIENT_SG, State {
@@ -1901,11 +1909,11 @@ table.insert(CLIENT_SG, State {
 
         TimeEvent(9 * FRAMES, function(inst)
             inst:ClearBufferedAction()
+            inst.sg:RemoveStateTag("abouttoattack")
         end),
     },
 
     ontimeout = function(inst)
-        inst.sg:RemoveStateTag("abouttoattack")
         inst.sg:RemoveStateTag("attack")
         inst.sg:AddStateTag("idle")
         inst.sg:GoToState("idle", true)
@@ -2382,7 +2390,7 @@ GLOBAL.GaleModAddKnockbackSG = function(sgname, add_data)
                     inst.sg.statemem.speed = 0
                 end
                 inst.Physics:SetMotorVel(inst.sg.statemem.reverse and -inst.sg.statemem.speed or inst.sg.statemem.speed,
-                    inst.sg.statemem.hspeed, 0)
+                                         inst.sg.statemem.hspeed, 0)
 
                 local x, y, z = inst:GetPosition():Get()
                 if not inst.components.amphibiouscreature and inst:IsOnOcean() and y <= 0.1 then

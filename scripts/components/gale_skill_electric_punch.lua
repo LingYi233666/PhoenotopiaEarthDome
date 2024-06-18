@@ -2,52 +2,69 @@ local function onanim_index(self, anim_index)
     self.inst.replica.gale_skill_electric_punch:SetAnimIndex(anim_index)
 end
 
+local function onenable(self, enable)
+    self.inst.replica.gale_skill_electric_punch:SetEnabled(enable)
+end
+
 local PUNCH_RANGE_BASE = 2
 
-local GaleSkillElectricPunch = Class(function(self, inst)
-    self.inst               = inst
-    self.enable             = false
-    self.anim_index         = 0
+local GaleSkillElectricPunch = Class(
+    function(self, inst)
+        self.inst               = inst
+        self.enable             = false
+        self.anim_index         = 0
 
-    self._on_perform_action = function(_, data)
-        if not self:IsEnabled() then
-            return
+        self._on_perform_action = function(_, data)
+            if not self:IsEnabled() then
+                return
+            end
+
+            local buffered_action = data.action
+            local action = buffered_action.action
+
+            if action == ACTIONS.ATTACK
+                or action == ACTIONS.CHOP
+                or action == ACTIONS.MINE
+                or action == ACTIONS.HAMMER then
+                self:PickAnimIndex()
+            end
         end
 
-        local buffered_action = data.action
-        local action = buffered_action.action
-
-        if action == ACTIONS.ATTACK
-            or action == ACTIONS.CHOP
-            or action == ACTIONS.MINE
-            or action == ACTIONS.HAMMER then
-            self:PickAnimIndex()
+        self._on_hit_other      = function(_, data)
+            if self:IsEnabled() and data.weapon == self:GetWeapon() then
+                -- if inst.components.hunger then
+                --     inst.components.hunger:DoDelta(1, true)
+                -- end
+                if inst.components.gale_magic then
+                    inst.components.gale_magic:DoDelta(-3)
+                end
+            end
         end
-    end
 
-    self._on_hit_other      = function(_, data)
-        if self:IsEnabled()
-            and data.weapon == self:GetWeapon()
-            and inst.components.gale_magic then
-            inst.components.gale_magic:DoDelta(-1)
+        self._check_gale_magic  = function()
+            if self:IsEnabled() and
+                (inst.components.gale_magic:GetPercent() <= 0
+                    or not inst.components.gale_magic:IsEnable()) then
+                self:SetEnabled(false)
+            end
         end
-    end
 
-    self._check_gale_magic  = function()
-        if self:IsEnabled() and
-            (inst.components.gale_magic:GetPercent() <= 0
-                or not inst.components.gale_magic:IsEnable()) then
-            self:SetEnabled(false)
+        self._on_equip_change   = function()
+            if self:IsEnabled() then
+                self:PickAnimIndex()
+            end
         end
-    end
 
-    inst:ListenForEvent("performaction", self._on_perform_action)
-    inst:ListenForEvent("onhitother", self._on_hit_other)
-    inst:ListenForEvent("gale_magic_delta", self._check_gale_magic)
-    inst:ListenForEvent("gale_magic_enable", self._check_gale_magic)
-end, nil, {
-    anim_index = onanim_index,
-})
+        inst:ListenForEvent("performaction", self._on_perform_action)
+        inst:ListenForEvent("onhitother", self._on_hit_other)
+        inst:ListenForEvent("gale_magic_delta", self._check_gale_magic)
+        inst:ListenForEvent("gale_magic_enable", self._check_gale_magic)
+        inst:ListenForEvent("equip", self._on_equip_change)
+        inst:ListenForEvent("unequip", self._on_equip_change)
+    end, nil, {
+        anim_index = onanim_index,
+        enable = onenable,
+    })
 
 -- inst:AddComponent("gale_skill_electric_punch")
 -- inst.components.gale_skill_electric_punch:CreateWeapon()
@@ -59,6 +76,12 @@ end
 function GaleSkillElectricPunch:SetEnabled(enable)
     self.enable = enable
     self:PickAnimIndex()
+
+    if enable then
+
+    else
+
+    end
 end
 
 function GaleSkillElectricPunch:CreateWeapon()
@@ -128,6 +151,10 @@ function GaleSkillElectricPunch:CanWork(target)
 end
 
 function GaleSkillElectricPunch:CanPunch(target)
+    if not (target and target:IsValid()) then
+        return false
+    end
+
     local range = target:GetPhysicsRadius(0) + PUNCH_RANGE_BASE
 
     return self:IsEnabled() and self:GetAnimIndex() > 0 and self:GetAnimIndex() < 3

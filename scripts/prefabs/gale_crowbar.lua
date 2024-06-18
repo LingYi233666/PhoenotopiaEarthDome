@@ -95,32 +95,35 @@ local function ChargeCommonAttackWrapper(charge_atk_range,
             inst.components.weapon.attackwear = 0
             local attack_ents_num = 0
             GaleCommon.AoeForEach(attacker, hit_pt, complete_charge_atk_range, nil, { "INLIMBO" },
-                { "_combat", "_inventoryitem" },
-                function(doer, other)
-                    local can_attack = doer.components.combat:CanTarget(other) and
-                        not doer.components.combat:IsAlly(other)
-                    local is_inv = other.components.inventoryitem ~= nil
+                                  { "_combat", "_inventoryitem" },
+                                  function(doer, other)
+                                      local can_attack = doer.components.combat:CanTarget(other) and
+                                          not doer.components.combat:IsAlly(other)
+                                      local is_inv = other.components.inventoryitem ~= nil
 
-                    if can_attack then
-                        doer.components.combat.ignorehitrange = true
-                        doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil, nil,
-                            FunctionOrValue(complete_charge_atk_damage_mult, doer, other))
-                        doer.components.combat.ignorehitrange = false
+                                      if can_attack then
+                                          doer.components.combat.ignorehitrange = true
+                                          doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
+                                                                          nil,
+                                                                          FunctionOrValue(
+                                                                              complete_charge_atk_damage_mult, doer,
+                                                                              other))
+                                          doer.components.combat.ignorehitrange = false
 
-                        other:PushEvent("knockback", { knocker = doer, radius = 8 })
+                                          other:PushEvent("knockback", { knocker = doer, radius = 8 })
 
-                        attack_ents_num = attack_ents_num + 1
-                    elseif is_inv then
-                        GaleCommon.LaunchItem(other, doer, 6.5)
-                    end
+                                          attack_ents_num = attack_ents_num + 1
+                                      elseif is_inv then
+                                          GaleCommon.LaunchItem(other, doer, 6.5)
+                                      end
 
-                    if other ~= doer then
-                        SpawnPrefab("gale_hit_color_adder"):SetTarget(other)
-                    end
-                end,
-                function(doer, other)
-                    return other and other:IsValid()
-                end)
+                                      if other ~= doer then
+                                          SpawnPrefab("gale_hit_color_adder"):SetTarget(other)
+                                      end
+                                  end,
+                                  function(doer, other)
+                                      return other and other:IsValid()
+                                  end)
 
 
             inst.components.finiteuses:Use(attack_ents_num)
@@ -202,23 +205,24 @@ local function OnSpecialAtk(owner, data)
             local hit_pos = owner:GetPosition() +
                 GaleCommon.GetFaceVector(owner) * owner.components.combat:GetHitRange() * 0.75
             GaleCommon.AoeForEach(owner, hit_pos, 2.5, nil, { "INLIMBO" }, { "_combat", "_inventoryitem" },
-                function(doer, other)
-                    local can_attack = doer.components.combat:CanTarget(other) and
-                        not doer.components.combat:IsAlly(other)
-                    local is_inv = other.components.inventoryitem ~= nil
+                                  function(doer, other)
+                                      local can_attack = doer.components.combat:CanTarget(other) and
+                                          not doer.components.combat:IsAlly(other)
+                                      local is_inv = other.components.inventoryitem ~= nil
 
-                    if can_attack then
-                        doer.components.combat.ignorehitrange = true
-                        doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil, nil,
-                            GetRandomMinMax(0.75, 1))
-                        doer.components.combat.ignorehitrange = false
-                    elseif is_inv then
-                        GaleCommon.LaunchItem(other, doer, 2)
-                    end
-                end,
-                function(doer, other)
-                    return other and other:IsValid()
-                end)
+                                      if can_attack then
+                                          doer.components.combat.ignorehitrange = true
+                                          doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
+                                                                          nil,
+                                                                          GetRandomMinMax(0.75, 1))
+                                          doer.components.combat.ignorehitrange = false
+                                      elseif is_inv then
+                                          GaleCommon.LaunchItem(other, doer, 2)
+                                      end
+                                  end,
+                                  function(doer, other)
+                                      return other and other:IsValid()
+                                  end)
 
             -- SpawnAt("gale_atk_firepuff_cold",target).Transform:SetScale(1,1,1)
             SpawnAt("gale_leap_puff_fx", hit_pos)
@@ -311,7 +315,7 @@ local function MakeCrowbar(prefabname, config)
 
         weapon_data = {
             damage = 34,
-            ranges = 0.2,
+            -- ranges = 0.2,
         },
 
         finiteuses_data = {

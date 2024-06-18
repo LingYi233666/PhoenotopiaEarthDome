@@ -126,7 +126,10 @@ local common_postinit = function(inst)
 	inst.AnimState:HideSymbol("shadow_3")
 
 	inst.AnimState:AddOverrideBuild("gale_phantom_add")
-	inst.AnimState:SetSymbolMultColour("handswipes_fx", 0, 0, 0, 1)
+	-- inst.AnimState:SetSymbolMultColour("handswipes_fx", 0, 0, 0, 1)
+	inst.AnimState:SetSymbolAddColour("handswipes_fx", 255 / 255, 255 / 255, 0 / 255, 1)
+	inst.AnimState:SetSymbolLightOverride("handswipes_fx", 1)
+
 
 
 	inst:AddComponent("gale_skill_shadow_dodge")

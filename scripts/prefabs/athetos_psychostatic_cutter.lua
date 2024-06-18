@@ -149,7 +149,7 @@ return GaleEntity.CreateNormalWeapon({
         tags = { "allow_action_on_impassable" },
 
         weapon_data = {
-            damage = 10,
+            damage = 17,
             onequip_anim_override = OnEquip,
             onunequip_anim_override = OnUnequip,
         },
@@ -184,7 +184,7 @@ return GaleEntity.CreateNormalWeapon({
             end)
 
             inst:AddComponent("gale_spdamage_psychic")
-            inst.components.gale_spdamage_psychic:SetBaseDamage(58)
+            inst.components.gale_spdamage_psychic:SetBaseDamage(51)
         end,
     }),
     GaleEntity.CreateNormalFx({
