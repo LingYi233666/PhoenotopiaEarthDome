@@ -183,7 +183,7 @@ end
 local function GetAnim(inst)
     local debug_str = inst.entity:GetDebugString()
     local bank, build, anim, frame, frame_all = string.match(debug_str,
-                                                             "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
+        "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
 
     local percent = nil
     if frame and frame_all then
@@ -446,8 +446,52 @@ local function IsTyphonTarget(v)
         or (v:HasTag("player") and v.components.gale_skiller and v.components.gale_skiller:GetTyphonSkillNum() >= 3)
 end
 
+-- Can work in both client and server side
+local function GetDestructRecipesByName(name, percent, float_to_int_fn)
+    percent = math.max(0, percent or 1)
+    float_to_int_fn = float_to_int_fn or math.floor
 
+    local recipe = AllRecipes[name]
+    if recipe == nil then
+        return {}
+    end
 
+    local tmp = {}
+    local results = {}
+    for i, v in ipairs(recipe.ingredients) do
+        if tmp[v.type] == nil then
+            tmp[v.type] = 0
+        end
+        tmp[v.type] = tmp[v.type] + v.amount
+    end
+
+    for name, cnt in pairs(tmp) do
+        local cnt_fix = float_to_int_fn(cnt * percent / recipe.numtogive)
+        if cnt_fix > 0 then
+            results[name] = cnt_fix
+        end
+    end
+
+    return results
+end
+
+-- Only work in server side
+local function GetDestructRecipesByEntity(target, percent, float_to_int_fn)
+    local recipe = AllRecipes[target.prefab]
+    if recipe == nil or FunctionOrValue(recipe.no_deconstruction, target) then
+        return {}
+    end
+
+    percent = percent or 1
+    float_to_int_fn = float_to_int_fn or math.floor
+
+    local ingredient_percent = (target.components.finiteuses ~= nil and target.components.finiteuses:GetPercent()) or
+        (target.components.fueled ~= nil and target.components.inventoryitem ~= nil and target.components.fueled:GetPercent()) or
+        (target.components.armor ~= nil and target.components.inventoryitem ~= nil and target.components.armor:GetPercent()) or
+        1
+
+    return GetDestructRecipesByName(name, percent * ingredient_percent, float_to_int_fn)
+end
 
 
 return {
@@ -495,4 +539,7 @@ return {
 
     IsTyphonTarget = IsTyphonTarget,
     IsShadowCreature = IsShadowCreature,
+
+    GetDestructRecipesByName = GetDestructRecipesByName,
+    GetDestructRecipesByEntity = GetDestructRecipesByEntity,
 }

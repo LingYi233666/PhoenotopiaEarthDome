@@ -1,14 +1,25 @@
 local GaleSkillElectricPunch = Class(function(self, inst)
     self.inst = inst
-    self.anim_index = net_byte(inst.GUID, "GaleSkillElectricPunch.anim_index")
+    self._anim_index = net_byte(inst.GUID, "GaleSkillElectricPunch._anim_index")
+    self._enabled = net_bool(inst.GUID, "GaleSkillElectricPunch._enabled")
 end)
 
+local PUNCH_RANGE_BASE = 2
+
 function GaleSkillElectricPunch:SetAnimIndex(index)
-    self.anim_index:set(index)
+    self._anim_index:set(index)
 end
 
 function GaleSkillElectricPunch:GetAnimIndex()
-    return self.anim_index:value()
+    return self._anim_index:value()
+end
+
+function GaleSkillElectricPunch:SetEnabled(enabled)
+    self._enabled:set(enabled)
+end
+
+function GaleSkillElectricPunch:IsEnabled()
+    return self._enabled:value()
 end
 
 function GaleSkillElectricPunch:CanPunch(target)
@@ -16,11 +27,14 @@ function GaleSkillElectricPunch:CanPunch(target)
         return self.inst.components.gale_skill_electric_punch:CanPunch()
     end
 
-    local range = target:GetPhysicsRadius(0) + self.inst.replica.combat._attackrange:value()
+    local range = target:GetPhysicsRadius(0) + PUNCH_RANGE_BASE
 
-
-    return self:GetAnimIndex() > 0 and self:GetAnimIndex() < 3
+    return self:IsEnabled() and self:GetAnimIndex() > 0 and self:GetAnimIndex() < 3
         and distsq(target:GetPosition(), self.inst:GetPosition()) <= range * range
+end
+
+function GaleSkillElectricPunch:CanWork(target)
+
 end
 
 return GaleSkillElectricPunch

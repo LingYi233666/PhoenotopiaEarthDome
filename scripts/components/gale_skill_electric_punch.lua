@@ -2,26 +2,52 @@ local function onanim_index(self, anim_index)
     self.inst.replica.gale_skill_electric_punch:SetAnimIndex(anim_index)
 end
 
+local PUNCH_RANGE_BASE = 2
+
 local GaleSkillElectricPunch = Class(function(self, inst)
-                                         self.inst = inst
-                                         self.enable = false
-                                         self.anim_index = 0
+    self.inst               = inst
+    self.enable             = false
+    self.anim_index         = 0
 
-                                         inst:ListenForEvent("performaction", function(_, data)
-                                             if not self.enable then
-                                                 return
-                                             end
+    self._on_perform_action = function(_, data)
+        if not self:IsEnabled() then
+            return
+        end
 
-                                             local buffered_action = data.action
-                                             local action = buffered_action.action
+        local buffered_action = data.action
+        local action = buffered_action.action
 
-                                             if action == ACTIONS.ATTACK then
-                                                 self:PickAnimIndex()
-                                             end
-                                         end)
-                                     end, nil, {
-                                         anim_index = onanim_index,
-                                     })
+        if action == ACTIONS.ATTACK
+            or action == ACTIONS.CHOP
+            or action == ACTIONS.MINE
+            or action == ACTIONS.HAMMER then
+            self:PickAnimIndex()
+        end
+    end
+
+    self._on_hit_other      = function(_, data)
+        if self:IsEnabled()
+            and data.weapon == self:GetWeapon()
+            and inst.components.gale_magic then
+            inst.components.gale_magic:DoDelta(-1)
+        end
+    end
+
+    self._check_gale_magic  = function()
+        if self:IsEnabled() and
+            (inst.components.gale_magic:GetPercent() <= 0
+                or not inst.components.gale_magic:IsEnable()) then
+            self:SetEnabled(false)
+        end
+    end
+
+    inst:ListenForEvent("performaction", self._on_perform_action)
+    inst:ListenForEvent("onhitother", self._on_hit_other)
+    inst:ListenForEvent("gale_magic_delta", self._check_gale_magic)
+    inst:ListenForEvent("gale_magic_enable", self._check_gale_magic)
+end, nil, {
+    anim_index = onanim_index,
+})
 
 -- inst:AddComponent("gale_skill_electric_punch")
 -- inst.components.gale_skill_electric_punch:CreateWeapon()
@@ -75,13 +101,6 @@ function GaleSkillElectricPunch:PickAnimIndex()
 
     local item = self.inst.components.inventory and self.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
     if item then
-        -- if self.anim_index == 0 then
-        --     self.anim_index = math.random(2)
-        -- elseif self.anim_index == 1 then
-        --     self.anim_index = 2
-        -- else
-        --     self.anim_index = 1
-        -- end
         if self.anim_index == 0 then
             self.anim_index = 1
         else
@@ -102,11 +121,33 @@ function GaleSkillElectricPunch:GetAnimIndex()
     return self.anim_index
 end
 
+function GaleSkillElectricPunch:CanWork(target)
+    local range = target:GetPhysicsRadius(0) + PUNCH_RANGE_BASE
+
+    return self:IsEnabled() and distsq(target:GetPosition(), self.inst:GetPosition()) <= range * range
+end
+
 function GaleSkillElectricPunch:CanPunch(target)
-    local range = target:GetPhysicsRadius(0) + self.inst.components.combat.attackrange
+    local range = target:GetPhysicsRadius(0) + PUNCH_RANGE_BASE
 
     return self:IsEnabled() and self:GetAnimIndex() > 0 and self:GetAnimIndex() < 3
         and distsq(target:GetPosition(), self.inst:GetPosition()) <= range * range
+end
+
+function GaleSkillElectricPunch:OnSave()
+    local data = {
+        enable = self.enable
+    }
+
+    return data
+end
+
+function GaleSkillElectricPunch:OnLoad(data)
+    if data ~= nil then
+        if data.enable ~= nil then
+            self:SetEnabled(data.enable)
+        end
+    end
 end
 
 function GaleSkillElectricPunch:GetDebugString()
