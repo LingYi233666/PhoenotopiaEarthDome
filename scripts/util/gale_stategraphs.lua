@@ -417,6 +417,17 @@ end
 
 
 local function ServerAttackEnter(inst)
+	if inst.components.combat:InCooldown() then
+		inst.sg:RemoveStateTag("abouttoattack")
+		inst:ClearBufferedAction()
+		inst.sg:GoToState("idle", true)
+		return false
+	end
+
+	-- if inst.sg.laststate == inst.sg.currentstate then
+	-- 	inst.sg.statemem.chained = true
+	-- end
+
 	local buffaction = inst:GetBufferedAction()
 	local target = buffaction ~= nil and buffaction.target or nil
 	inst.components.combat:SetTarget(target)
@@ -428,6 +439,7 @@ local function ServerAttackEnter(inst)
 		if target:IsValid() then
 			inst:FacePoint(target:GetPosition())
 			inst.sg.statemem.attacktarget = target
+			inst.sg.statemem.retarget = target
 		end
 	end
 
@@ -435,28 +447,26 @@ local function ServerAttackEnter(inst)
 end
 
 local function ClientAttackEnter(inst)
-	local buffaction = inst:GetBufferedAction()
-	if inst.replica.combat ~= nil then
-		if inst.replica.combat:InCooldown() then
-			inst.sg:RemoveStateTag("abouttoattack")
-			inst:ClearBufferedAction()
-			inst.sg:GoToState("idle", true)
-			return false
-		end
-		inst.replica.combat:StartAttack()
+	local combat = inst.replica.combat
+	if combat:InCooldown() then
+		inst.sg:RemoveStateTag("abouttoattack")
+		inst:ClearBufferedAction()
+		inst.sg:GoToState("idle", true)
+		return false
 	end
 
+	combat:StartAttack()
 	inst.components.locomotor:Stop()
 
+	local buffaction = inst:GetBufferedAction()
 	if buffaction ~= nil then
 		inst:PerformPreviewBufferedAction()
 
 		if buffaction.target ~= nil and buffaction.target:IsValid() then
 			inst:FacePoint(buffaction.target:GetPosition())
 			inst.sg.statemem.attacktarget = buffaction.target
+			inst.sg.statemem.retarget = buffaction.target
 		end
-
-		return buffaction.target
 	end
 end
 
@@ -766,16 +776,11 @@ local function GenerateMultiShootSG_pistol()
 				name = state_name,
 				tags = { "attack", "notalking", "abouttoattack", "autopredict" },
 				onenter = function(inst)
-					if inst.components.combat:InCooldown() then
-						inst.sg:RemoveStateTag("abouttoattack")
-						inst:ClearBufferedAction()
-						inst.sg:GoToState("idle", true)
+					local target = ServerAttackEnter(inst)
+					if target == false then
 						return
 					end
 
-					local target = ServerAttackEnter(inst)
-
-					inst.sg.statemem.retarget = target
 
 					inst.AnimState:PlayAnimation("hand_shoot")
 
@@ -862,8 +867,6 @@ local function GenerateMultiShootSG_pistol()
 					if target == false then
 						return
 					end
-
-					inst.sg.statemem.retarget = target
 
 					inst.AnimState:PlayAnimation("hand_shoot")
 
