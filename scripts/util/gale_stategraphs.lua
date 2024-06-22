@@ -439,6 +439,8 @@ local function ServerAttackEnter(inst)
 		if target:IsValid() then
 			inst:FacePoint(target:GetPosition())
 			inst.sg.statemem.attacktarget = target
+
+			-- This can make quick attack
 			inst.sg.statemem.retarget = target
 		end
 	end
@@ -759,7 +761,7 @@ local function GenerateMultiShootSG_pistol()
 
 	for earlier_index = 0, 14 do
 		-- 18,21,24,27,30
-		for remove_attacktag_index = 18, 30, 3 do
+		for remove_attacktag_index = 18, 30 do
 			local earlier_time = earlier_index * FRAMES
 			local remove_attacktag_time = remove_attacktag_index * FRAMES
 			local chain_duration = remove_attacktag_time - normal_shoot_time + 5 * FRAMES

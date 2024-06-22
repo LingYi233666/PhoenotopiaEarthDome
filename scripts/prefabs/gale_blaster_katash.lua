@@ -32,7 +32,10 @@ end
 return GaleEntity.CreateNormalWeapon({
         prefabname = "gale_blaster_katash",
         assets = assets,
-        tags = { "gale_blaster", "hide_percentage" },
+        tags = {
+            "gale_blaster",
+            -- "hide_percentage",
+        },
 
         bank = "gale_blaster_katash",
         build = "gale_blaster_katash",
@@ -42,6 +45,11 @@ return GaleEntity.CreateNormalWeapon({
             imagename = "gale_blaster_katash",
             atlasname = "gale_blaster_katash",
             use_gale_item_desc = true,
+        },
+
+        finiteuses_data = {
+            maxuse = 1000,
+            -- onfinished
         },
 
         equippable_data = {
@@ -85,8 +93,9 @@ return GaleEntity.CreateNormalWeapon({
         serverfn = function(inst)
             inst.last_shoot_scale = 1
 
-            inst.components.equippable.restrictedtag = "gale"
+            -- inst.components.equippable.restrictedtag = "gale"
 
+            inst.components.weapon.attackwear = 0
             inst.components.weapon:SetProjectile("gale_fake_projectile")
             inst.components.weapon:SetOnProjectileLaunch(function(inst, attacker, target)
                 local face_vec = GaleCommon.GetFaceVector(attacker)
@@ -117,6 +126,10 @@ return GaleEntity.CreateNormalWeapon({
                     end
                     inst.last_shoot_scale = -inst.last_shoot_scale
                 end)
+
+                if inst.components.finiteuses then
+                    inst.components.finiteuses:Use(1)
+                end
             end)
 
             inst:AddComponent("gale_blaster_charge")
@@ -145,8 +158,12 @@ return GaleEntity.CreateNormalWeapon({
                 end
 
                 if doer.components.gale_stamina then
-                    doer.components.gale_stamina:DoDelta(-20)
-                    doer.components.gale_stamina:Pause(3)
+                    doer.components.gale_stamina:DoDelta(-5)
+                    doer.components.gale_stamina:Pause(1)
+                end
+
+                if inst.components.finiteuses then
+                    inst.components.finiteuses:Use(5)
                 end
             end)
 

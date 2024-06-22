@@ -173,4 +173,5 @@ return Prefab("gale_atk_firepuff_cold", cold_firepufffn, assets),
     Prefab("gale_atk_firepuff_hot", hot_firepufffn, assets),
     Prefab("gale_charge_fx", chargefn, assets),
     CreateHitFn("gale_hit_color_adder", Vector3(0, 1, 1)),
-    CreateHitFn("gale_hit_color_adder_green", Vector3(0, 1, 0))
+    CreateHitFn("gale_hit_color_adder_green", Vector3(0, 1, 0)),
+    CreateHitFn("gale_hit_color_adder_yellow", Vector3(1, 1, 0))

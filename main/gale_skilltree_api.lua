@@ -526,20 +526,31 @@ GLOBAL.GALE_SKILL_NODES = {
             Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
+            local cooldown = 1
+            local last_cast_time = inst.components.gale_skiller.skillmem.LastElectricPunchTime or 0
+            if GetTime() - last_cast_time < cooldown then
+                return
+            end
+
             if not inst.sg:HasStateTag("dead")
                 and not inst.sg:HasStateTag("busy")
                 and not IsEntityDeadOrGhost(inst)
                 and not (inst.components.rider and inst.components.rider:IsRiding()) then
-                if not (inst.components.gale_magic
-                        and inst.components.gale_magic:CanUseMagic(5)) then
+                local old_is_enable = inst.components.gale_skill_electric_punch:IsEnabled()
+                local magic_consume = (inst:IsInLight() or CanEntitySeeInDark(inst)) and 5 or 15
+                if not old_is_enable and not (inst.components.gale_magic
+                        and inst.components.gale_magic:CanUseMagic(magic_consume)) then
                     SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
                                        STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_MAGIC)
                     return
                 end
 
-                if inst.components.gale_skill_electric_punch then
-                    inst.components.gale_skill_electric_punch:SetEnabled(not inst.components.gale_skill_electric_punch
-                        :IsEnabled())
+                inst.components.gale_skiller.skillmem.LastElectricPunchTime = GetTime()
+
+                inst.components.gale_skill_electric_punch:SetEnabled(not old_is_enable)
+
+                if inst.components.gale_skill_electric_punch:IsEnabled() then
+                    inst.components.gale_magic:DoDelta(-magic_consume)
                 end
             end
         end,

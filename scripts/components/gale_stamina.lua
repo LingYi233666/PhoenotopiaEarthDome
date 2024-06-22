@@ -51,7 +51,7 @@ local GaleStamina = Class(
 						end
 
 						if weapon.prefab == "gale_blaster_katash" then
-							return 15
+							return 1
 						end
 
 						if weapon.prefab == "gale_spear" then
@@ -83,7 +83,7 @@ local GaleStamina = Class(
 
 						-- Test
 						if weapon.prefab == "gale_blaster_katash" then
-							return 3
+							return FRAMES
 						end
 
 						if weapon.prefab == "gale_spear" then
