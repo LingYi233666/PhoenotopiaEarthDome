@@ -29,6 +29,8 @@ local skilltree_Assets = {
     Asset("ATLAS", "images/ui/skill_slot/dimension_jump.xml"),
     Asset("IMAGE", "images/ui/skill_slot/doctor.tex"),
     Asset("ATLAS", "images/ui/skill_slot/doctor.xml"),
+    Asset("IMAGE", "images/ui/skill_slot/electric_punch.tex"),
+    Asset("ATLAS", "images/ui/skill_slot/electric_punch.xml"),
     Asset("IMAGE", "images/ui/skill_slot/harpy_whirl.tex"),
     Asset("ATLAS", "images/ui/skill_slot/harpy_whirl.xml"),
     Asset("IMAGE", "images/ui/skill_slot/hyper_burn.tex"),

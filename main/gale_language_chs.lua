@@ -513,9 +513,9 @@ STRINGS.RECIPE_DESC.ATHETOS_PSYCHOSTATIC_CUTTER                 = "有违道德�
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_PSYCHOSTATIC_CUTTER = "这把武器让我感到不安。"
 STRINGS.CHARACTERS.WAXWELL.DESCRIBE.ATHETOS_PSYCHOSTATIC_CUTTER = "到底是谁发明它的？肯定不是我，也不是查理！"
 STRINGS.GALE_ITEM_DESC.ATHETOS_PSYCHOSTATIC_CUTTER              = {
-	SIMPLE = "有违道德伦理的武器。",
+	SIMPLE = "有违道德伦理的武器，能造成心灵伤害。",
 	COMPLEX =
-	"刀柄内镶嵌有脑组织的武器。\n脑组织取自活生生的不死鸟失败克隆体，\n有将精神化为实体刀刃的能力。\n是有违道德伦理的武器。\n阿瑟托斯为了破解不死鸟的基因锁，\n不分昼夜地开展克隆实验，\n此武器大概是他逐渐失去理智的证明。\n战技·强袭：\n猛力挥动武器，射出光束。\n光束是由精神力量组成的，因此可以穿透障碍和敌人。",
+	"刀柄内镶嵌有脑组织的武器。\n脑组织取自活生生的不死鸟失败克隆体，\n由此产生的刀刃能造成心灵伤害。\n心灵伤害无视护甲防御，但对上没有心智的敌人时，效果不佳。\n阿瑟托斯为了破解不死鸟的基因锁，\n不分昼夜地开展克隆实验，\n此武器大概是他逐渐失去理智的证明。\n战技·强袭：\n猛力挥动武器，射出光束。\n光束是由心灵力量组成的，因此可以穿透障碍和敌人。",
 }
 
 STRINGS.NAMES.ATHETOS_MAGIC_POTION                              = "灵能兴奋剂"

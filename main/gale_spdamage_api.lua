@@ -16,6 +16,10 @@ SpDamageUtil.DefineSpType("gale_psychic", {
             basedef = basedef + 51
         end
 
+        if ent.components.sanity then
+            basedef = basedef + ent.components.sanity.current / 5
+        end
+
         return (ent.components.gale_spdefense_psychic ~= nil and
             ent.components.gale_spdefense_psychic:GetDefense() or 0) + basedef
     end,
