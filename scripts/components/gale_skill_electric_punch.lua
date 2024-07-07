@@ -181,6 +181,9 @@ function GaleSkillElectricPunch:CreateWeapon()
 
     self.punch_weapon.persists = false
 
+    self.punch_weapon:AddTag("NOCLICK")
+    self.punch_weapon:AddTag("NOBLOCK")
+
     self.punch_weapon:AddComponent("weapon")
     self.punch_weapon.components.weapon:SetDamage(34)
     self.punch_weapon.components.weapon:SetRange(0)

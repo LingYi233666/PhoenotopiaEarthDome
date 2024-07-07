@@ -169,6 +169,12 @@ AddComponentPostInit("dynamicmusic", function(self)
         "gale_bgm/bgm/final_battle_intro", --3.5s
         "gale_bgm/bgm/final_battle",
     }
+    ORIGINAL_FUNCS.TRIGGERED_DANGER_MUSIC.galeboss_katash_2 = {
+        "gale_bgm/bgm/bossfight_machines",
+        "",
+        "gale_bgm/bgm/victory_fanfare",
+    }
+
     -- Add modified Area Bgm here !
     self.area_bgm_list = {
         -- panselo = {

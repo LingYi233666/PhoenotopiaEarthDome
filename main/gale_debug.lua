@@ -21,7 +21,7 @@ GLOBAL.galetestmen = {}
 --     return old_PlaySound(self,path,...)
 -- end
 
-
+-- RevealAllMap()
 -- for x=-1000,1000,30 do for y=-1000,1000,30 do ThePlayer.player_classified.MapExplorer:RevealArea(x ,0, y) end end
 function GLOBAL.RevealAllMap()
     for x = -1000, 1000, 30 do

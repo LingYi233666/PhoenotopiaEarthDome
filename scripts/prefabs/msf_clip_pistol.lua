@@ -119,6 +119,7 @@ local function CreateClip(suffix)
             -- use_gale_item_desc = true,
             imagename = "msf_clip_pistol",
             atlasname = "msf_clip_pistol",
+            floatable_param = { "small", 0.15, 0.5 },
         },
 
 

@@ -549,6 +549,10 @@ STRINGS.NAMES.GALEBOSS_KATASH                                   = "科伯特的�
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH             = "是狼人？还是狗头人？"
 STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH                = "很爱吃狗狗饼干的外星人。"
 
+STRINGS.NAMES.GALEBOSS_KATASH_2                                 = "科伯特的卡塔什（心智遭受控制）"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_2           = "是狼人？还是狗头人？"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH_2              = "很爱吃狗狗饼干的外星人。"
+
 STRINGS.NAMES.TYPHON_MIMIC_CANCER                               = "拟态瘤"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.TYPHON_MIMIC_CANCER         = "脏兮兮的一团。"
 STRINGS.GALE_ITEM_DESC.TYPHON_MIMIC_CANCER                      = {

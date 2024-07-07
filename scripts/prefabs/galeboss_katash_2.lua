@@ -7,13 +7,13 @@ local assets = {
 
 local function SelectTargetFn(inst)
     return FindEntity(inst, 20,
-        function(guy)
-            return inst.components.combat:CanTarget(guy)
-                and (not GaleCommon.IsShadowCreature(guy) or (guy.components.combat and guy.components.combat:TargetIs(inst)))
-        end,
-        { "_combat", "_health" },
-        { "INLIMBO" },
-        { "character", "lunar_aligned", "largecreature" }
+                      function(guy)
+                          return inst.components.combat:CanTarget(guy)
+                              and (not GaleCommon.IsShadowCreature(guy) or (guy.components.combat and guy.components.combat:TargetIs(inst)))
+                      end,
+                      { "_combat", "_health" },
+                      { "INLIMBO" },
+                      { "character", "lunar_aligned", "largecreature" }
     )
 end
 
@@ -32,14 +32,16 @@ local function OnAttacked(inst, data)
 end
 
 local function EnableUpBody(inst, enabled)
-    local upbody_symbols = {
+    local hidden_symbols = {
         "arm_lower",
         "arm_upper",
+        "arm_upper_skin",
         "cheeks",
         "face",
         "hand",
         "headbase",
         "torso",
+        -- "torso_pelvis",
     }
 
     local ent = inst._up_body:value()
@@ -47,20 +49,32 @@ local function EnableUpBody(inst, enabled)
         ent = inst:SpawnChild("galeboss_katash_2_upbody")
         inst._up_body:set(ent)
         ent.entity:AddFollower()
-        ent.Follower:FollowSymbol(inst.GUID, "torso", 0, 53, 0, nil, true)
-        for _, v in pairs(upbody_symbols) do
+        -- ent.Follower:FollowSymbol(inst.GUID, "torso", 0, 53, 0, true)
+        ent.Follower:FollowSymbol(inst.GUID, "torso", 0, 53, 0, true)
+        -- ent.Follower:FollowSymbol(inst.GUID, "torso", nil, nil, nil, true)
+        -- ent.Follower:FollowSymbol(inst.GUID, "torso_pelvis", 0, 0, 0)
+
+        for _, v in pairs(hidden_symbols) do
             inst.AnimState:SetSymbolMultColour(v, 0, 0, 0, 0)
         end
     elseif not enabled and ent ~= nil then
         inst._up_body:set(nil)
         ent:Remove()
-        for _, v in pairs(upbody_symbols) do
+        for _, v in pairs(hidden_symbols) do
             inst.AnimState:SetSymbolMultColour(v, 1, 1, 1, 1)
         end
         ent = nil
     end
 
     return ent
+end
+
+local function EnableMindControledParam(inst, enabled)
+    if enabled then
+        inst.components.gale_spdamage_psychic:SetBaseDamage(34)
+    else
+        inst.components.gale_spdamage_psychic:SetBaseDamage(0)
+    end
 end
 
 local function OnLoad(inst, data)
@@ -77,6 +91,13 @@ local function AnimClientFn(inst)
     inst.AnimState:AddOverrideBuild("player_superjump")
     inst.AnimState:AddOverrideBuild("player_multithrust")
     inst.AnimState:AddOverrideBuild("player_parryblock")
+    -- inst.AnimState:AddOverrideBuild("gale_phantom_add")
+
+    -- inst.AnimState:SetSymbolAddColour("handswipes_fx", 255 / 255, 0 / 255, 255 / 255, 1)
+    -- inst.AnimState:SetSymbolLightOverride("handswipes_fx", 1)
+
+    inst.AnimState:OverrideSymbol("headbase", "galeboss_katash", "headbase_with_hair")
+    inst.AnimState:OverrideSymbol("headbase_hat", "galeboss_katash", "headbase_with_hair")
 
 
     -- inst.AnimState:Show("ARM_carry")
@@ -88,10 +109,10 @@ local function AnimClientFn(inst)
 
     inst.AnimState:Show("HEAD")
     inst.AnimState:Hide("HEAD_HAT")
+    inst.AnimState:HideSymbol("hair")
+    inst.AnimState:HideSymbol("hair_hat")
 
-    inst.AnimState:AddOverrideBuild("gale_phantom_add")
-    inst.AnimState:SetSymbolAddColour("handswipes_fx", 255 / 255, 0 / 255, 0 / 255, 1)
-    inst.AnimState:SetSymbolLightOverride("handswipes_fx", 1)
+    -- inst.AnimState:SetSymbolAddColour("face", 1, 0, 1, 1)
 end
 
 local function KatashClientFn(inst)
@@ -112,11 +133,12 @@ local function KatashClientFn(inst)
 
     -- GaleCommon.AddEpicBGM(inst, "galeboss_katash")
 
-    inst._upper_body = net_entity(inst.GUID, "inst._upper_body")
+    inst._up_body = net_entity(inst.GUID, "inst._up_body")
 end
 
 local function KatashServerFn(inst)
     inst.EnableUpBody = EnableUpBody
+    inst.EnableMindControledParam = EnableMindControledParam
     inst.OnLoad = OnLoad
 
     inst:AddComponent("timer")
@@ -132,11 +154,14 @@ local function KatashServerFn(inst)
     inst.components.health:SetMinHealth(1)
 
     inst:AddComponent("combat")
-    inst.components.combat:SetRange(15)
-    inst.components.combat:SetDefaultDamage(20)
-    inst.components.combat:SetAttackPeriod(3)
+    inst.components.combat.playerdamagepercent = 0.5
+    inst.components.combat:SetDefaultDamage(TUNING.UNARMED_DAMAGE)
+    inst.components.combat:SetAttackPeriod(TUNING.WILSON_ATTACK_PERIOD)
+    inst.components.combat:SetRange(TUNING.DEFAULT_ATTACK_RANGE)
     inst.components.combat:SetRetargetFunction(1, SelectTargetFn)
     inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
+
+    inst:AddComponent("gale_spdamage_psychic")
 
     inst:AddComponent("lootdropper")
     -- inst.components.lootdropper:SetChanceLootTable("galeboss_katash")
@@ -163,12 +188,19 @@ local function KatashServerFn(inst)
         superjump = "gale_sfx/battle/galeboss_errorbot/teleport",
     }
 
+    inst:EnableMindControledParam(true)
+
     inst:ListenForEvent("attacked", OnAttacked)
 end
 
 ----------------------------------------------------------------------------------------
 local function UpBodyClientFn(inst)
     AnimClientFn(inst)
+
+    inst.AnimState:HideSymbol("foot")
+    inst.AnimState:HideSymbol("leg")
+    inst.AnimState:HideSymbol("tail")
+    inst.AnimState:HideSymbol("torso_pelvis")
 end
 
 local function UpBodyServerFn(inst)
@@ -195,9 +227,68 @@ return GaleEntity.CreateNormalEntity({
         bank = "wilson",
         build = "galeboss_katash",
         anim = "idle",
+        persists = false,
 
-        tags = { "epic", "hostile", "character", "scarytoprey", "katash" },
+        tags = { "FX" },
 
         clientfn = UpBodyClientFn,
         serverfn = UpBodyServerFn,
+    }),
+    GaleEntity.CreateNormalFx({
+        prefabname = "galeboss_katash_2_punch_fx",
+        assets = assets,
+
+        bank = "wilson",
+        build = "galeboss_katash",
+
+        tags = { "FX", "NOCLICK" },
+
+        clientfn = function(inst)
+            local symbols = {
+                "arm_lower",
+                "arm_upper",
+                "arm_upper_skin",
+                "cheeks",
+                "face",
+                "foot",
+                "hair",
+                "hairfront",
+                "hairpigtails",
+                "hair_hat",
+                "hand",
+                "headbase",
+                "headbase_hat",
+                "headbase_with_hair",
+                "leg",
+                "skirt",
+                "SWAP_ICON",
+                "tail",
+                "torso",
+                "torso_pelvis",
+            }
+
+            for _, v in pairs(symbols) do
+                inst.AnimState:HideSymbol(v)
+            end
+
+            inst.Transform:SetFourFaced()
+
+            inst.AnimState:AddOverrideBuild("gale_phantom_add")
+            inst.AnimState:SetSymbolAddColour("handswipes_fx", 255 / 255, 0 / 255, 255 / 255, 1)
+            inst.AnimState:SetSymbolLightOverride("handswipes_fx", 1)
+
+            inst.AnimState:SetFinalOffset(2)
+        end,
+        serverfn = function(inst)
+            inst.SetAnim = function(inst, index)
+                local anims = {
+                    "atk_werewilba",
+                    "atk_2_werewilba",
+                }
+
+                inst.AnimState:PlayAnimation(anims[index])
+
+                inst.AnimState:SetTime(6 * FRAMES)
+            end
+        end,
     })
