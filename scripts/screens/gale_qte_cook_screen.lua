@@ -9,22 +9,22 @@ local GaleQteCookScreen = Class(Screen, function(self, owner, product, container
 	Screen._ctor(self, "GaleQteCookScreen")
 	TheInput:ClearCachedController()
 
-	self.owner = owner
-	self.has_ended = false
-	self.pausing = false
-	self.bar_len = 250
-	self.bar_len_vaild = 80
-	self.last_tick_time = GetTime()
+	self.owner           = owner
+	self.has_ended       = false
+	self.pausing         = false
+	self.bar_len         = 250
+	self.bar_len_vaild   = 80
+	self.last_tick_time  = GetTime()
 
-	self.product = product or "meatballs"
-	self.container = container
-	self.dot_num = dot_num or 3
-	self.per_time = per_time or 1.2
-	self.time_remain = time_remain or (self.dot_num * 2.25 * self.per_time)
-	self.max_time_remain = self.time_remain
+	self.product         = product
+	self.container       = container
+	self.dot_num         = dot_num
+	self.per_time        = per_time
+	self.time_limit      = time_remain
+	self.game_start_time = GetTime()
 
 	-- self.bar = self:AddChild(Image("images/ui/qte_cook/hud_cook_interface.xml","hud_cook_interface.tex"))
-	self.bar = self:AddChild(UIAnim())
+	self.bar             = self:AddChild(UIAnim())
 	self.bar:GetAnimState():SetBank("gale_ui_cook_remaster")
 	self.bar:GetAnimState():SetBuild("gale_ui_cook_remaster")
 	self.bar:GetAnimState():PlayAnimation("bar")
@@ -125,8 +125,16 @@ function GaleQteCookScreen:SpawnSmoke()
 
 end
 
+function GaleQteCookScreen:GetTimeRemain()
+	return GetTime() - self.game_start_time
+end
+
+function GaleQteCookScreen:GetTimeRemainPercent()
+	return self:GetTimeRemain() / self.time_limit
+end
+
 function GaleQteCookScreen:GetTickPeriod()
-	return Remap(self.time_remain / self.max_time_remain, 0, 1, 0.2, 0.55)
+	return Remap(self:GetTimeRemainPercent(), 0, 1, 0.2, 0.55)
 end
 
 function GaleQteCookScreen:OnControl(control, down)
@@ -215,8 +223,6 @@ function GaleQteCookScreen:End(end_state)
 end
 
 function GaleQteCookScreen:OnUpdate(dt)
-	local dt_refine = math.min(dt, 1 / 60)
-
 	if not self.has_ended and not self.pausing then
 		local x, y = TheSim:GetScreenPos(self.owner:GetPosition():Get())
 		self:SetPosition(x + 100, y + 140)
@@ -228,15 +234,14 @@ function GaleQteCookScreen:OnUpdate(dt)
 				self.arrow.sanityarrow:SetTint(1, 1, 1, 1)
 			end
 		end
-		self.time_remain = self.time_remain - dt_refine
-		self.cooktimer:GetAnimState():SetPercent("timer", self.time_remain / self.max_time_remain)
+		self.cooktimer:GetAnimState():SetPercent("timer", self:GetTimeRemainPercent())
 		local tick_period = self:GetTickPeriod()
 		if GetTime() - self.last_tick_time >= tick_period then
 			TheFocalPoint.SoundEmitter:PlaySoundWithParams("gale_sfx/cooking/p1_tick",
 				{ intensity = GetRandomMinMax(0.3, 0.4) })
 			self.last_tick_time = GetTime()
 		end
-		if self.time_remain <= 0 then
+		if self:GetTimeRemain() <= 0 then
 			self:End("FAILED")
 		end
 	end

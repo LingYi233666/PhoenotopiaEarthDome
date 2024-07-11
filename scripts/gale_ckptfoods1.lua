@@ -308,7 +308,7 @@ local foods = {
             return GetNum(tags, "egg") >= 1
                 and GetNum(names, "pepper", "pepper_cooked") >= 1
                 and GetNum(names, "red_cap", "blue_cap", "green_cap", "red_cap_cooked", "blue_cap_cooked",
-                           "green_cap_cooked") >= 1
+                    "green_cap_cooked") >= 1
                 and GetNum(names, "corn") >= 1
                 and GetNum(tags, "fruit") <= 0
                 and GetNum(tags, "sweetener") <= 0
@@ -367,8 +367,12 @@ local foods = {
 
     gale_ckptfood_dog_cookie = {
         test = function(cooker, names, tags)
-            return GetNum(tags, "monster") > 0
-                and GetNum(tags, "meat") > 0
+            local num_monster = GetNum(tags, "monster")
+            local num_meat = GetNum(tags, "meat")
+
+            return num_monster > 0
+                and num_meat > 0
+                and num_meat <= num_monster
         end,
         priority = 0,
         foodtype = FOODTYPE.MEAT,
@@ -401,7 +405,7 @@ local foods = {
         potlevel = "high",
         stacksize = 2,
         floater = { nil, 0.1 },
-        card_def = { ingredients = { { "meat", 3 }, { "monstermeat", 1 } } },
+        card_def = { ingredients = { { "berries", 1 }, { "monstermeat", 3 } } },
     },
 }
 
