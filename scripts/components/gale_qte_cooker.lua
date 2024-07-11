@@ -28,8 +28,7 @@ function GaleQteCooker:GetQTEData(product)
 
 	local recover_score = (recipe_data.health or 0) + (recipe_data.sanity or 0) * 0.7 + (recipe_data.hunger or 0) * 0.5
 
-	dot_num = math.clamp(cooktime * 8.25, 1, TUNING.GALECOOK.MAX_DOTS_NUM)
-	dot_num = math.ceil(dot_num)
+	dot_num = math.ceil(math.clamp(cooktime * 8.25, 1, TUNING.GALECOOK.MAX_DOTS_NUM))
 	if recipe_data.foodtype == FOODTYPE.VEGGIE then
 		dot_num = math.max(1, dot_num - 1)
 	end
@@ -52,6 +51,14 @@ function GaleQteCooker:GetQTEData(product)
 	-- per_time = per_time - 0.2
 
 	time_remain = dot_num * 2.05 * per_time * (math.clamp((recipe_data.hunger or 0) / 55, 1, 1.5))
+	return dot_num, per_time, time_remain
+end
+
+function GaleQteCooker:GetQTEData_Debug(product)
+	local dot_num = 6
+	local per_time = 1
+
+	local time_remain = dot_num * per_time
 	return dot_num, per_time, time_remain
 end
 
@@ -82,13 +89,15 @@ function GaleQteCooker:Start(doer)
 
 	self.inst.components.container:DestroyContents()
 
-	local dot_num, per_time, time_remain = self:GetQTEData(self.product)
+	-- local dot_num, per_time, time_remain = self:GetQTEData(self.product)
+	local dot_num, per_time, time_remain = self:GetQTEData_Debug(self.product)
+
 	print(self.product,
-		  string.format("QTE Data.dot_num:%.2f,per_time:%.2f,time_remain:%.2f", dot_num, per_time, time_remain))
+		string.format("QTE Data.dot_num:%.2f,per_time:%.2f,time_remain:%.2f", dot_num, per_time, time_remain))
 
 
 	SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["cook_qte_start"], doer.userid, self.product, self.inst, dot_num,
-					   per_time, time_remain)
+		per_time, time_remain)
 end
 
 function GaleQteCooker:Stop(end_state)
@@ -110,13 +119,13 @@ function GaleQteCooker:Stop(end_state)
 		if not self.doer.sg:HasStateTag("dead") then
 			if end_state ~= "INTERRUPTE" then
 				self.doer.sg:GoToState("gale_qte_cooking_pst",
-									   {
-										   end_state = end_state,
-										   product = self.product,
-										   container = self.inst,
-										   ingredient_prefabs = shallowcopy(self.ingredient_prefabs),
-										   product_stacksize = (self.product == "spoiled_food" and 1 or self.product_stacksize)
-									   })
+					{
+						end_state = end_state,
+						product = self.product,
+						container = self.inst,
+						ingredient_prefabs = shallowcopy(self.ingredient_prefabs),
+						product_stacksize = (self.product == "spoiled_food" and 1 or self.product_stacksize)
+					})
 			else
 				self.doer.sg:GoToState("idle")
 			end

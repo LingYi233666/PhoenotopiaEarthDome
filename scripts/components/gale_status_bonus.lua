@@ -1,5 +1,5 @@
-local GaleStatusBonus = Class(function(self,inst)
-    self.inst = inst 
+local GaleStatusBonus = Class(function(self, inst)
+    self.inst = inst
 
     self.base_value = {
         hunger = 100,
@@ -16,27 +16,29 @@ local GaleStatusBonus = Class(function(self,inst)
         gale_stamina = 0,
         gale_magic = 0,
     }
+
+    self.use_gale_reroll_data_handler = true
 end)
 
-function GaleStatusBonus:AddBonus(dtype,val)
-    self.bonus_value[dtype] = self.bonus_value[dtype] + val 
+function GaleStatusBonus:AddBonus(dtype, val)
+    self.bonus_value[dtype] = self.bonus_value[dtype] + val
 
     self:Apply()
 end
 
 function GaleStatusBonus:Apply()
     local hunger_percent = self.inst.components.hunger:GetPercent()
-	local health_percent = self.inst.components.health:GetPercent()
-	local sanity_percent = self.inst.components.sanity:GetPercent()
+    local health_percent = self.inst.components.health:GetPercent()
+    local sanity_percent = self.inst.components.sanity:GetPercent()
     local stamina_percent = self.inst.components.gale_stamina:GetPercent()
     local magic_percent = self.inst.components.gale_magic:GetPercent()
 
-	self.inst.components.hunger.max = self.base_value.hunger + (self.bonus_value.hunger or 0)
-	self.inst.components.health.maxhealth = self.base_value.health + (self.bonus_value.health or 0)
-	self.inst.components.sanity.max = self.base_value.sanity + (self.bonus_value.sanity or 0)
+    self.inst.components.hunger.max = self.base_value.hunger + (self.bonus_value.hunger or 0)
+    self.inst.components.health.maxhealth = self.base_value.health + (self.bonus_value.health or 0)
+    self.inst.components.sanity.max = self.base_value.sanity + (self.bonus_value.sanity or 0)
     self.inst.components.gale_stamina.max = self.base_value.gale_stamina + (self.bonus_value.gale_stamina or 0)
     self.inst.components.gale_magic.max = self.base_value.gale_magic + (self.bonus_value.gale_magic or 0)
-    
+
     self.inst.components.hunger:SetPercent(hunger_percent)
     self.inst.components.health:SetPercent(health_percent)
     self.inst.components.sanity:SetPercent(sanity_percent)
@@ -56,7 +58,7 @@ function GaleStatusBonus:OnSave()
         },
     }
 
-    return data 
+    return data
 end
 
 function GaleStatusBonus:OnLoad(data)

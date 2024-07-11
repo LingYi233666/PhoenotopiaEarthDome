@@ -16,10 +16,12 @@ local function GaleSaveForRerollWrapper(old_fn)
         -- if inst.com
 
         if inst.prefab == "gale" then
-            data.gale_skiller = inst.components.gale_skiller:OnSave()
-            data.gale_status_bonus = inst.components.gale_status_bonus:OnSave()
+            -- data.gale_skiller = inst.components.gale_skiller:OnSave()
+            -- data.gale_status_bonus = inst.components.gale_status_bonus:OnSave()
 
-            -- print(inst,"Gale SaveForReroll gale_skiller,gale_status_bonus")
+            inst.components.gale_reroll_data_handler:UpdateMemory()
+            data.gale_reroll_data_handler = inst.components.gale_reroll_data_handler:OnSave()
+
             print(inst, "Gale save for reroll")
             -- elseif inst.prefab == "wonkey" then
             --     if inst.wonkey_carried_gale_data then
@@ -31,10 +33,13 @@ local function GaleSaveForRerollWrapper(old_fn)
             --     -- print(inst,"Wonkey carry gale skiller data SaveForReroll !!!")
             --     print(inst, "Wonkey save for reroll (carry)")
         else
-            if inst.other_character_carried_gale_data then
-                data.gale_skiller = inst.other_character_carried_gale_data.gale_skiller
-                data.gale_status_bonus = inst.other_character_carried_gale_data.gale_status_bonus
-            end
+            -- if inst.other_character_carried_gale_data then
+            --     data.gale_skiller = inst.other_character_carried_gale_data.gale_skiller
+            --     data.gale_status_bonus = inst.other_character_carried_gale_data.gale_status_bonus
+            -- end
+
+            data.gale_reroll_data_handler = inst.components.gale_reroll_data_handler:OnSave()
+
 
             print(inst, "Other character save for reroll (carry)")
         end
@@ -52,13 +57,19 @@ local function GaleLoadForRerollWrapper(old_fn)
         old_fn(inst, data, ...)
 
         if inst.prefab == "gale" then
-            if data.gale_skiller ~= nil then
-                inst.components.gale_skiller:OnLoad(data.gale_skiller)
+            -- if data.gale_skiller ~= nil then
+            --     inst.components.gale_skiller:OnLoad(data.gale_skiller)
+            -- end
+            -- if data.gale_status_bonus ~= nil then
+            --     inst.components.gale_status_bonus:OnLoad(data.gale_status_bonus)
+            -- end
+
+            if data.gale_reroll_data_handler ~= nil then
+                inst.components.gale_reroll_data_handler:OnLoad(data.gale_reroll_data_handler)
+                inst.components.gale_reroll_data_handler:ApplyMemory()
             end
-            if data.gale_status_bonus ~= nil then
-                inst.components.gale_status_bonus:OnLoad(data.gale_status_bonus)
-            end
-            -- print(inst, "Gale LoadForReroll !!!")
+
+
             print(inst, "Gale load for rerool")
             -- elseif inst.prefab == "wonkey" then
             --     if inst.wonkey_carried_gale_data == nil then
@@ -70,11 +81,15 @@ local function GaleLoadForRerollWrapper(old_fn)
 
             --     print(inst, "Wonkey load for rerool (carry)")
         else
-            if inst.other_character_carried_gale_data == nil then
-                inst.other_character_carried_gale_data = {}
+            -- if inst.other_character_carried_gale_data == nil then
+            --     inst.other_character_carried_gale_data = {}
+            -- end
+            -- inst.other_character_carried_gale_data.gale_skiller = data.gale_skiller
+            -- inst.other_character_carried_gale_data.gale_status_bonus = data.gale_status_bonus
+
+            if data.gale_reroll_data_handler ~= nil then
+                inst.components.gale_reroll_data_handler:OnLoad(data.gale_reroll_data_handler)
             end
-            inst.other_character_carried_gale_data.gale_skiller = data.gale_skiller
-            inst.other_character_carried_gale_data.gale_status_bonus = data.gale_status_bonus
 
             print(inst, "Other character load for rerool (carry)")
         end
@@ -125,6 +140,8 @@ AddPlayerPostInit(function(inst)
     --     inst.SaveForReroll = GaleSaveForRerollWrapper(inst.SaveForReroll)
     --     inst.LoadForReroll = GaleLoadForRerollWrapper(inst.LoadForReroll)
     -- end
+
+    inst:AddComponent("gale_reroll_data_handler")
 
     inst.SaveForReroll = GaleSaveForRerollWrapper(inst.SaveForReroll)
     inst.LoadForReroll = GaleLoadForRerollWrapper(inst.LoadForReroll)

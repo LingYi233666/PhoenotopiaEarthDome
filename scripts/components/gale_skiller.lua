@@ -1,30 +1,32 @@
 require "json"
 
-local function onjson_data(self,data)
+local function onjson_data(self, data)
     self.inst.replica.gale_skiller:SetJsonData(data)
 end
 
-local GaleSkiller = Class(function(self,inst)
+local GaleSkiller = Class(function(self, inst)
     self.inst = inst
 
     self.learned_skill = {}
     self.unlocked_tree = {
-        "survival","science","combat",
-        "energy","morph","psy"
+        "survival", "science", "combat",
+        "energy", "morph", "psy"
     }
 
     self.skillmem = {}
     self.json_data = "{}"
 
+    self.use_gale_reroll_data_handler = true
+
     self:UpdateJsonData()
-end,nil,{
+end, nil, {
     json_data = onjson_data,
 })
 
-function GaleSkiller:Learn(name,is_onload)
+function GaleSkiller:Learn(name, is_onload)
     if self:IsLearned(name) then
-        print("[GaleSkiller]Try to learn a skill you already learned:",name)
-        return 
+        print("[GaleSkiller]Try to learn a skill you already learned:", name)
+        return
     end
 
     -- if is_onload then
@@ -40,15 +42,15 @@ function GaleSkiller:Learn(name,is_onload)
     if data then
         self.learned_skill[name] = true
         if data.OnLearned then
-            data.OnLearned(self.inst,is_onload)
+            data.OnLearned(self.inst, is_onload)
         end
 
-        self.inst:PushEvent("gale_skill_learned",{
+        self.inst:PushEvent("gale_skill_learned", {
             name = name,
             is_onload = is_onload
         })
     else
-        print("[GaleSkiller]Error:Unable to learn",name)
+        print("[GaleSkiller]Error:Unable to learn", name)
     end
 
     self:UpdateJsonData()
@@ -56,20 +58,20 @@ end
 
 function GaleSkiller:Forget(name)
     if not self:IsLearned(name) then
-        return 
+        return
     end
 
-    self.learned_skill[name] = nil 
+    self.learned_skill[name] = nil
     local data = GALE_SKILL_NODES[name:upper()].data
     if data then
         if data.OnForget then
             data.OnForget(self.inst)
         end
-        self.inst:PushEvent("gale_skill_forgot",{
+        self.inst:PushEvent("gale_skill_forgot", {
             name = name,
         })
     else
-        print("[GaleSkiller]Error:Data not found:",name)
+        print("[GaleSkiller]Error:Data not found:", name)
     end
 
     self:UpdateJsonData()
@@ -90,9 +92,9 @@ end
 
 function GaleSkiller:GetLearnedSkill()
     local ret = {}
-    for name,v in pairs(self.learned_skill) do
+    for name, v in pairs(self.learned_skill) do
         if v == true then
-            table.insert(ret,name)
+            table.insert(ret, name)
         end
     end
 
@@ -106,15 +108,15 @@ function GaleSkiller:GetTyphonSkillNum()
         GALE_SKILL_TREE.MORPH:ListByLeft(),
         GALE_SKILL_TREE.PSY:ListByLeft()
     )
-    for i=1,#typhon_skill_names do
-        local node = table.remove(typhon_skill_names,1)
-        table.insert(typhon_skill_names,node.code_name)
+    for i = 1, #typhon_skill_names do
+        local node = table.remove(typhon_skill_names, 1)
+        table.insert(typhon_skill_names, node.code_name)
     end
 
     local result = 0
-    for name,v in pairs(self.learned_skill) do
+    for name, v in pairs(self.learned_skill) do
         if v == true then
-            if table.contains(typhon_skill_names,name) then
+            if table.contains(typhon_skill_names, name) then
                 result = result + 1
             end
         end
@@ -125,21 +127,21 @@ end
 
 function GaleSkiller:GetCanUnlockSkill()
     local ret = {}
-    for _,name in pairs(self.unlocked_tree) do
+    for _, name in pairs(self.unlocked_tree) do
         local tree = GALE_SKILL_TREE[name:upper()]
-        for k,child in pairs(tree.root.childs) do
+        for k, child in pairs(tree.root.childs) do
             if not self:IsLearned(child.data.code_name) then
-                table.insert(ret,child.data.code_name)
+                table.insert(ret, child.data.code_name)
             end
         end
     end
 
-    for name,v in pairs(self.learned_skill) do
+    for name, v in pairs(self.learned_skill) do
         if v == true then
             local node = GALE_SKILL_NODES[name:upper()]
-            for k,child in pairs(node.childs) do
+            for k, child in pairs(node.childs) do
                 if not self:IsLearned(child.data.code_name) then
-                    table.insert(ret,child.data.code_name)
+                    table.insert(ret, child.data.code_name)
                 end
             end
         end
@@ -161,8 +163,8 @@ function GaleSkiller:OnLoad(data)
         if data.learned_skill then
             print("[GaleSkiller]:OnLoad() data.learned_skill:")
             dumptable(data.learned_skill)
-            for k,name in pairs(data.learned_skill) do
-                self:Learn(name,true)
+            for k, name in pairs(data.learned_skill) do
+                self:Learn(name, true)
             end
         end
     end
@@ -170,14 +172,14 @@ end
 
 function GaleSkiller:GetDebugString()
     local s = "Learned skill:"
-    for name,bool in pairs(self.learned_skill) do
+    for name, bool in pairs(self.learned_skill) do
         if bool then
-            s = s..name..","
+            s = s .. name .. ","
         end
     end
-    s = s.."  Can unlock skill:"
-    for k,name in pairs(self:GetCanUnlockSkill()) do
-        s = s..name..","
+    s = s .. "  Can unlock skill:"
+    for k, name in pairs(self:GetCanUnlockSkill()) do
+        s = s .. name .. ","
     end
     return s
 end
