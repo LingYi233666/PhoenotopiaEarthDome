@@ -15,6 +15,7 @@ tiled
 *.flac
 *.fdp
 *.fdp.bak
+*.fdp.autosave
 *.obj
 *.fobj
 *.rar

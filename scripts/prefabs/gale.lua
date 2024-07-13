@@ -165,7 +165,8 @@ local talk_alternative = {
 	"gale_sfx/character/talk/female/f_Z",
 }
 local function PlayTalkSeq(inst, data)
-	if not data.noanim and not inst:HasTag("busy") then
+	-- if not data.noanim and not inst:HasTag("busy") then
+	if not data.noanim and inst.sg:HasStateTag("idle") and not inst.sg:HasStateTag("notalking") then
 		local length = #data.message
 		length = math.clamp(length, 18, 25)
 

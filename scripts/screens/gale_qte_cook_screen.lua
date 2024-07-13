@@ -70,7 +70,7 @@ local GaleQteCookScreen = Class(Screen, function(self, owner, product, container
 	self.arrow = self:AddChild(GaleQteCookArrow())
 	self.arrow:SetScale(1.2)
 	-- self.arrow:SetPosition(300,0)
-	self.arrow:SetPosition(self.bar_len, 0)
+	self.arrow:SetPosition(-self.bar_len, 0)
 
 	self:SetDotNum(self.dot_num)
 
@@ -125,8 +125,12 @@ function GaleQteCookScreen:SpawnSmoke()
 
 end
 
-function GaleQteCookScreen:GetTimeRemain()
+function GaleQteCookScreen:GetTimeElapsed()
 	return GetTime() - self.game_start_time
+end
+
+function GaleQteCookScreen:GetTimeRemain()
+	return self.time_limit - self:GetTimeElapsed()
 end
 
 function GaleQteCookScreen:GetTimeRemainPercent()
@@ -238,7 +242,7 @@ function GaleQteCookScreen:OnUpdate(dt)
 		local tick_period = self:GetTickPeriod()
 		if GetTime() - self.last_tick_time >= tick_period then
 			TheFocalPoint.SoundEmitter:PlaySoundWithParams("gale_sfx/cooking/p1_tick",
-				{ intensity = GetRandomMinMax(0.3, 0.4) })
+														   { intensity = GetRandomMinMax(0.3, 0.4) })
 			self.last_tick_time = GetTime()
 		end
 		if self:GetTimeRemain() <= 0 then
