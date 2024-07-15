@@ -860,9 +860,9 @@ print(string.format("[GaleMod]Generate %d names for mech", #STRINGS.NAMES.GALE_N
 -- //////////////////////////////////////////////////////////////////////
 STRINGS.GALE_CHATTYNODES = {}
 
-STRINGS.GALE_CHATTYNODES.GALE = {
-	FIND_BLASTER_JAMMED = "哎呀，枪卡壳了！",
-}
+-- STRINGS.GALE_CHATTYNODES.GALE = {
+-- 	FIND_BLASTER_JAMMED = "哎呀，枪卡壳了！",
+-- }
 
 STRINGS.GALE_CHATTYNODES.GALEBOSS_ERRORBOT = {
 	NEW_TARGET = {
@@ -1218,6 +1218,12 @@ STRINGS.GALE_CHATTYNODES.ATHETOS_OPERATOR_MEDICAL = {
 	SYSTEM_ALERT = "系统告急！需要维修！请联系合格工程师。",
 	ALL_SYSTEM_OPERATIONAL = "全体系统恢复正常！谢谢你！",
 }
+
+-- //////////////////////////////////////////////////////////////////////
+--                        Other haracter speechs
+-- //////////////////////////////////////////////////////////////////////
+
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_GUN_JAMMED = "哎呀，枪卡壳了！"
 
 -- //////////////////////////////////////////////////////////////////////
 --                              Melodies

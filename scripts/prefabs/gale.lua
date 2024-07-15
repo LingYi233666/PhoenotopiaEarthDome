@@ -319,16 +319,15 @@ local master_postinit = function(inst)
 
 
 	inst:ListenForEvent("attacked", PlayAttackedSound)
-	inst:ListenForEvent("newcombattarget", AddRandomAtkTag)
-	inst:ListenForEvent("equip", RemoveAllAtkTags)
-	inst:ListenForEvent("unequip", RemoveAllAtkTags)
-	-- inst:ListenForEvent("ontalk",PlayTalkSeq)
+	-- inst:ListenForEvent("newcombattarget", AddRandomAtkTag)
+	-- inst:ListenForEvent("equip", RemoveAllAtkTags)
+	-- inst:ListenForEvent("unequip", RemoveAllAtkTags)
 
-	inst:ListenForEvent("owner_find_gale_blaster_jammed", function()
-		if not IsEntityDeadOrGhost(inst, true) then
-			inst.components.talker:Say(STRINGS.GALE_CHATTYNODES.GALE.FIND_BLASTER_JAMMED)
-		end
-	end)
+	-- inst:ListenForEvent("owner_find_gale_blaster_jammed", function()
+	-- 	if not IsEntityDeadOrGhost(inst, true) then
+	-- 		inst.components.talker:Say(STRINGS.GALE_CHATTYNODES.GALE.FIND_BLASTER_JAMMED)
+	-- 	end
+	-- end)
 end
 
 return MakePlayerCharacter("gale", prefabs, assets, common_postinit, master_postinit, start_inv)

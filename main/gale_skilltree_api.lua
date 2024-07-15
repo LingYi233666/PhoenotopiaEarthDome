@@ -1092,6 +1092,40 @@ end
 
 
 local DODGE_TIMEOUT = 0.33
+
+local function IsWeaponEquipped(inst, weapon)
+    return weapon ~= nil
+        and weapon.components.equippable ~= nil
+        and weapon.components.equippable:IsEquipped()
+        and weapon.components.inventoryitem ~= nil
+        and weapon.components.inventoryitem:IsHeldBy(inst)
+end
+
+local function ValidateGaleMultiThruster(inst)
+    return IsWeaponEquipped(inst, inst.sg.statemem.weapon) and
+        inst.sg.statemem.weapon.components.gale_multithruster ~= nil
+end
+
+local function ValidateGaleHelmSplitter(inst)
+    return IsWeaponEquipped(inst, inst.sg.statemem.weapon) and
+        inst.sg.statemem.weapon.components.gale_helmsplitter ~= nil
+end
+
+local function DoGaleThrust(inst, nosound)
+    if ValidateGaleMultiThruster(inst) then
+        inst.sg.statemem.weapon.components.gale_multithruster:DoThrust(inst, inst.sg.statemem.target)
+        if not nosound then
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
+        end
+    end
+end
+
+local function DoGaleHelmSplit(inst)
+    if ValidateGaleHelmSplitter(inst) then
+        inst.sg.statemem.weapon.components.gale_helmsplitter:DoHelmSplit(inst, inst.sg.statemem.target)
+    end
+end
+
 -- gale_dodge
 AddStategraphState("wilson",
     State
@@ -1790,70 +1824,130 @@ AddStategraphState("wilson", State {
     end,
 })
 
-State {
-    name = "gale_destruct_item",
-    tags = { "doing", "busy", "nodangle" },
+AddStategraphState("wilson",
+    State {
+        name = "gale_skill_combat_leap",
+        tags = { "attack", "abouttoattack", "busy", "nopredict" },
 
-    onenter = function(inst, data)
-        data = data or {}
-        if not data.target or not data.rewards_data then
-            inst.sg:GoToState("idle")
-            return
-        end
+        onenter = function(inst, data)
+            inst.sg.statemem.targetpos = data.targetpos
+            inst.sg.statemem.weapon = data.weapon
 
-        inst.components.locomotor:Stop()
-        if not inst.SoundEmitter:PlayingSound("make") then
-            inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
-        end
-        inst.AnimState:PlayAnimation("build_pre")
-        inst.AnimState:PushAnimation("build_loop", true)
-
-        inst.sg.statemem.target = data.target
-        inst.sg.statemem.other_consumed_items = data.other_consumed_items or {}
-        inst.sg.statemem.rewards_data = data.rewards_data
-
-        if data.destruct_tool then
-            inst.sg.statemem.destruct_tool = data.destruct_tool
-            if data.destruct_tool.components.container then
-                data.destruct_tool.components.container:Close()
-                data.destruct_tool.components.container.canbeopened = false
+            if not ValidateGaleHelmSplitter(inst) then
+                inst.sg:GoToState("idle")
+                return
             end
-        end
 
-        inst.sg:SetTimeout(1)
-    end,
+            inst.Transform:SetEightFaced()
+            inst.AnimState:PlayAnimation("atk_leap")
+            inst.SoundEmitter:PlaySound("dontstarve/common/deathpoof", nil, nil, true)
 
-    ontimeout = function(inst)
-        inst.sg:RemoveStateTag("busy")
+            inst.sg.statemem.weapon.components.gale_helmsplitter:StartHelmSplitting()
+        end,
 
-        if inst.sg.statemem.target:IsValid() then
-            inst.sg.statemem.target:Remove()
-            for k, v in pairs(inst.sg.statemem.other_consumed_items) do
-                if v:IsValid() then
-                    v:Remove()
+        timeline = {
+            TimeEvent(12 * FRAMES, function(inst)
+                inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
+                    { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1) })
+                inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke", nil, nil, true)
+            end),
+
+            TimeEvent(13 * FRAMES, function(inst)
+                DoGaleHelmSplit(inst)
+            end),
+
+            TimeEvent(18 * FRAMES, function(inst)
+                inst.sg:RemoveStateTag("abouttoattack")
+            end),
+        },
+
+        events = {
+            EventHandler("unequip", function(inst)
+                inst.sg:GoToState("idle")
+            end),
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+
+        onexit = function(inst)
+            inst.Transform:SetFourFaced()
+            if inst.sg.statemem.weapon
+                and inst.sg.statemem.weapon:IsValid()
+                and inst.sg.statemem.weapon.components.gale_helmsplitter then
+                inst.sg.statemem.weapon.components.gale_helmsplitter:StopHelmSplitting(inst)
+            end
+        end,
+    }
+)
+
+AddStategraphState("wilson",
+    State {
+        name = "gale_destruct_item",
+        tags = { "doing", "busy", "nodangle" },
+
+        onenter = function(inst, data)
+            data = data or {}
+            if not data.target or not data.rewards_data then
+                inst.sg:GoToState("idle")
+                return
+            end
+
+            inst.components.locomotor:Stop()
+            if not inst.SoundEmitter:PlayingSound("make") then
+                inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
+            end
+            inst.AnimState:PlayAnimation("build_pre")
+            inst.AnimState:PushAnimation("build_loop", true)
+
+            inst.sg.statemem.target = data.target
+            inst.sg.statemem.other_consumed_items = data.other_consumed_items or {}
+            inst.sg.statemem.rewards_data = data.rewards_data
+
+            if data.destruct_tool then
+                inst.sg.statemem.destruct_tool = data.destruct_tool
+                if data.destruct_tool.components.container then
+                    data.destruct_tool.components.container:Close()
+                    data.destruct_tool.components.container.canbeopened = false
                 end
             end
 
-            for name, cnt in pairs(inst.sg.statemem.rewards_data) do
-                for i = 1, cnt do
-                    local item = SpawnAt(name, inst)
-                    inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
+            inst.sg:SetTimeout(1)
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:RemoveStateTag("busy")
+
+            if inst.sg.statemem.target:IsValid() then
+                inst.sg.statemem.target:Remove()
+                for k, v in pairs(inst.sg.statemem.other_consumed_items) do
+                    if v:IsValid() then
+                        v:Remove()
+                    end
+                end
+
+                for name, cnt in pairs(inst.sg.statemem.rewards_data) do
+                    for i = 1, cnt do
+                        local item = SpawnAt(name, inst)
+                        inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
+                    end
                 end
             end
-        end
 
-        inst.AnimState:PlayAnimation("build_pst")
-        inst.sg:GoToState("idle", true)
-    end,
+            inst.AnimState:PlayAnimation("build_pst")
+            inst.sg:GoToState("idle", true)
+        end,
 
-    onexit = function(inst)
-        inst.SoundEmitter:KillSound("make")
-        if inst.sg.statemem.destruct_tool then
-            inst.sg.statemem.destruct_tool.components.container.canbeopened = true
-        end
-    end,
-}
-
+        onexit = function(inst)
+            inst.SoundEmitter:KillSound("make")
+            if inst.sg.statemem.destruct_tool then
+                inst.sg.statemem.destruct_tool.components.container.canbeopened = true
+            end
+        end,
+    }
+)
 ----------------------------------------------------------------------------------
 -- c_testtree(true)
 -- GLOBAL.c_testtree = function(return_whole_node)
