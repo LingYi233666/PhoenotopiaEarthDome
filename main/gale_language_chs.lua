@@ -612,7 +612,17 @@ STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_PUNCHINGBAG               = "制作它的�
 STRINGS.NAMES.GALEBOSS_KATASH_SKYMINE                           = "空雷"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_SKYMINE     = "这又是什么机械造物？"
 STRINGS.CHARACTERS.WX78.DESCRIBE.GALEBOSS_KATASH_SKYMINE        = "警告：该机器人随时有可能爆炸。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH_SKYMINE        = "皇宫里有很多这种东西。"
 
+STRINGS.NAMES.GALE_HAMMER                                       = "凯尔的大锤"
+STRINGS.RECIPE_DESC.GALE_HAMMER                                 = "能有效地发挥你的蛮力。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_HAMMER                 = "再正常不过的锤子。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_HAMMER                    = "当我的冒险结束后，可以拿它来钉钉子。"
+STRINGS.GALE_ITEM_DESC.GALE_HAMMER                              = {
+	SIMPLE = "借由蛮力挥舞的大锤。",
+	COMPLEX =
+	"使用废铁与岩石制造的大型锤。\n除了一般锤子的功能外，也能当做打击武器使用，\n摧毁护甲、击溃盾防御的效果显著。\n大锤是个重蛮力的武器，\n造成伤害时，力量的增益会以双倍计算。\n战技·抡锤：\n长按鼠标右键蓄力后，打出致命的大力挥击，\n造成巨量伤害并击退一部分敌人。",
+}
 
 -- Foods are below...
 
@@ -1409,6 +1419,11 @@ STRINGS.GALE_UI.SKILL_NODES = {
 		DESC = "使用普通攻击投出的音速矛会钉死在敌人身上，持续伤害敌人。",
 	},
 
+	COMBAT_LEAP = {
+		NAME = "战技·过顶斩击",
+		DESC = "跳劈攻击。能在所有锤类武器上使用。",
+	},
+
 	KINETIC_BLAST = {
 		NAME = "动态爆炸",
 		DESC = "释放冲击波，造成大量伤害，并震开周围的物品。需要消耗些许灵能。",
@@ -1524,8 +1539,10 @@ STRINGS.GALE_SKILL_CAST = {}
 STRINGS.GALE_SKILL_CAST.FAILED = {
 	INSUFFICIENT_MAGIC = "灵能不足！",
 	INSUFFICIENT_HEALTH = "生命值不足！",
+	INSUFFICIENT_STAMINA = "耐力值不足！",
 	COOLING_DOWN = "技能“%s”正在冷却，还需要%.1f秒才能释放。",
 	INVALID_TARGET = "指向的目标不合法。",
+	TOO_FAR = "目标过远",
 
 	NO_TARGET_ITEM = "“%s”必须以一个物品为对象才能发动。",
 	NO_TARGET_ALLY = "“%s”必须以一个盟友为对象才能发动。",

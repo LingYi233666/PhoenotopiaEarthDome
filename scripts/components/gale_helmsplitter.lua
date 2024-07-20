@@ -7,11 +7,13 @@ local GaleHelmsplitter = Class(function(self, inst)
 end)
 
 function GaleHelmsplitter:StartHelmSplitting()
-    return self.onstartfn and self.onstartfn(self.inst)
+    local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
+    return self.onstartfn and self.onstartfn(self.inst, owner)
 end
 
 function GaleHelmsplitter:StopHelmSplitting()
-    return self.onstopfn and self.onstopfn(self.inst)
+    local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
+    return self.onstopfn and self.onstopfn(self.inst, owner)
 end
 
 function GaleHelmsplitter:DoHelmSplit(doer, target)

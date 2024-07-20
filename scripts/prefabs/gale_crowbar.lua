@@ -79,15 +79,34 @@ local function ChargeCommonAttackWrapper(charge_atk_range,
             if bufferedaction.action == ACTIONS.ATTACK then
                 attacker.components.combat:DoAttack(target)
             else
-                local hit_pt = face_vec * attacker.components.combat:GetHitRange() + attacker:GetPosition()
+                -- local hit_pt = face_vec * attacker.components.combat:GetHitRange() + attacker:GetPosition()
+
+                -- inst.components.weapon.attackwear = 0
+                -- local hit_ents = GaleCommon.AoeDoAttack(attacker, hit_pt, charge_atk_range, {
+                --     ignorehitrange = true,
+                --     instancemult = charge_atk_damage_mult,
+                -- })
+                -- inst.components.finiteuses:Use(#hit_ents)
+                -- inst.components.weapon.attackwear = 1
 
                 inst.components.weapon.attackwear = 0
-                local hit_ents = GaleCommon.AoeDoAttack(attacker, hit_pt, charge_atk_range, {
-                    ignorehitrange = true,
-                    instancemult = charge_atk_damage_mult,
-                })
-                inst.components.finiteuses:Use(#hit_ents)
+                local hit_ents = GaleCommon.AoeDoAttack(attacker,
+                                                        attacker:GetPosition(),
+                                                        attacker.components.combat:GetHitRange(),
+                                                        {
+                                                            ignorehitrange = false,
+                                                            instancemult = charge_atk_damage_mult,
+                                                        },
+                                                        function(inst, other)
+                                                            local tar_deg = GaleCommon.GetFaceAngle(inst, other)
+
+                                                            return math.abs(tar_deg) <= 45
+                                                                and inst.components.combat
+                                                                and inst.components.combat:CanTarget(other)
+                                                                and not inst.components.combat:IsAlly(other)
+                                                        end)
                 inst.components.weapon.attackwear = 1
+                inst.components.finiteuses:Use(#hit_ents)
             end
         else
             local hit_pt = face_vec * attacker.components.combat:GetHitRange() + attacker:GetPosition()

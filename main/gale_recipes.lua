@@ -382,3 +382,18 @@ GaleModAddRecipe2(
     },
     { "WEAPONS" }
 )
+
+GaleModAddRecipe2(
+    "gale_hammer",
+    {
+        Ingredient("hammer", 1),
+        Ingredient("wagpunk_bits", 2),
+        Ingredient("rocks", 8),
+        Ingredient("twigs", 4),
+    },
+    TECH.SCIENCE_ONE,
+    {
+        builder_tag = "gale",
+    },
+    { "CHARACTER", "TOOLS", "WEAPONS" }
+)
