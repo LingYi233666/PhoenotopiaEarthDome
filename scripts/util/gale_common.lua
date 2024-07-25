@@ -19,8 +19,15 @@ local function GetFaceAngle(inst, target)
     return deltaangle
 end
 
-local function LaunchItem(inst, launcher, basespeed)
-    local x0, y0, z0 = launcher.Transform:GetWorldPosition()
+local function LaunchItem(inst, launcher_or_lpos, basespeed)
+    local x0, y0, z0 = 0, 0, 0
+
+    if launcher_or_lpos.entity then
+        x0, y0, z0 = launcher_or_lpos.Transform:GetWorldPosition()
+    else
+        x0, y0, z0 = launcher_or_lpos:Get()
+    end
+
     local x1, y1, z1 = inst.Transform:GetWorldPosition()
     local dx, dz = x1 - x0, z1 - z0
     local dsq = dx * dx + dz * dz
@@ -121,6 +128,18 @@ local function AoeDestroyWorkableStuff(inst, pos, radius, work_count, validfn)
     end
 
     return AoeForEach(inst, pos, radius, nil, { "INLIMBO" }, nil, applyfn, validfn)
+end
+
+local function AoeLaunchItems(pos, radius, basespeed, validfn)
+    validfn = validfn or function(_, other)
+        return other.components.inventoryitem ~= nil
+    end
+
+    local applyfn = function(_, other)
+        LaunchItem(other, pos, FunctionOrValue(basespeed, other))
+    end
+
+    return AoeForEach(nil, pos, radius, { "_inventoryitem" }, { "locomotor", "INLIMBO" }, nil, applyfn, validfn)
 end
 
 local function FadeTo(inst, duration, scales, multcolours, addcolours, onfinished)
@@ -504,6 +523,7 @@ return {
     AoeGetAttacked = AoeGetAttacked,
     AoeDoAttack = AoeDoAttack,
     AoeDestroyWorkableStuff = AoeDestroyWorkableStuff,
+    AoeLaunchItems = AoeLaunchItems,
 
 
     -- FadeOut = FadeOut,
