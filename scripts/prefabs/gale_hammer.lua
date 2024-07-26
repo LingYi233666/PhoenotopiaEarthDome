@@ -1,6 +1,5 @@
 local GaleEntity = require("util/gale_entity")
 local GaleCommon = require("util/gale_common")
-local GaleWeaponSkill = require("util/gale_weaponskill")
 local GaleCondition = require("util/gale_conditions")
 local GaleChargeableWeaponFns = require("util/gale_chargeable_weapon_fns")
 
@@ -34,7 +33,7 @@ local function OnStartHelmSplitter(inst, attacker)
     if targetpos then
         local duration = 13 * FRAMES
         local dist = (attacker:GetPosition() - targetpos):Length()
-        local dist_adjust = dist - inst.components.gale_helmsplitter.forward_offset
+        local dist_adjust = dist - inst.components.gale_helmsplitter:GetForwardOffset()
         local speed = dist_adjust / duration
         if speed > 0 then
             attacker.Physics:SetMotorVel(speed, 0, 0)
@@ -297,6 +296,6 @@ return GaleEntity.CreateNormalWeapon({
                 ChargeAttackIfNotCompleted,
                 ChargeAttackIfCompleted)
 
-        inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCb)
+        inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCbWrapper())
     end,
 })

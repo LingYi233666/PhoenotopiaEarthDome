@@ -18,6 +18,12 @@ local GaleHelmsplitter = Class(function(self, inst)
     self.oncastfn = nil
 end)
 
+----------------------------------------------------------------------------
+function GaleHelmsplitter:GetForwardOffset()
+    return self.forward_offset
+end
+
+----------------------------------------------------------------------------
 function GaleHelmsplitter:SetForwardOffset(forward_offset)
     self.forward_offset = forward_offset
 end
@@ -43,6 +49,7 @@ function GaleHelmsplitter:EnableDefaultFX(enable)
     self.use_default_fx = enable
 end
 
+----------------------------------------------------------------------------
 function GaleHelmsplitter:StartHelmSplitting()
     local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
     return self.onstartfn and self.onstartfn(self.inst, owner)

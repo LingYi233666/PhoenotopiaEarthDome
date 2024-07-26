@@ -146,33 +146,40 @@ local function WeaponAttackWrapper(ChargeAttackIfNotCompletedFn, ChargeAttackIfC
     return fn
 end
 
-local function ChargeTimeCb(inst, data)
-    local old_percent = data.old_percent
-    local percent = data.current_percent
-    local owner = inst.components.inventoryitem:GetGrandOwner()
-    local equipped = inst.components.equippable:IsEquipped()
+local function ChargeTimeCbWrapper(offset)
+    offset = offset or Vector3(0, -190, 0)
+    offset = ToVector3(offset)
 
-    if percent <= 0 or not (owner and equipped) then
-        if inst.charge_fx then
-            inst.charge_fx:KillFX()
-            inst.charge_fx = nil
-        end
-    elseif percent >= 1 and (owner and equipped) then
-        if not inst.charge_fx then
-            inst.charge_fx = SpawnPrefab("gale_charge_fx")
-            inst.charge_fx.entity:SetParent(owner.entity)
-            inst.charge_fx.entity:AddFollower()
-            inst.charge_fx.Follower:FollowSymbol(owner.GUID, "swap_object", 0, -190, 0)
-            inst.charge_fx.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge")
+    local function fn(inst, data)
+        local old_percent = data.old_percent
+        local percent = data.current_percent
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        local equipped = inst.components.equippable:IsEquipped()
+
+        if percent <= 0 or not (owner and equipped) then
+            if inst.charge_fx then
+                inst.charge_fx:KillFX()
+                inst.charge_fx = nil
+            end
+        elseif percent >= 1 and (owner and equipped) then
+            if not inst.charge_fx then
+                inst.charge_fx = SpawnPrefab("gale_charge_fx")
+                inst.charge_fx.entity:SetParent(owner.entity)
+                inst.charge_fx.entity:AddFollower()
+                inst.charge_fx.Follower:FollowSymbol(owner.GUID, "swap_object", offset:Get())
+                inst.charge_fx.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge")
+            end
         end
     end
+
+    return fn
 end
 
 return {
     MeleeAttackNonCompletedWrapper = MeleeAttackNonCompletedWrapper,
     MeleeAttackCompletedWrapper = MeleeAttackCompletedWrapper,
     WeaponAttackWrapper = WeaponAttackWrapper,
+    ChargeTimeCbWrapper = ChargeTimeCbWrapper,
 
     EmitChargeAttackFXs = EmitChargeAttackFXs,
-    ChargeTimeCb = ChargeTimeCb,
 }

@@ -13,7 +13,12 @@ local GaleMultiThruster = Class(function(self, inst)
     self.oncastfn = nil
 end)
 
+----------------------------------------------------------------------------
+function GaleMultiThruster:GetForwardOffset()
+    return self.forward_offset
+end
 
+----------------------------------------------------------------------------
 function GaleMultiThruster:SetForwardOffset(forward_offset)
     self.forward_offset = forward_offset
 end
@@ -30,6 +35,7 @@ function GaleMultiThruster:SetAttackMults(m1, m2)
     end
 end
 
+----------------------------------------------------------------------------
 function GaleMultiThruster:StartThrusting()
     local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
     return self.onstartfn and self.onstartfn(self.inst, owner)

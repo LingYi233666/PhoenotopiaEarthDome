@@ -291,7 +291,7 @@ local function ServerFn(inst)
             ChargeAttackIfNotCompleted,
             ChargeAttackIfCompleted)
 
-    inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCb)
+    inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCbWrapper())
 
     -- -- ThePlayer:AddTag("galeatk_leap")
     -- inst:ListenForEvent("equipped", function(inst, data)

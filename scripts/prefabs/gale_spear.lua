@@ -1,6 +1,7 @@
 local GaleCommon = require("util/gale_common")
 local GaleEntity = require("util/gale_entity")
 local GaleCondition = require("util/gale_conditions")
+local GaleChargeableWeaponFns = require("util/gale_chargeable_weapon_fns")
 
 local assets = {
     Asset("ANIM", "anim/gale_spear.zip"),
@@ -84,7 +85,7 @@ local function SpearServerFn(inst)
             percent >= 1 or GaleCondition.GetCondition(player, "condition_carry_charge") ~= nil)
     end
 
-    inst:ListenForEvent("gale_charge_time_change", SpearChargeTimeCb)
+    inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCbWrapper({ 0, -155, 0 }))
 end
 
 -----------------------------------------------------------------------------------------------------------------
@@ -231,7 +232,7 @@ local function OnUpdateProjectileTail(inst)
 
     local FADE_FRAMES = 5 * FRAMES
     local c = (not inst.entity:IsVisible() and 0) or
-    (inst._fade ~= nil and (FADE_FRAMES - inst._fade:value() + 1) / FADE_FRAMES) or 1
+        (inst._fade ~= nil and (FADE_FRAMES - inst._fade:value() + 1) / FADE_FRAMES) or 1
     if c > 0 then
         local tail = CreateTail()
         tail.Transform:SetPosition(inst.Transform:GetWorldPosition())
