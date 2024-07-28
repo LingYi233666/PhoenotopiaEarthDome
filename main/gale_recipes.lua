@@ -388,7 +388,7 @@ GaleModAddRecipe2(
     {
         Ingredient("hammer", 1),
         Ingredient("wagpunk_bits", 2),
-        Ingredient("rocks", 8),
+        Ingredient("cutstone", 2),
         Ingredient("twigs", 4),
     },
     TECH.SCIENCE_ONE,
@@ -396,4 +396,18 @@ GaleModAddRecipe2(
         builder_tag = "gale",
     },
     { "CHARACTER", "TOOLS", "WEAPONS" }
+)
+
+GaleModAddRecipe2(
+    "gale_mace",
+    {
+        Ingredient("livinglog", 3),
+        Ingredient("thulecite", 4),
+        Ingredient("moonrocknugget", 8),
+    },
+    TECH.SCIENCE_TWO,
+    {
+        builder_tag = "gale",
+    },
+    { "CHARACTER", "MAGIC", "WEAPONS" }
 )

@@ -202,7 +202,7 @@ end
 local function GetAnim(inst)
     local debug_str = inst.entity:GetDebugString()
     local bank, build, anim, frame, frame_all = string.match(debug_str,
-        "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
+                                                             "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
 
     local percent = nil
     if frame and frame_all then
@@ -512,6 +512,15 @@ local function GetDestructRecipesByEntity(target, percent, float_to_int_fn)
     return GetDestructRecipesByName(name, percent * ingredient_percent, float_to_int_fn)
 end
 
+local function SumDices(num_dices, dice_max_value)
+    local result = 0
+    for i = 1, num_dices do
+        result = result + math.random(dice_max_value)
+    end
+
+    return result
+end
+
 
 return {
     GetFaceVector = GetFaceVector,
@@ -562,4 +571,6 @@ return {
 
     GetDestructRecipesByName = GetDestructRecipesByName,
     GetDestructRecipesByEntity = GetDestructRecipesByEntity,
+
+    SumDices = SumDices,
 }

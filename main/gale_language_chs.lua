@@ -621,8 +621,18 @@ STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_HAMMER                    = "当我的冒�
 STRINGS.GALE_ITEM_DESC.GALE_HAMMER                              = {
 	SIMPLE = "借由蛮力挥舞的大锤。",
 	COMPLEX =
-	"使用废铁与岩石制造的大型锤。\n除了一般锤子的功能外，也能当做打击武器使用，\n摧毁护甲、击溃盾防御的效果显著。\n大锤是个重蛮力的武器，\n造成伤害时，力量的增益会以双倍计算。\n战技·抡锤：\n长按鼠标右键蓄力后，打出致命的大力挥击，\n造成巨量伤害并击退一部分敌人。",
+	"使用废铁与岩石制造的大型锤。\n除了一般锤子的功能外，也能当做打击武器使用，\n摧毁护甲、击溃盾防御的效果显著。\n大锤是个重蛮力的武器，\n仅在计算伤害时，力量的增益会变成两倍。\n战技·抡锤：\n长按鼠标右键蓄力后，打出致命的大力挥击，\n造成巨量伤害并击退一部分敌人。",
 }
+
+STRINGS.NAMES.GALE_MACE                                         = "凯尔的刺锤"
+STRINGS.RECIPE_DESC.GALE_MACE                                   = "这件武器来自另一个时代。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_MACE                   = "很明显是用太空陨石打造的。"
+STRINGS.GALE_ITEM_DESC.GALE_MACE                                = {
+	SIMPLE = "带有神圣力量的刺锤。",
+	COMPLEX =
+	"战斗用的铁锤。\n以神圣属性的跳跃攻击为特征。\n由于制造时使用了铥矿与月岩，\n武器坚硬、难以损坏，\n造成位面伤害的能力优秀。\n战技·抡锤：\n长按鼠标右键蓄力后，打出致命的大力挥击，\n造成巨量伤害并击退一部分敌人。",
+}
+
 
 -- Foods are below...
 
@@ -1420,8 +1430,8 @@ STRINGS.GALE_UI.SKILL_NODES = {
 	},
 
 	COMBAT_LEAP = {
-		NAME = "战技·过顶斩击",
-		DESC = "跳劈攻击。能在所有锤类武器上使用。",
+		NAME = "跳跃攻击",
+		DESC = "进行跳跃攻击，造成小范围伤害。能在装备撬棍、锤类武器时使用。",
 	},
 
 	KINETIC_BLAST = {

@@ -17,192 +17,6 @@ local assets = {
     Asset("ATLAS", "images/inventoryimages/gale_crowbar.xml"),
 }
 
--- local weapon_level_datas = {
---     gale_crowbar = {
---         basedamage = 34,
---         maxuse = 175,
---         charge_atk_range = 1.25,
---         charge_atk_damage_mult = 0.66,
---         complete_charge_atk_range = 2.2,
---         complete_charge_atk_damage_mult = function() return GetRandomMinMax(2.8, 3.0) end,
---     },
-
---     -- gale_crowbar_lv2 = {
---     --     basedamage = 42.5,
---     --     maxuse = 250,
---     --     keeponfinished = true,
---     --     charge_atk_range = 1.25,
---     --     charge_atk_damage_mult = 0.66,
---     --     complete_charge_atk_range = 2.2,
---     --     complete_charge_atk_damage_mult = function() return GetRandomMinMax(2.8, 3.0) end,
---     -- },
-
---     -- gale_crowbar_lv3 = {
---     --     basedamage = 51,
---     --     maxuse = 400,
---     --     keeponfinished = true,
---     --     charge_atk_range = 1.25,
---     --     charge_atk_damage_mult = 0.66,
---     --     complete_charge_atk_range = 2.2,
---     --     complete_charge_atk_damage_mult = function() return GetRandomMinMax(2.8, 3.0) end,
---     -- },
-
---     -- gale_crowbar_lv4 = {
---     --     basedamage = 68,
---     --     maxuse = 400,
---     --     keeponfinished = true,
---     --     charge_atk_range = 1.25,
---     --     charge_atk_damage_mult = 0.66,
---     --     complete_charge_atk_range = 2.2,
---     --     complete_charge_atk_damage_mult = function() return GetRandomMinMax(2.8, 3.0) end,
---     -- },
-
---     -- gale_crowbar_lv5 = {
---     --     basedamage = 97,
---     --     charge_atk_range = 1.25,
---     --     charge_atk_damage_mult = 0.66,
---     --     complete_charge_atk_range = 2.2,
---     --     complete_charge_atk_damage_mult = function() return GetRandomMinMax(2.8, 3.0) end,
---     -- },
--- }
-
--- local function ChargeCommonAttackWrapper(charge_atk_range,
---                                          charge_atk_damage_mult,
---                                          complete_charge_atk_range,
---                                          complete_charge_atk_damage_mult)
---     return function(inst, attacker, target, target_pos, percent)
---         local face_vec = GaleCommon.GetFaceVector(attacker)
-
---         local complete_charge = percent >= 1.0 or GaleCondition.GetCondition(attacker, "condition_carry_charge") ~= nil
-
---         if not complete_charge then
---             local bufferedaction = attacker:GetBufferedAction()
---             if bufferedaction.action == ACTIONS.ATTACK then
---                 attacker.components.combat:DoAttack(target)
---             else
---                 -- local hit_pt = face_vec * attacker.components.combat:GetHitRange() + attacker:GetPosition()
-
---                 -- inst.components.weapon.attackwear = 0
---                 -- local hit_ents = GaleCommon.AoeDoAttack(attacker, hit_pt, charge_atk_range, {
---                 --     ignorehitrange = true,
---                 --     instancemult = charge_atk_damage_mult,
---                 -- })
---                 -- inst.components.finiteuses:Use(#hit_ents)
---                 -- inst.components.weapon.attackwear = 1
-
---                 inst.components.weapon.attackwear = 0
---                 local hit_ents = GaleCommon.AoeDoAttack(attacker,
---                     attacker:GetPosition(),
---                     attacker.components.combat:GetHitRange(),
---                     {
---                         ignorehitrange = false,
---                         instancemult = charge_atk_damage_mult,
---                     },
---                     function(inst, other)
---                         local tar_deg = GaleCommon.GetFaceAngle(inst, other)
-
---                         return math.abs(tar_deg) <= 45
---                             and inst.components.combat
---                             and inst.components.combat:CanTarget(other)
---                             and not inst.components.combat:IsAlly(other)
---                     end)
---                 inst.components.weapon.attackwear = 1
---                 inst.components.finiteuses:Use(#hit_ents)
---             end
---         else
---             local hit_pt = face_vec * attacker.components.combat:GetHitRange() + attacker:GetPosition()
-
---             inst.components.weapon.attackwear = 0
---             local attack_ents_num = 0
---             GaleCommon.AoeForEach(attacker, hit_pt, complete_charge_atk_range, nil, { "INLIMBO" },
---                 { "_combat", "_inventoryitem" },
---                 function(doer, other)
---                     local can_attack = doer.components.combat:CanTarget(other) and
---                         not doer.components.combat:IsAlly(other)
---                     local is_inv = other.components.inventoryitem ~= nil
-
---                     if can_attack then
---                         doer.components.combat.ignorehitrange = true
---                         doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
---                             nil,
---                             FunctionOrValue(
---                                 complete_charge_atk_damage_mult, doer,
---                                 other))
---                         doer.components.combat.ignorehitrange = false
-
---                         other:PushEvent("knockback", { knocker = doer, radius = 8 })
-
---                         attack_ents_num = attack_ents_num + 1
---                     elseif is_inv then
---                         GaleCommon.LaunchItem(other, doer, 6.5)
---                     end
-
---                     if other ~= doer then
---                         SpawnPrefab("gale_hit_color_adder"):SetTarget(other)
---                     end
---                 end,
---                 function(doer, other)
---                     return other and other:IsValid()
---                 end)
-
-
---             inst.components.finiteuses:Use(attack_ents_num)
---             inst.components.weapon.attackwear = 1
-
---             local sparkle = attacker:SpawnChild("gale_sparkle_vfx")
---             sparkle.Transform:SetPosition(1.2, 0, 0)
---             sparkle._target_pos_x:set(hit_pt.x - attacker:GetPosition().x)
---             sparkle._target_pos_y:set(0)
---             sparkle._target_pos_z:set(hit_pt.z - attacker:GetPosition().z)
---             sparkle._can_emit:set(true)
-
-
---             local animfx = SpawnAt("hammer_mjolnir_crackle", hit_pt)
---             animfx.AnimState:SetAddColour(50 / 255, 169 / 255, 255 / 255, 1)
---             animfx.AnimState:HideSymbol("flash_up")
---             animfx.AnimState:HideSymbol("lightning_land")
---             animfx.AnimState:HideSymbol("lightning1")
---             animfx.AnimState:HideSymbol("droplet")
---             animfx.AnimState:SetDeltaTimeMultiplier(1.66)
---             animfx.AnimState:SetLightOverride(2)
---             animfx.persists = false
---             animfx:ListenForEvent("animover", animfx.Remove)
-
---             attacker.SoundEmitter:PlaySound("gale_sfx/battle/P1_punchF")
---             attacker.SoundEmitter:PlaySound("gale_sfx/character/p1_gale_charge_atk_shout")
-
---             ShakeAllCameras(CAMERASHAKE.FULL, .35, .02, 0.5, attacker, 40)
-
---             if GaleCondition.GetCondition(attacker, "condition_carry_charge") ~= nil then
---                 GaleCondition.RemoveCondition(attacker, "condition_carry_charge")
---             end
---         end
---     end
--- end
-
-
--- local function ChargeTimeCb(inst, data)
---     local old_percent = data.old_percent
---     local percent = data.current_percent
---     local owner = inst.components.inventoryitem:GetGrandOwner()
---     local equipped = inst.components.equippable:IsEquipped()
-
---     if percent <= 0 or not (owner and equipped) then
---         if inst.charge_fx then
---             inst.charge_fx:KillFX()
---             inst.charge_fx = nil
---         end
---     elseif percent >= 1 and (owner and equipped) then
---         if not inst.charge_fx then
---             inst.charge_fx = SpawnPrefab("gale_charge_fx")
---             inst.charge_fx.entity:SetParent(owner.entity)
---             inst.charge_fx.entity:AddFollower()
---             inst.charge_fx.Follower:FollowSymbol(owner.GUID, "swap_object", 0, -190, 0)
---             inst.charge_fx.SoundEmitter:PlaySound("gale_sfx/battle/p1_weapon_charge")
---         end
---     end
--- end
-
 -- ThePlayer:AddTag("galeatk_multithrust")
 local function OnSpecialAtk(owner, data)
     local target = data.target
@@ -225,24 +39,24 @@ local function OnSpecialAtk(owner, data)
             local hit_pos = owner:GetPosition() +
                 GaleCommon.GetFaceVector(owner) * owner.components.combat:GetHitRange() * 0.75
             GaleCommon.AoeForEach(owner, hit_pos, 2.5, nil, { "INLIMBO" }, { "_combat", "_inventoryitem" },
-                function(doer, other)
-                    local can_attack = doer.components.combat:CanTarget(other) and
-                        not doer.components.combat:IsAlly(other)
-                    local is_inv = other.components.inventoryitem ~= nil
+                                  function(doer, other)
+                                      local can_attack = doer.components.combat:CanTarget(other) and
+                                          not doer.components.combat:IsAlly(other)
+                                      local is_inv = other.components.inventoryitem ~= nil
 
-                    if can_attack then
-                        doer.components.combat.ignorehitrange = true
-                        doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
-                            nil,
-                            GetRandomMinMax(0.75, 1))
-                        doer.components.combat.ignorehitrange = false
-                    elseif is_inv then
-                        GaleCommon.LaunchItem(other, doer, 2)
-                    end
-                end,
-                function(doer, other)
-                    return other and other:IsValid()
-                end)
+                                      if can_attack then
+                                          doer.components.combat.ignorehitrange = true
+                                          doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
+                                                                          nil,
+                                                                          GetRandomMinMax(0.75, 1))
+                                          doer.components.combat.ignorehitrange = false
+                                      elseif is_inv then
+                                          GaleCommon.LaunchItem(other, doer, 2)
+                                      end
+                                  end,
+                                  function(doer, other)
+                                      return other and other:IsValid()
+                                  end)
 
             -- SpawnAt("gale_atk_firepuff_cold",target).Transform:SetScale(1,1,1)
             SpawnAt("gale_leap_puff_fx", hit_pos)
@@ -266,6 +80,28 @@ local function OnHitOther(owner, data)
     end
 end
 
+local function OnStartHelmSplitter(inst, attacker)
+    local targetpos = attacker.sg.statemem.targetpos
+    if targetpos then
+        local duration = 13 * FRAMES
+        local dist = (attacker:GetPosition() - targetpos):Length()
+        local dist_adjust = dist - inst.components.gale_helmsplitter:GetForwardOffset()
+        local speed = dist_adjust / duration
+        if speed > 0 then
+            attacker.Physics:SetMotorVel(speed, 0, 0)
+        end
+    end
+end
+
+
+local function OnStopHelmSplitter(inst, attacker)
+    attacker.Physics:Stop()
+end
+
+local function OnCastHelmSplitter(inst, attacker, target)
+    attacker.Physics:Stop()
+end
+
 local function ClientFn(inst)
 
 end
@@ -281,6 +117,11 @@ local function ServerFn(inst)
     --     config.complete_charge_atk_damage_mult)
 
     -- inst:ListenForEvent("gale_charge_time_change", ChargeTimeCb)
+
+    inst:AddComponent("gale_helmsplitter")
+    inst.components.gale_helmsplitter.onstartfn = OnStartHelmSplitter
+    inst.components.gale_helmsplitter.onstopfn = OnStopHelmSplitter
+    inst.components.gale_helmsplitter.oncastfn = OnCastHelmSplitter
 
     local ChargeAttackIfNotCompleted = GaleChargeableWeaponFns.MeleeAttackNonCompletedWrapper()
     local ChargeAttackIfCompleted = GaleChargeableWeaponFns.MeleeAttackCompletedWrapper()
@@ -341,9 +182,9 @@ return GaleEntity.CreateNormalWeapon({
                     function(inst, owner)
                         if not inst.magicgas then
                             inst.magicgas = SpawnPrefab("gale_magicgas_vfx")
-                            inst.magicgas.entity:SetParent(data.owner.entity)
+                            inst.magicgas.entity:SetParent(owner.entity)
                             inst.magicgas.entity:AddFollower()
-                            inst.magicgas.Follower:FollowSymbol(data.owner.GUID, "swap_object", 15, -190, 0)
+                            inst.magicgas.Follower:FollowSymbol(owner.GUID, "swap_object", 15, -190, 0)
                         end
                     end,
                     1,

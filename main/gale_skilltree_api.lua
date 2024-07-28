@@ -1889,7 +1889,7 @@ AddStategraphState("wilson", State {
 
         inst.Transform:SetEightFaced()
         inst.AnimState:PlayAnimation("atk_leap")
-        inst.SoundEmitter:PlaySound("dontstarve/common/deathpoof", nil, nil, true)
+        inst.SoundEmitter:PlaySound(inst.sg.statemem.weapon.components.gale_helmsplitter:GetWhooshSound(), nil, nil, true)
 
         inst:ForceFacePoint(inst.sg.statemem.targetpos)
 
@@ -1902,11 +1902,13 @@ AddStategraphState("wilson", State {
             inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
                                                              { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0,
                                                                                                 0, 1) })
-            inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke", nil, nil, true)
+            inst.SoundEmitter:PlaySound(inst.sg.statemem.weapon.components.gale_helmsplitter:GetImpactSound(), nil, nil,
+                                        true)
         end),
 
         TimeEvent(18 * FRAMES, function(inst)
             inst.sg:RemoveStateTag("abouttoattack")
+            inst.sg:GoToState("idle", true)
         end),
     },
 
