@@ -95,3 +95,6 @@ end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_DISSECT, function(inst)
     return "dolongaction"
 end))
+
+
+AddIngredientValues({ "gale_duri_flower_petal" }, { veggie = 0.5 })

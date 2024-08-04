@@ -634,6 +634,41 @@ STRINGS.GALE_ITEM_DESC.GALE_MACE                                = {
 }
 
 
+
+
+STRINGS.NAMES.GALE_TRINKET_RABBIT                          = "兔子模型"
+STRINGS.RECIPE_DESC.GALE_TRINKET_RABBIT                    = "加洛普喜欢兔子！"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_RABBIT    = "我们世界的兔子和这里的不一样。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_RABBIT       = "我好怀念在普林斯汀城的时光。"
+STRINGS.CHARACTERS.GALLOP.DESCRIBE.GALE_TRINKET_RABBIT     = "我要在我的被窝里放满兔子。"
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                 = {
+	SIMPLE = "模仿兔子制作的模型。",
+	COMPLEX = "模仿兔子制作的模型。\n因为有点过于光滑，所以一眼就能看出是假的。\n富有弹性，手感相当好的小孩玩具。\n据说是加洛普的最爱。",
+}
+
+STRINGS.NAMES.GALE_TRINKET_DUCK                            = "橡皮鸭"
+STRINGS.RECIPE_DESC.GALE_TRINKET_DUCK                      = "嘎嘎嘎。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_DUCK      = "泡澡必备用品。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_DUCK         = "亚泰的射击场里就有一个！"
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_DUCK                   = {
+	SIMPLE = "用橡胶素材制作的可爱小鸭子玩具。",
+	COMPLEX = "用橡胶素材制作的可爱小鸭子玩具。\n用力捏就会发出叫声。\n能够消除遭受电击时造成的麻痹状态，一次性使用。",
+}
+
+STRINGS.NAMES.GALE_DURI_FLOWER                             = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER       = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER          = "高墙的厨师曾经用这个调味来着。"
+
+STRINGS.NAMES.GALE_DURI_FLOWER_PETAL                       = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER_PETAL = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER_PETAL    = "高墙的厨师曾经用这个调味来着。"
+STRINGS.GALE_ITEM_DESC.GALE_DURI_FLOWER_PETAL              = {
+	SIMPLE = "可用于调味的食材。",
+	COMPLEX = "散发着薄荷清香的药草。\n主要用于给炖菜等料理调味，\n也能直接生吃。",
+}
+
+
+
 -- Foods are below...
 
 
@@ -1270,6 +1305,8 @@ STRINGS.GALE_MELODIES = {
 
 	TRIGGER_NORMAL = "吹奏了%s！",
 
+	TEND_TO_PLANTS = "周围%d个农作物因为歌曲的原因变得开心了！",
+
 	TRIGGER_SUCCESS = {
 		MELODY_PANSELO = "吹奏了潘瑟罗序曲，凯尔的生命值恢复了99点！",
 		MELODY_BATTLE = "吹奏了战斗号令，凯尔及其附近的盟友均获得力量提升！",
@@ -1314,6 +1351,8 @@ STRINGS.GALE_UI.KEY_CONFIGED_CURRENT_NO_KEY = "未设置"
 -- 	UNLOCK = "解锁",
 -- 	SET_KEY = "设置键位",
 -- }
+
+STRINGS.GALE_UI.ANNOUNCE_DUCK_AVOID_ELECTROCUTE = "使用橡皮鸭防止了触电！"
 
 STRINGS.GALE_UI.CONDITION_STACK = "层数"
 

@@ -1902,8 +1902,12 @@ AddStategraphState("wilson", State {
             inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil,
                                                              { Vector4(0, 0.9, 0.9, 1), Vector4(0, 0,
                                                                                                 0, 1) })
-            inst.SoundEmitter:PlaySound(inst.sg.statemem.weapon.components.gale_helmsplitter:GetImpactSound(), nil, nil,
-                                        true)
+
+            if ValidateGaleHelmSplitter(inst) then
+                inst.SoundEmitter:PlaySound(inst.sg.statemem.weapon.components.gale_helmsplitter:GetImpactSound(), nil,
+                                            nil,
+                                            true)
+            end
         end),
 
         TimeEvent(18 * FRAMES, function(inst)

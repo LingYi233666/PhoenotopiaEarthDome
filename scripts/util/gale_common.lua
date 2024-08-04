@@ -65,8 +65,10 @@ local function AoeForEach(inst, pos, radius, must_tag, no_tag, one_of_tag, apply
     local ret_ents = {}
     local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, radius, must_tag, no_tag, one_of_tag)
     for k, v in pairs(ents) do
-        if validfn(inst, v) then
-            applyfn(inst, v)
+        if validfn == nil or validfn(inst, v) then
+            if applyfn then
+                applyfn(inst, v)
+            end
 
             table.insert(ret_ents, v)
         end

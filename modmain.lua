@@ -163,6 +163,8 @@ PrefabFiles = {
 	"gale_hammer",
 	"gale_mace",
 	"gale_divine_smite_fxs",
+	"gale_trinkets",
+	"gale_duri_flower",
 }
 ---对比老版本 主要是增加了names图片 人物检查图标 还有人物的手臂修复（增加了上臂）
 --人物动画里面有个SWAP_ICON 里面的图片是在检查时候人物头像那里显示用的
@@ -314,6 +316,7 @@ AddMinimapAtlas("images/map_icons/gale.xml") --增加小地图图标
 AddMinimapAtlas("images/map_icons/gale_fran_door.xml")
 AddMinimapAtlas("images/map_icons/gale_fran_door_lv2.xml")
 AddMinimapAtlas("images/map_icons/gale_forest_pillar_tree.xml")
+AddMinimapAtlas("images/map_icons/gale_pocket_backpack.xml")
 
 --增加人物到mod人物列表的里面 性别为女性（MALE, FEMALE, ROBOT, NEUTRAL, and PLURAL）
 AddModCharacter("gale", "FEMALE")

@@ -63,10 +63,15 @@ local function SpawnFX(inst, attacker)
     SpawnAt("gale_divine_smite_burntground_fx", hit_pos)
 end
 
-local function OnCastHelmSplitter(inst, attacker, target)
+local function OnCastHelmSplitter(inst, attacker, target, hit_targets, hit_items)
     attacker.Physics:Stop()
 
     SpawnFX(inst, attacker)
+
+    -- for _, v in pairs(hit_targets) do
+    --     local fx = v:SpawnChild("gale_divine_smite_fire_vfx")
+    --     fx:DoTaskInTime(GetRandomMinMax(2, 4), fx.Remove)
+    -- end
 
     inst.delat_light_over_task = inst:DoTaskInTime(2.6, function()
         inst.periodic_light_over_task = inst:DoPeriodicTask(0, function()

@@ -1,4 +1,5 @@
 local GaleCommon = require("util/gale_common")
+local GaleConditionUtil = require "util/gale_conditions"
 
 -- AddPrefabPostInit("world",function(inst)
 --     inst:DoTaskInTime(0.1,function()
@@ -28,6 +29,18 @@ function GLOBAL.RevealAllMap()
         for y = -1000, 1000, 30 do
             ThePlayer.player_classified.MapExplorer:RevealArea(x, 0, y)
         end
+    end
+end
+
+function GLOBAL.c_condition(name, stack, target)
+    target = target or ThePlayer
+    stack = stack or 1
+    if stack > 0 then
+        GaleConditionUtil.AddCondition(target, name, stack)
+    elseif stack < 0 then
+        GaleConditionUtil.RemoveCondition(target, name, -stack)
+    else
+        print("Zero stack condition!")
     end
 end
 

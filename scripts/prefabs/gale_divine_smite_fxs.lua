@@ -214,7 +214,7 @@ local function firevfxfn()
     effect:SetBlendMode(0, BLENDMODE.Additive)
     effect:EnableBloomPass(0, true)
     effect:SetUVFrameSize(0, 0.25, 0.25)
-    effect:SetSortOrder(0, 1)
+    effect:SetSortOffset(0, 1)
 
     local sphere_emitter = CreateSphereEmitter(.1)
 
@@ -290,7 +290,7 @@ return Prefab("gale_divine_smite_explode_vfx", explovfxfn, assets),
 
             inst.Transform:SetRotation(math.random() * 360)
 
-            local s = 0.66
+            local s = 0.7
             inst.AnimState:SetScale(s, s, s)
         end,
 

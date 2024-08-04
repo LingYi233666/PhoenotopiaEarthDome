@@ -1,23 +1,11 @@
+local GaleEntity = require("util/gale_entity")
+
 local assets =
 {
-    Asset("ANIM", "anim/flowers.zip"),
+    Asset("ANIM", "anim/gale_duri_flower.zip"),
+    Asset("IMAGE", "images/inventoryimages/gale_duri_flower_petal.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_duri_flower_petal.xml"),
 }
-
-
-local names = { "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "f10" }
-local ROSE_NAME = "rose"
-local ROSE_CHANCE = 0.01
-
-
-local function onsave(inst, data)
-    data.anim = inst.animname
-    data.planted = inst.planted
-end
-
-local function onload(inst, data)
-    setflowertype(inst, data ~= nil and data.anim or nil)
-    inst.planted = data ~= nil and data.planted or nil
-end
 
 local function onpickedfn(inst, picker)
     local pos = inst:GetPosition()
@@ -25,13 +13,6 @@ local function onpickedfn(inst, picker)
     if picker ~= nil then
         if picker.components.sanity ~= nil and not picker:HasTag("plantkin") then
             picker.components.sanity:DoDelta(TUNING.SANITY_TINY)
-        end
-
-        if inst.animname == ROSE_NAME and
-            picker.components.combat ~= nil and
-            not (picker.components.inventory ~= nil and picker.components.inventory:EquipHasTag("bramble_resistant")) and not picker:HasTag("shadowminion") then
-            picker.components.combat:GetAttacked(inst, TUNING.ROSE_DAMAGE)
-            picker:PushEvent("thorns")
         end
     end
 
@@ -50,9 +31,8 @@ local function DieInDarkness(inst)
             return
         end
     end
-    --in darkness
-    inst:Remove()
-    SpawnPrefab("flower_withered").Transform:SetPosition(x, y, z)
+
+    ReplacePrefab(inst, "flower_withered")
 end
 
 local function OnIsCaveDay(inst, isday)
@@ -61,124 +41,116 @@ local function OnIsCaveDay(inst, isday)
     end
 end
 
-local function CheckForPlanted(inst)
-    if not inst.planted then
-        AddToRegrowthManager(inst)
+local function PetalOnHaunt(inst, haunter)
+    local success_percent = TUNING.HAUNT_CHANCE_VERYRARE * inst.components.stackable:StackSize()
+
+    if math.random() <= success_percent then
+        SpawnAt("small_puff", inst)
+
+        local heart = SpawnAt("reviver", inst)
+        heart.components.inventoryitem:InheritMoisture(inst.components.inventoryitem:GetMoisture(),
+                                                       inst.components.inventoryitem:IsWet())
+        heart:PushEvent("spawnedfromhaunt", { haunter = haunter, oldPrefab = inst })
+        inst:PushEvent("despawnedfromhaunt", { haunter = haunter, newPrefab = heart })
+
+        -- Why didn't just remove it ?
+        inst.persists = false
+        inst.entity:Hide()
+        inst:DoTaskInTime(0, inst.Remove)
+
+        inst.components.hauntable.hauntvalue = TUNING.HAUNT_SMALL
+
+        return true
     end
-end
-
-local function OnIsRoseDirty(inst)
-    inst.scrapbook_proxy = inst._isrose:value() and "flower_rose" or nil
-end
-
---------------------------------------------------------------------------
-
-local function CanResidueBeSpawnedBy(inst, doer)
-    local skilltreeupdater = doer and doer.components.skilltreeupdater or nil
-    return skilltreeupdater and skilltreeupdater:IsActivated("winona_charlie_2") or false
-end
-
-local function OnResidueCreated(inst, owner, residue)
-    if not inst._isrose:value() then
-        setflowertype(inst, ROSE_NAME)
-        SpawnPrefab("small_puff").Transform:SetPosition(inst.Transform:GetWorldPosition())
-    end
-end
-
-local function OnResidueActivated(inst, doer)
-    if inst._isrose:value() and doer and doer.components.inventory then
-        local rose = SpawnPrefab("charlierose")
-        doer.components.inventory:GiveItem(rose, nil, inst:GetPosition())
-        if doer.SoundEmitter then
-            doer.SoundEmitter:PlaySound("meta4/charlie_residue/rose_activate")
-        end
-        inst:Remove()
-    end
-end
-
---------------------------------------------------------------------------
-
-local function commonfn(isplanted)
-    local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    inst.AnimState:SetBank("flowers")
-    inst.AnimState:SetBuild("flowers")
-    inst.AnimState:SetRayTestOnBB(true)
-    inst.scrapbook_anim = "f1"
-
-    inst:SetDeploySmartRadius(DEPLOYSPACING_RADIUS[DEPLOYSPACING.LESS] / 2) --butterfly deployspacing/2
-
-    inst:AddTag("flower")
-    inst:AddTag("cattoy")
-
-    inst.OnIsRoseDirty = OnIsRoseDirty
-
-    inst._isrose = net_bool(inst.GUID, "flower._isrose", "isrosedirty")
-
-    inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        inst:ListenForEvent("isrosedirty", inst.OnIsRoseDirty)
-
-        return inst
-    end
-
-    inst:AddComponent("inspectable")
-    inst.components.inspectable.getstatus = GetStatus
-
-    inst:AddComponent("pickable")
-    inst.components.pickable.picksound = "dontstarve/wilson/pickup_plants"
-    inst.components.pickable:SetUp("petals", 10)
-    inst.components.pickable.onpickedfn = onpickedfn
-    inst.components.pickable.remove_when_picked = true
-    inst.components.pickable.quickpick = true
-    inst.components.pickable.wildfirestarter = true
-
-    --inst:AddComponent("transformer")
-    --inst.components.transformer:SetTransformWorldEvent("isfullmoon", true)
-    --inst.components.transformer:SetRevertWorldEvent("isfullmoon", false)
-    --inst.components.transformer:SetOnLoadCheck(testfortransformonload)
-    --inst.components.transformer.transformPrefab = "flower_evil"
-
-    MakeSmallBurnable(inst)
-    if not isplanted then -- This will be true during load but it will be false and cut down on runtime.
-        inst:DoTaskInTime(0, CheckForPlanted)
-    end
-    MakeSmallPropagator(inst)
-
-    inst:AddComponent("halloweenmoonmutable")
-    inst.components.halloweenmoonmutable:SetPrefabMutated("moonbutterfly_sapling")
-
-    local roseinspectable = inst:AddComponent("roseinspectable")
-    roseinspectable:SetCanResidueBeSpawnedBy(CanResidueBeSpawnedBy)
-    roseinspectable:SetOnResidueCreated(OnResidueCreated)
-    roseinspectable:SetOnResidueActivated(OnResidueActivated)
-    roseinspectable:SetForcedInduceCooldownOnActivate(true)
-
-    if TheWorld:HasTag("cave") then
-        inst:WatchWorldState("iscaveday", OnIsCaveDay)
-    end
-
-    MakeHauntableChangePrefab(inst, "flower_evil")
-
-    if not POPULATING then
-        setflowertype(inst)
-    end
-    --------SaveLoad
-    inst.OnSave = onsave
-    inst.OnLoad = onload
-
-    return inst
-end
-
-local function plainfn()
-    -- NOTES(JBK): This is here to stop TheSim from appearing in the commonfn callback.
-    return commonfn()
+    return false
 end
 
 
-return Prefab("flower", plainfn, assets, prefabs)
+return GaleEntity.CreateNormalEntity({
+        prefabname = "gale_duri_flower",
+        assets = assets,
+
+        bank = "gale_duri_flower",
+        build = "gale_duri_flower",
+        anim = "idle",
+
+        tags = { "flower", "cattoy" },
+
+        clientfn = function(inst)
+
+        end,
+
+        serverfn = function(inst)
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("pickable")
+            inst.components.pickable.picksound = "dontstarve/wilson/pickup_plants"
+            inst.components.pickable:SetUp("gale_duri_flower_petal", 10)
+            inst.components.pickable.onpickedfn = onpickedfn
+            inst.components.pickable.remove_when_picked = true
+            inst.components.pickable.quickpick = true
+            inst.components.pickable.wildfirestarter = true
+
+            MakeSmallBurnable(inst)
+            MakeSmallPropagator(inst)
+
+            inst:AddComponent("halloweenmoonmutable")
+            inst.components.halloweenmoonmutable:SetPrefabMutated("moonbutterfly_sapling")
+
+            if TheWorld:HasTag("cave") then
+                inst:WatchWorldState("iscaveday", OnIsCaveDay)
+            end
+
+            MakeHauntableChangePrefab(inst, "flower_evil")
+        end,
+    }),
+    GaleEntity.CreateNormalInventoryItem({
+        prefabname = "gale_duri_flower_petal",
+        assets = assets,
+
+        bank = "gale_duri_flower",
+        build = "gale_duri_flower",
+        anim = "idle_petal",
+
+        tags = {
+            "cattoy",
+            -- "vasedecoration",
+        },
+
+        inventoryitem_data = {
+            floatable_param = {},
+            use_gale_item_desc = true,
+        },
+
+        clientfn = function(inst)
+
+        end,
+
+        serverfn = function(inst)
+            inst:AddComponent("stackable")
+            inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+
+            inst:AddComponent("tradable")
+
+            -- inst:AddComponent("vasedecoration")
+
+            inst:AddComponent("fuel")
+            inst.components.fuel.fuelvalue = TUNING.TINY_FUEL
+
+            MakeSmallBurnable(inst, TUNING.TINY_BURNTIME)
+            MakeSmallPropagator(inst)
+
+            inst:AddComponent("edible")
+            inst.components.edible.healthvalue = TUNING.HEALING_TINY
+            inst.components.edible.hungervalue = TUNING.CALORIES_TINY / 4
+            inst.components.edible.foodtype = FOODTYPE.VEGGIE
+
+            inst:AddComponent("perishable")
+            inst.components.perishable:SetPerishTime(TUNING.PERISH_FAST)
+            inst.components.perishable:StartPerishing()
+            inst.components.perishable.onperishreplacement = "spoiled_food"
+
+            MakeHauntableLaunchAndPerish(inst)
+            AddHauntableCustomReaction(inst, PetalOnHaunt, false, true, false)
+        end,
+    })

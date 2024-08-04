@@ -32,10 +32,10 @@ local assets_archive =
 for k, v in pairs(cooking.recipes.cookpot) do
     table.insert(prefabs, v.name)
 
-	if v.overridebuild then
-        table.insert(assets, Asset("ANIM", "anim/"..v.overridebuild..".zip"))
-        table.insert(assets_archive, Asset("ANIM", "anim/"..v.overridebuild..".zip"))
-	end
+    if v.overridebuild then
+        table.insert(assets, Asset("ANIM", "anim/" .. v.overridebuild .. ".zip"))
+        table.insert(assets_archive, Asset("ANIM", "anim/" .. v.overridebuild .. ".zip"))
+    end
 end
 
 local containers = require("containers")
@@ -48,9 +48,9 @@ local gale_cookpot =
     {
         slotpos =
         {
-            Vector3(0, 64 + 32 + 8 + 4, 0), 
+            Vector3(0, 64 + 32 + 8 + 4, 0),
             Vector3(0, 32 + 4, 0),
-            Vector3(0, -(32 + 4), 0), 
+            Vector3(0, -(32 + 4), 0),
             Vector3(0, -(64 + 32 + 8 + 4), 0),
         },
         animbank = "ui_cookpot_1x4",
@@ -73,7 +73,7 @@ end
 
 function gale_cookpot.widget.buttoninfo.fn(inst)
     if inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
-        SendModRPCToServer( MOD_RPC["gale_rpc"]["cook_qte_button_clicked"],inst)
+        SendModRPCToServer(MOD_RPC["gale_rpc"]["cook_qte_button_clicked"], inst)
     end
 end
 
@@ -88,7 +88,7 @@ local function ChangeToItem(inst)
     if inst.components.container ~= nil then
         inst.components.container:DropEverything()
     end
-    
+
 
     local item = SpawnPrefab(inst.item_prefab, inst.linked_skinname, inst.skin_id)
     item.Transform:SetPosition(inst.Transform:GetWorldPosition())
@@ -96,7 +96,7 @@ local function ChangeToItem(inst)
     item.SoundEmitter:PlaySound("dontstarve/common/together/portable/cookpot/collapse")
 end
 
-local function onhammered(inst)--, worker)
+local function onhammered(inst) --, worker)
     if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
         inst.components.burnable:Extinguish()
     end
@@ -113,7 +113,7 @@ local function onhammered(inst)--, worker)
     inst:Remove()
 end
 
-local function onhit(inst)--, worker)
+local function onhit(inst) --, worker)
     if not inst:HasTag("burnt") then
         if inst.components.gale_qte_cooker:IsCooking() then
             inst.AnimState:PlayAnimation("hit_cooking")
@@ -194,12 +194,11 @@ local function ShowProduct(inst)
     end
 end
 
-local function donecookfn(inst,end_state)
+local function donecookfn(inst, end_state)
     if end_state == "INTERRUPTE" then
         inst.AnimState:PlayAnimation("idle_empty")
         inst.SoundEmitter:PlaySound("dontstarve/common/cookingpot_close")
-
-    else 
+    else
         if not inst:HasTag("burnt") then
             inst.AnimState:PlayAnimation("cooking_pst")
             inst.AnimState:PushAnimation("idle_full", false)
@@ -208,7 +207,7 @@ local function donecookfn(inst,end_state)
             inst.SoundEmitter:PlaySound("gale_sfx/cooking/cooking_finished")
         end
     end
-    
+
     inst.SoundEmitter:KillSound("snd")
     inst.Light:Enable(false)
 end
@@ -226,7 +225,7 @@ local function getstatus(inst)
         or "COOKING_SHORT"
 end
 
-local function OnDismantle(inst)--, doer)
+local function OnDismantle(inst) --, doer)
     ChangeToItem(inst)
     inst:Remove()
 end
@@ -245,13 +244,13 @@ local function commonfn(data)
     inst:SetPhysicsRadiusOverride(.5)
     MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
-    inst.MiniMapEntity:SetIcon("gale_cookpot.png")
+    inst.MiniMapEntity:SetIcon("portablecookpot.png")
 
     inst.Light:Enable(false)
     inst.Light:SetRadius(.6)
     inst.Light:SetFalloff(1)
     inst.Light:SetIntensity(.5)
-    inst.Light:SetColour(235/255,62/255,12/255)
+    inst.Light:SetColour(235 / 255, 62 / 255, 12 / 255)
 
     inst.DynamicShadow:SetSize(2, 1)
 
@@ -311,7 +310,7 @@ local function fn()
         return inst
     end
 
-    return inst 
+    return inst
 end
 
 local function duplicatefn()
@@ -328,7 +327,7 @@ local function duplicatefn()
     inst.item_prefab = "gale_cookpot_item_duplicate"
 
 
-    return inst 
+    return inst
 end
 
 ---------------------------------------------------------------
@@ -336,7 +335,7 @@ end
 ---------------------------------------------------------------
 
 local function ondeploy(inst, pt, deployer)
-    local pot = SpawnPrefab(inst.cookpot_prefab, inst.linked_skinname, inst.skin_id )
+    local pot = SpawnPrefab(inst.cookpot_prefab, inst.linked_skinname, inst.skin_id)
     if pot ~= nil then
         pot.Physics:SetCollides(false)
         pot.Physics:Teleport(pt.x, 0, pt.z)
@@ -406,7 +405,7 @@ local function duplicateitemfn()
 
     inst.cookpot_prefab = "gale_cookpot_duplicate"
 
-    return inst 
+    return inst
 end
 
 return Prefab("gale_cookpot", fn, assets, prefabs),

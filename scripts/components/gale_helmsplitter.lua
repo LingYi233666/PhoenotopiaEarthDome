@@ -99,23 +99,25 @@ end
 
 function GaleHelmsplitter:DoHelmSplit(doer, target)
     local hit_pos = self:GetHitPos(doer)
+    local hit_targets = {}
+    local hit_items = {}
 
     if self.attack_range > 0 then
-        GaleCommon.AoeDoAttack(doer, hit_pos, self.attack_range, function(doer, other)
-                                   return self.inst,
-                                       nil,
-                                       nil,
-                                       GetRandomMinMax(self.instant_mults[1], self.instant_mults[2]),
-                                       true
-                               end,
-                               function(doer, other)
-                                   return doer.components.combat:CanTarget(other)
-                                       and not doer.components.combat:IsAlly(other)
-                               end)
+        hit_targets = GaleCommon.AoeDoAttack(doer, hit_pos, self.attack_range, function(doer, other)
+                                                 return self.inst,
+                                                     nil,
+                                                     nil,
+                                                     GetRandomMinMax(self.instant_mults[1], self.instant_mults[2]),
+                                                     true
+                                             end,
+                                             function(doer, other)
+                                                 return doer.components.combat:CanTarget(other)
+                                                     and not doer.components.combat:IsAlly(other)
+                                             end)
     end
 
     if self.launch_item_range > 0 and self.launch_item_speed ~= 0 then
-        GaleCommon.AoeLaunchItems(hit_pos, self.launch_item_range, self.launch_item_speed)
+        hit_items = GaleCommon.AoeLaunchItems(hit_pos, self.launch_item_range, self.launch_item_speed)
     end
 
     if self.use_default_fx then
@@ -124,7 +126,7 @@ function GaleHelmsplitter:DoHelmSplit(doer, target)
 
     ShakeAllCameras(CAMERASHAKE.VERTICAL, .7, .015, .8, hit_pos, 20)
 
-    if self.oncastfn == nil or self.oncastfn(self.inst, doer, target) then
+    if self.oncastfn == nil or self.oncastfn(self.inst, doer, target, hit_targets, hit_items) then
         return true
     end
 end

@@ -411,3 +411,18 @@ GaleModAddRecipe2(
     },
     { "CHARACTER", "MAGIC", "WEAPONS" }
 )
+
+GaleModAddRecipe2(
+    "gale_trinket_rabbit",
+    {
+        Ingredient("rabbit", 1),
+        Ingredient("manrabbit_tail", 1),
+        Ingredient("carrot", 1),
+
+    },
+    TECH.NONE,
+    {
+        builder_tag = "gallop",
+    },
+    { "CHARACTER", "DECOR" }
+)
