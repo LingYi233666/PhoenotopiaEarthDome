@@ -636,11 +636,13 @@ STRINGS.GALE_ITEM_DESC.GALE_MACE                                = {
 
 
 
-STRINGS.NAMES.GALE_TRINKET_RABBIT                          = "兔子模型"
-STRINGS.RECIPE_DESC.GALE_TRINKET_RABBIT                    = "加洛普喜欢兔子！"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_RABBIT    = "我们世界的兔子和这里的不一样。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_RABBIT       = "我好怀念在普林斯汀城的时光。"
-STRINGS.CHARACTERS.GALLOP.DESCRIBE.GALE_TRINKET_RABBIT     = "我要在我的被窝里放满兔子。"
+STRINGS.NAMES.GALE_TRINKET_RABBIT                       = "兔子模型"
+STRINGS.RECIPE_DESC.GALE_TRINKET_RABBIT                 = "加洛普喜欢兔子！"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_RABBIT = "我们世界的兔子和这里的不一样。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_RABBIT    = "我好怀念在普林斯汀城的时光。"
+if STRINGS.CHARACTERS.GALLOP then
+	STRINGS.CHARACTERS.GALLOP.DESCRIBE.GALE_TRINKET_RABBIT = "我要在我的被窝里放满兔子。"
+end
 STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                 = {
 	SIMPLE = "模仿兔子制作的模型。",
 	COMPLEX = "模仿兔子制作的模型。\n因为有点过于光滑，所以一眼就能看出是假的。\n富有弹性，手感相当好的小孩玩具。\n据说是加洛普的最爱。",
