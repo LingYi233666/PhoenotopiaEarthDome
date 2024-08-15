@@ -3,8 +3,17 @@ local GaleCommon = require("util/gale_common")
 local GaleWeaponSkill = require("util/gale_weaponskill")
 local GaleCondition = require("util/gale_conditions")
 
-local function PhysicsFn()
-    
+local function OnSeasonChange(inst, season)
+    season = season or TheWorld.state.season
+    if season == "winter" then
+        inst.components.insulator:SetInsulation(TUNING.INSULATION_MED)
+    else
+        inst.components.insulator:SetInsulation(0)
+    end
+end
+
+local function GetDamage(inst, attacker, target)
+    return 45 + math.clamp(TheWorld.state.temperature / 2, 0, 54)
 end
 
 
@@ -30,8 +39,8 @@ return GaleEntity.CreateNormalWeapon({
         Asset("ANIM", "anim/gale_sky_striker_blade_fire.zip"),
         Asset("ANIM", "anim/swap_gale_sky_striker_blade_fire.zip"),
 
-        Asset("IMAGE","images/inventoryimages/gale_sky_striker_blade_fire.tex"),
-        Asset("ATLAS","images/inventoryimages/gale_sky_striker_blade_fire.xml"),
+        Asset("IMAGE", "images/inventoryimages/gale_sky_striker_blade_fire.tex"),
+        Asset("ATLAS", "images/inventoryimages/gale_sky_striker_blade_fire.xml"),
     },
 
     bank = "gale_sky_striker_blade_fire",
@@ -43,7 +52,7 @@ return GaleEntity.CreateNormalWeapon({
     },
 
     weapon_data = {
-        damage = 45,
+        damage = GetDamage,
         ranges = 0.2,
     },
 
@@ -52,25 +61,37 @@ return GaleEntity.CreateNormalWeapon({
     },
 
     clientfn = function(inst)
-        GaleWeaponSkill.AddAoetargetingClient(inst,"line",nil,12)
+        GaleWeaponSkill.AddAoetargetingClient(inst, "line", nil, 12)
     end,
 
     serverfn = function(inst)
-        GaleWeaponSkill.AddAoetargetingServer(inst,function(inst,doer,pos)
+        GaleWeaponSkill.AddAoetargetingServer(inst, function(inst, doer, pos)
             inst.components.rechargeable:Discharge(8)
 
-            local power = GaleCondition.GetCondition(doer,"condition_power")
+            local power = GaleCondition.GetCondition(doer, "condition_power")
 
-            
-            doer.sg.statemem.addition_attack = power ~= nil and power.condition_data.stacks and power.condition_data.stacks >= 3
+
+            doer.sg.statemem.addition_attack = power ~= nil and power.condition_data.stacks and
+                power.condition_data.stacks >= 3
         end)
 
         inst.components.finiteuses:SetOnFinished(function()
-            SpawnAt("galeboss_ruinforce_core",inst).components.inventoryitem:OnDropped(false)
+            SpawnAt("galeboss_ruinforce_core", inst).components.inventoryitem:OnDropped(false)
             inst:Remove()
         end)
+
+        inst:AddComponent("waterproofer")
+        inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
+
+        inst:AddComponent("insulator")
+        inst.components.insulator:SetWinter()
+        inst.components.insulator:SetInsulation(0)
+
+        inst:WatchWorldState("season", OnSeasonChange)
+
+        OnSeasonChange(inst)
     end,
-}),GaleEntity.CreateNormalFx({
+}), GaleEntity.CreateNormalFx({
     prefabname = "gale_sky_striker_blade_fire_tail",
     assets = {
         Asset("ANIM", "anim/lavaarena_blowdart_attacks.zip"),
@@ -86,41 +107,37 @@ return GaleEntity.CreateNormalWeapon({
     clientfn = function(inst)
         inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
         inst.AnimState:SetAddColour(1, 1, 0, 0)
-        inst.AnimState:SetLayer( LAYER_GROUND )
+        inst.AnimState:SetLayer(LAYER_GROUND)
         -- inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetScale(1,1,1)
+        inst.AnimState:SetScale(1, 1, 1)
 
         if not TheNet:IsDedicated() then
-            
-            inst:DoPeriodicTask(0,function()
+            inst:DoPeriodicTask(0, function()
                 local parent = inst.entity:GetParent()
 
                 if parent then
                     local emitter = CreateRingEmitter(0.2)
-                    for i = 1,3 do
+                    for i = 1, 3 do
                         local tail = GaleEntity.CreateClientAnim({
                             bank = "lavaarena_blowdart_attacks",
                             build = "lavaarena_blowdart_attacks",
                             anim = weighted_random_choice(TAILS_ANIM),
                             lightoverride = 1
                         })
-                        
-                        local x,z = emitter()
-                        
-                        tail.Transform:SetPosition(parent.entity:LocalToWorldSpace(x,GetRandomMinMax(0.33,1.5),z))
+
+                        local x, z = emitter()
+
+                        tail.Transform:SetPosition(parent.entity:LocalToWorldSpace(x, GetRandomMinMax(0.33, 1.5), z))
                         tail.Transform:SetRotation(parent.Transform:GetRotation())
 
-                        tail.AnimState:SetAddColour(1,1,0,1)
+                        tail.AnimState:SetAddColour(1, 1, 0, 1)
                         tail.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
                     end
-                    
                 end
-                
             end)
-            
         end
     end,
-}),GaleEntity.CreateNormalFx({
+}), GaleEntity.CreateNormalFx({
     prefabname = "gale_sky_striker_blade_fire_hitground_fx",
     assets = {
         -- Asset("ANIM", "anim/lavaarena_blowdart_attacks.zip"),
@@ -161,7 +178,7 @@ return GaleEntity.CreateNormalWeapon({
         -- inst:StartThread(function()
         --     local radius = 0.1
         --     local dist = 0.5
-            
+
 
         --     while radius < 5 do
         --         local theta = math.acos((2 * radius * radius - dist*dist) / (2 * radius * radius))
@@ -178,6 +195,6 @@ return GaleEntity.CreateNormalWeapon({
 
         inst:SpawnChild("gale_flame_circle_vfx")
 
-        inst:DoTaskInTime(5,inst.Remove)
+        inst:DoTaskInTime(5, inst.Remove)
     end,
 })
