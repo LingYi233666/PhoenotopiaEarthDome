@@ -44,6 +44,26 @@ function GLOBAL.c_condition(name, stack, target)
     end
 end
 
+function GLOBAL.DebugCartPolar(v1, v2)
+    local polar_1 = GaleCommon.Cart2Polar(v1 or Vector3(1, 1, 1), true)
+    local polar_2 = GaleCommon.Cart2Polar(v2 or Vector3(-1, -1, -1), true)
+    local polar_delta = polar_2 - polar_1
+
+    local cnt = 100
+    local step = polar_delta / cnt
+
+    for i = 0, cnt - 1 do
+        local polar_cur  = polar_1 + step * i
+        local polar_next = polar_1 + step * (i + 1)
+
+        local cart_cur   = GaleCommon.Polar2Cart(polar_cur, true)
+        local cart_next  = GaleCommon.Polar2Cart(polar_next, true)
+
+        print(cart_cur)
+        print("Delta length:", (cart_next - cart_cur):Length())
+    end
+end
+
 -- ThePlayer.components.locomotor:GoToEntity(c_findnext("galeboss_dragon_snare"))
 -- c_findnext("galeboss_ruinforce").sg:GoToState("roar")
 

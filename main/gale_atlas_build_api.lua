@@ -49,7 +49,7 @@ AddPrefabPostInit("world", function(inst)
 
     inst:ListenForEvent("playeractivated", function(inst, player)
         local str_zipped = ZipAndEncodeString(addition_assets_server_dict)
-        SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["auto_add_atlas_build_sync"], player.GUID, str_zipped)
+        SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["auto_add_atlas_build_sync"], player.userid, str_zipped)
     end)
 end)
 

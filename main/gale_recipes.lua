@@ -141,7 +141,7 @@ GaleModAddRecipe2(
     {
 
     },
-    { "REFINE", "WEAPONS" }
+    { "WEAPONS" }
 )
 
 GaleModAddRecipe2(
@@ -425,4 +425,19 @@ GaleModAddRecipe2(
         builder_tag = "gallop",
     },
     { "CHARACTER", "DECOR" }
+)
+
+GaleModAddRecipe2(
+    "gale_destruct_item_table",
+    {
+        Ingredient("rabbit", 1),
+        Ingredient("manrabbit_tail", 1),
+        Ingredient("carrot", 1),
+
+    },
+    TECH.NONE,
+    {
+        builder_tag = "gale_destruct_item_table_builder",
+    },
+    { "CHARACTER", "STRUCTURES" }
 )

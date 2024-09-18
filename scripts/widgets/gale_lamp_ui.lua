@@ -176,10 +176,10 @@ function GaleLampUi:OnControl(control, down)
 
     if self.joystick.focus and down and control == CONTROL_ACCEPT then
         self.joy_enable = true
-    end
-
-    if control == CONTROL_ACCEPT and not down then
+        TheFrontEnd:LockFocus(true)
+    elseif control == CONTROL_ACCEPT and not down then
         self.joy_enable = false
+        TheFrontEnd:LockFocus(false)
     end
 
 

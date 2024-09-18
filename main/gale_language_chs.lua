@@ -643,32 +643,36 @@ STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_RABBIT    = "我好怀念在普林
 if STRINGS.CHARACTERS.GALLOP then
 	STRINGS.CHARACTERS.GALLOP.DESCRIBE.GALE_TRINKET_RABBIT = "我要在我的被窝里放满兔子。"
 end
-STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                 = {
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                   = {
 	SIMPLE = "模仿兔子制作的模型。",
 	COMPLEX = "模仿兔子制作的模型。\n因为有点过于光滑，所以一眼就能看出是假的。\n富有弹性，手感相当好的小孩玩具。\n据说是加洛普的最爱。",
 }
 
-STRINGS.NAMES.GALE_TRINKET_DUCK                            = "橡皮鸭"
-STRINGS.RECIPE_DESC.GALE_TRINKET_DUCK                      = "嘎嘎嘎。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_DUCK      = "泡澡必备用品。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_DUCK         = "亚泰的射击场里就有一个！"
-STRINGS.GALE_ITEM_DESC.GALE_TRINKET_DUCK                   = {
+STRINGS.NAMES.GALE_TRINKET_DUCK                              = "橡皮鸭"
+STRINGS.RECIPE_DESC.GALE_TRINKET_DUCK                        = "嘎嘎嘎。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_DUCK        = "泡澡必备用品。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_DUCK           = "亚泰的射击场里就有一个！"
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_DUCK                     = {
 	SIMPLE = "用橡胶素材制作的可爱小鸭子玩具。",
 	COMPLEX = "用橡胶素材制作的可爱小鸭子玩具。\n用力捏就会发出叫声。\n能够消除遭受电击时造成的麻痹状态，一次性使用。",
 }
 
-STRINGS.NAMES.GALE_DURI_FLOWER                             = "心跳香草"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER       = "闻起来像薄荷。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER          = "高墙的厨师曾经用这个调味来着。"
+STRINGS.NAMES.GALE_DURI_FLOWER                               = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER         = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER            = "高墙的厨师曾经用这个调味来着。"
 
-STRINGS.NAMES.GALE_DURI_FLOWER_PETAL                       = "心跳香草"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER_PETAL = "闻起来像薄荷。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER_PETAL    = "高墙的厨师曾经用这个调味来着。"
-STRINGS.GALE_ITEM_DESC.GALE_DURI_FLOWER_PETAL              = {
+STRINGS.NAMES.GALE_DURI_FLOWER_PETAL                         = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER_PETAL   = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER_PETAL      = "高墙的厨师曾经用这个调味来着。"
+STRINGS.GALE_ITEM_DESC.GALE_DURI_FLOWER_PETAL                = {
 	SIMPLE = "可用于调味的食材。",
 	COMPLEX = "散发着薄荷清香的药草。\n主要用于给炖菜等料理调味，\n也能直接生吃。",
 }
 
+STRINGS.NAMES.GALE_DESTRUCT_ITEM_TABLE                       = "物品拆解台"
+STRINGS.RECIPE_DESC.GALE_DESTRUCT_ITEM_TABLE                 = "用于拆解物品，也可以获得其蓝图。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE = "绿宝石法杖的完美替代品。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE    = "该做一些逆向工程了。"
 
 
 -- Foods are below...
@@ -1281,6 +1285,7 @@ STRINGS.GALE_CHATTYNODES.ATHETOS_OPERATOR_MEDICAL = {
 -- //////////////////////////////////////////////////////////////////////
 
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_GUN_JAMMED = "哎呀，枪卡壳了！"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT = "不知为何，我无法拆解此物品。"
 
 -- //////////////////////////////////////////////////////////////////////
 --                              Melodies
@@ -1440,6 +1445,11 @@ STRINGS.GALE_UI.SKILL_NODES = {
 		DESC = "解剖风暴恶魔类敌人的组织时，有可能获得更多掉落物。",
 	},
 
+	DESTRUCT_TABLE = {
+		NAME = "逆向工程",
+		DESC = "可以制作物品拆解台来拆解物品，搭配莎草纸和羽毛笔还能同时获得其蓝图。",
+	},
+
 	QUICK_CHARGE = {
 		NAME = "聚精会神",
 		DESC = "提高凯尔蓄力的速度。",
@@ -1583,6 +1593,8 @@ STRINGS.UI.COOKBOOK.FOOD_EFFECTS_RECOVER_STAMINA_OVER_TIME = "在一段时间内
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_GAIN_POWER_AND_RECOVER_STAMINA_OVER_TIME = "获得力量与耐力加成。"
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_RECOVER_STAMINA = "立刻恢复耐力。"
 STRINGS.UI.COOKBOOK.FOOD_EFFECTS_DOG_FOOD = "宠物或者犬类生物非常喜欢吃。"
+
+STRINGS.GALE_UI.DESTRUCT_ITEM = "拆解"
 -- //////////////////////////////////////////////////////////////////////
 --                              Skill Cast
 -- //////////////////////////////////////////////////////////////////////

@@ -204,7 +204,7 @@ end
 local function GetAnim(inst)
     local debug_str = inst.entity:GetDebugString()
     local bank, build, anim, frame, frame_all = string.match(debug_str,
-                                                             "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
+        "bank:%s+(.-)%s+build:%s+(.-)%s+anim:%s+(.-)%s+.-Frame:%s+(.-)/(.-)%s+")
 
     local percent = nil
     if frame and frame_all then
@@ -511,7 +511,7 @@ local function GetDestructRecipesByEntity(target, percent, float_to_int_fn)
         (target.components.armor ~= nil and target.components.inventoryitem ~= nil and target.components.armor:GetPercent()) or
         1
 
-    return GetDestructRecipesByName(name, percent * ingredient_percent, float_to_int_fn)
+    return GetDestructRecipesByName(target.prefab, percent * ingredient_percent, float_to_int_fn)
 end
 
 local function SumDices(num_dices, dice_max_value)
@@ -523,6 +523,49 @@ local function SumDices(num_dices, dice_max_value)
     return result
 end
 
+
+local function Cart2Polar(vec3, is_degree)
+    local x, y, z = vec3:Get()
+    local r, theta, phi
+
+    r = math.sqrt(x * x + y * y + z * z)
+    if r == 0 then
+        return Vector3(0, 0, 0)
+    end
+
+    -- theta = math.atan2(vec3.z, vec3.x)
+    -- phi = math.acos(vec3.y / r)
+
+    -- 天顶角 Angle between vec3 and vertical axis
+    -- [0, PI]
+    theta = math.acos(y / r)
+
+    -- 方位角 Angle between vec3 and forward axis
+    -- [-PI, PI]
+    phi = math.atan2(z, x)
+
+    if is_degree then
+        return Vector3(r, theta * RADIANS, phi * RADIANS)
+    end
+
+    return Vector3(r, theta, phi)
+end
+
+local function Polar2Cart(vec3, is_degree)
+    local r, theta, phi = vec3:Get()
+    if is_degree then
+        theta = theta * DEGREES
+        phi = phi * DEGREES
+    end
+
+    local x, y, z
+
+    x = r * math.sin(theta) * math.cos(phi)
+    y = r * math.cos(theta)
+    z = r * math.sin(theta) * math.sin(phi)
+
+    return Vector3(x, y, z)
+end
 
 return {
     GetFaceVector = GetFaceVector,
@@ -575,4 +618,7 @@ return {
     GetDestructRecipesByEntity = GetDestructRecipesByEntity,
 
     SumDices = SumDices,
+
+    Cart2Polar = Cart2Polar,
+    Polar2Cart = Polar2Cart,
 }
