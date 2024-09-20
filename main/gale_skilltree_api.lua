@@ -490,6 +490,47 @@ GLOBAL.GALE_SKILL_NODES = {
         end,
     }),
 
+    MULTITHRUST = GaleNode({
+        ui_pos = Vector3(1, 2),
+        ingredients = {
+            Ingredient("athetos_mushroom_cap", 2, "images/inventoryimages/athetos_mushroom_cap.xml"),
+        },
+
+        OnPressed = function(inst, x, y, z, ent)
+            if not inst.sg:HasStateTag("dead")
+                and not inst.sg:HasStateTag("busy")
+                and not IsEntityDeadOrGhost(inst)
+                and not (inst.components.rider and inst.components.rider:IsRiding())
+                and not (inst.components.gale_skill_mimic and inst.components.gale_skill_mimic:IsMimic())
+            then
+                local weapon = inst.components.combat:GetWeapon()
+                if not (weapon and weapon.components.gale_multithruster) then
+                    return
+                end
+
+                if inst.components.gale_stamina.current < 10 then
+                    SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce"], inst.userid,
+                        STRINGS.GALE_SKILL_CAST.FAILED.INSUFFICIENT_STAMINA)
+                    return
+                end
+
+                local targetpos = Vector3(x, y, z)
+
+                local last_cast_time = inst.components.gale_skiller.skillmem.LastMultiThrustTime
+
+                if last_cast_time == nil or GetTime() - last_cast_time >= 3 then
+                    inst.sg:GoToState("gale_skill_multithrust", {
+                        weapon = weapon,
+                        targetpos = targetpos,
+                    })
+                    inst.components.gale_stamina:DoDelta(-10)
+
+                    inst.components.gale_skiller.skillmem.LastMultiThrustTime = GetTime()
+                end
+            end
+        end,
+    }),
+
 
     -- ENERGY
     KINETIC_BLAST = GaleNode({
@@ -860,6 +901,10 @@ GLOBAL.GALE_SKILL_TREE.COMBAT.root:AddChilds({
     GLOBAL.GALE_SKILL_NODES.QUICK_CHARGE,
     GLOBAL.GALE_SKILL_NODES.SPEAR_FRAGMENT,
     GLOBAL.GALE_SKILL_NODES.COMBAT_LEAP,
+})
+
+GLOBAL.GALE_SKILL_NODES.COMBAT_LEAP:AddChilds({
+    GLOBAL.GALE_SKILL_NODES.MULTITHRUST,
 })
 
 -- SCIENCE
@@ -1981,8 +2026,78 @@ AddStategraphState("wilson", State {
             inst.sg.statemem.weapon.components.gale_helmsplitter:StopHelmSplitting(inst)
         end
     end,
-}
-)
+})
+
+AddStategraphState("wilson", State {
+    name = "gale_skill_multithrust",
+    tags = { "attack", "abouttoattack", "busy", "nopredict" },
+
+    onenter = function(inst, data)
+        inst.sg.statemem.targetpos = data.targetpos
+        inst.sg.statemem.weapon = data.weapon
+
+        if not ValidateGaleMultiThruster(inst) then
+            inst.sg:GoToState("idle")
+            return
+        end
+
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("multithrust")
+        inst.Transform:SetEightFaced()
+
+        inst:ForceFacePoint(inst.sg.statemem.targetpos)
+
+        inst.sg.statemem.weapon.components.gale_multithruster:StartThrusting()
+
+        inst.sg:SetTimeout(25 * FRAMES)
+    end,
+
+    timeline =
+    {
+        TimeEvent(7 * FRAMES, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
+        end),
+        TimeEvent(9 * FRAMES, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
+        end),
+        TimeEvent(11 * FRAMES, function(inst)
+            DoGaleThrust(inst)
+        end),
+        TimeEvent(13 * FRAMES, function(inst)
+            DoGaleThrust(inst)
+        end),
+        TimeEvent(15 * FRAMES, function(inst)
+            DoGaleThrust(inst)
+        end),
+        TimeEvent(17 * FRAMES, function(inst)
+            DoGaleThrust(inst, true)
+        end),
+        TimeEvent(19 * FRAMES, function(inst)
+            DoGaleThrust(inst, true)
+        end),
+    },
+
+    ontimeout = function(inst)
+        inst.sg:GoToState("idle", true)
+    end,
+
+    events =
+    {
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        inst.components.combat:SetTarget(nil)
+        inst.Transform:SetFourFaced()
+        if ValidateGaleMultiThruster(inst) then
+            inst.sg.statemem.weapon.components.gale_multithruster:StopThrusting()
+        end
+    end,
+})
 
 AddStategraphState("wilson", State {
     name = "gale_destruct_item",

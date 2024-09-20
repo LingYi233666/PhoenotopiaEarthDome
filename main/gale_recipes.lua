@@ -430,10 +430,10 @@ GaleModAddRecipe2(
 GaleModAddRecipe2(
     "gale_destruct_item_table",
     {
-        Ingredient("rabbit", 1),
-        Ingredient("manrabbit_tail", 1),
-        Ingredient("carrot", 1),
-
+        Ingredient("boards", 4),
+        Ingredient("wagpunk_bits", 2),
+        Ingredient("papyrus", 1),
+        Ingredient("blue_cap", 1),
     },
     TECH.NONE,
     {
