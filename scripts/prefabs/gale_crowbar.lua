@@ -39,24 +39,24 @@ local function OnSpecialAtk(owner, data)
             local hit_pos = owner:GetPosition() +
                 GaleCommon.GetFaceVector(owner) * owner.components.combat:GetHitRange() * 0.75
             GaleCommon.AoeForEach(owner, hit_pos, 2.5, nil, { "INLIMBO" }, { "_combat", "_inventoryitem" },
-                                  function(doer, other)
-                                      local can_attack = doer.components.combat:CanTarget(other) and
-                                          not doer.components.combat:IsAlly(other)
-                                      local is_inv = other.components.inventoryitem ~= nil
+                function(doer, other)
+                    local can_attack = doer.components.combat:CanTarget(other) and
+                        not doer.components.combat:IsAlly(other)
+                    local is_inv = other.components.inventoryitem ~= nil
 
-                                      if can_attack then
-                                          doer.components.combat.ignorehitrange = true
-                                          doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
-                                                                          nil,
-                                                                          GetRandomMinMax(0.75, 1))
-                                          doer.components.combat.ignorehitrange = false
-                                      elseif is_inv then
-                                          GaleCommon.LaunchItem(other, doer, 2)
-                                      end
-                                  end,
-                                  function(doer, other)
-                                      return other and other:IsValid()
-                                  end)
+                    if can_attack then
+                        doer.components.combat.ignorehitrange = true
+                        doer.components.combat:DoAttack(other, doer.components.combat:GetWeapon(), nil,
+                            nil,
+                            GetRandomMinMax(0.75, 1))
+                        doer.components.combat.ignorehitrange = false
+                    elseif is_inv then
+                        GaleCommon.LaunchItem(other, doer, 2)
+                    end
+                end,
+                function(doer, other)
+                    return other and other:IsValid()
+                end)
 
             -- SpawnAt("gale_atk_firepuff_cold",target).Transform:SetScale(1,1,1)
             SpawnAt("gale_leap_puff_fx", hit_pos)
@@ -102,6 +102,23 @@ local function OnCastHelmSplitter(inst, attacker, target)
     attacker.Physics:Stop()
 end
 
+
+local function OnStartMultithruster(inst, doer)
+    if not inst.magicgas then
+        inst.magicgas = SpawnPrefab("gale_magicgas_vfx")
+        inst.magicgas.entity:SetParent(doer.entity)
+        inst.magicgas.entity:AddFollower()
+        inst.magicgas.Follower:FollowSymbol(doer.GUID, "swap_object", 15, -190, 0)
+    end
+end
+
+local function OnStopMultithruster(inst, doer)
+    if inst.magicgas then
+        inst.magicgas:Remove()
+    end
+    inst.magicgas = nil
+end
+
 local function ClientFn(inst)
 
 end
@@ -122,6 +139,10 @@ local function ServerFn(inst)
     inst.components.gale_helmsplitter.onstartfn = OnStartHelmSplitter
     inst.components.gale_helmsplitter.onstopfn = OnStopHelmSplitter
     inst.components.gale_helmsplitter.oncastfn = OnCastHelmSplitter
+
+    inst:AddComponent("gale_multithruster")
+    inst.components.gale_multithruster.onstartfn = OnStartMultithruster
+    inst.components.gale_multithruster.onstopfn = OnStopMultithruster
 
     local ChargeAttackIfNotCompleted = GaleChargeableWeaponFns.MeleeAttackNonCompletedWrapper()
     local ChargeAttackIfCompleted = GaleChargeableWeaponFns.MeleeAttackCompletedWrapper()
@@ -173,35 +194,7 @@ return GaleEntity.CreateNormalWeapon({
         anim = "idle",
 
         equippable_data = {
-            owner_listeners = {
-                -- { "gale_speicalatk", OnSpecialAtk },
-                -- { "onhitother", OnHitOther },
-            },
-            onequip_priority = {
-                {
-                    function(inst, owner)
-                        if not inst.magicgas then
-                            inst.magicgas = SpawnPrefab("gale_magicgas_vfx")
-                            inst.magicgas.entity:SetParent(owner.entity)
-                            inst.magicgas.entity:AddFollower()
-                            inst.magicgas.Follower:FollowSymbol(owner.GUID, "swap_object", 15, -190, 0)
-                        end
-                    end,
-                    1,
-                }
-            },
 
-            onunequip_priority = {
-                {
-                    function(inst, owner)
-                        if inst.magicgas then
-                            inst.magicgas:Remove()
-                            inst.magicgas = nil
-                        end
-                    end,
-                    1,
-                }
-            },
         },
 
         inventoryitem_data = {
