@@ -9,7 +9,7 @@ local actionhandlers = {
 local events = {
     -- CommonHandlers.OnLocomote(true, false),
     -- CommonHandlers.OnDeath(),
-    -- CommonHandlers.OnAttacked(),
+    CommonHandlers.OnAttacked(),
     EventHandler("minhealth", function(inst, data)
         if not inst.sg:HasStateTag("defeated") then
             inst.sg:GoToState("defeated")
@@ -25,7 +25,49 @@ end
 
 local PUNCH_LOOP_ANIM_SPEED = 2.0
 
+local idle_anims = {
+    -- { "idle_groggy_pre", "idle_groggy" },
+    { "idle_lunacy_pre", "idle_lunacy_loop" },
+}
+
 local states = {
+    State {
+        name = "idle",
+        tags = { "idle", "canrotate" },
+
+        onenter = function(inst, pushanim)
+            if inst.components.locomotor ~= nil then
+                inst.components.locomotor:StopMoving()
+            end
+
+            local anim_list = idle_anims[math.random(1, #idle_anims)]
+
+            if pushanim then
+                for k, v in pairs(anim_list) do
+                    inst.AnimState:PushAnimation(v, k == #anim_list)
+                end
+            else
+                inst.AnimState:PlayAnimation(anim_list[1], #anim_list == 1)
+                for k, v in pairs(anim_list) do
+                    if k > 1 then
+                        inst.AnimState:PushAnimation(v, k == #anim_list)
+                    end
+                end
+            end
+        end,
+
+        timeline = {},
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+    },
+
     -- Only for up body
     State {
         name = "upbody_punch_loop",
@@ -86,7 +128,7 @@ local states = {
 
     State {
         name = "punch_loop",
-        tags = { "attack", "busy", "abouttoattack" },
+        tags = { "attack", "busy", "abouttoattack", },
 
         onenter = function(inst, data)
             data = data or {}
@@ -157,14 +199,14 @@ local states = {
         {
             EventHandler("upbody_doattack", function(inst)
                 local victims = GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst.components.combat:GetHitRange(),
-                                                       nil,
-                                                       function(inst, v)
-                                                           local tar_deg = GaleCommon.GetFaceAngle(inst, v)
-                                                           local face_angle = 90
-                                                           return inst.components.combat:CanTarget(v) and
-                                                               tar_deg >= -face_angle / 2 and
-                                                               tar_deg <= face_angle / 2
-                                                       end)
+                    nil,
+                    function(inst, v)
+                        local tar_deg = GaleCommon.GetFaceAngle(inst, v)
+                        local face_angle = 90
+                        return inst.components.combat:CanTarget(v) and
+                            tar_deg >= -face_angle / 2 and
+                            tar_deg <= face_angle / 2
+                    end)
 
                 for k, v in pairs(victims) do
                     if v.components.sanity and not IsEntityDead(v, true) then
@@ -183,9 +225,253 @@ local states = {
             end),
         },
     },
+
+    State {
+        name = "attack_throw",
+        tags = { "busy", "attack", "abouttoattack", },
+
+        onenter = function(inst, data)
+            inst.components.locomotor:Stop()
+
+            inst.AnimState:Show("ARM_carry")
+            inst.AnimState:Hide("ARM_normal")
+            inst.AnimState:OverrideSymbol("swap_object", "swap_athetos_grenade_elec", "swap_athstos_grenade_elec")
+
+            inst.AnimState:PlayAnimation("throw_pre")
+
+            inst.sg.statemem.target_pos   = data.target_pos
+            inst.sg.statemem.count        = data.count or 1
+            inst.sg.statemem.damage_taken = data.damage_taken or 0
+
+            if inst.sg.statemem.target_pos == nil then
+                local target = inst.components.combat.target
+                inst.sg.statemem.target_pos = target and target:GetPosition()
+            end
+
+            if inst.sg.statemem.target_pos == nil then
+                inst.sg:GoToState("idle")
+                return
+            end
+
+
+            inst:ForceFacePoint(data.target_pos)
+
+            inst.sg:SetTimeout(26 * FRAMES)
+        end,
+
+        ontimeout = function(inst)
+            inst.sg.statemem.count = inst.sg.statemem.count - 1
+
+            local target = inst.components.combat.target
+            if inst.sg.statemem.count > 0 and target then
+                inst.sg:GoToState("attack_throw", {
+                    target_pos = target:GetPosition(),
+                    count = inst.sg.statemem.count,
+                    damage_taken = inst.sg.statemem.damage_taken,
+                })
+            else
+                inst.sg:GoToState("idle", true)
+            end
+        end,
+
+        timeline = {
+            TimeEvent(16 * FRAMES, function(inst)
+                inst.AnimState:PlayAnimation("throw")
+                inst.AnimState:PushAnimation("idle_loop", true)
+            end),
+
+            TimeEvent(20 * FRAMES, function(inst)
+                local proj = SpawnAt("athetos_grenade_elec", inst)
+                proj.components.complexprojectile:SetHorizontalSpeed(25)
+                proj.components.complexprojectile:SetGravity(-50)
+                proj.components.complexprojectile:Launch(inst.sg.statemem.target_pos, inst)
+
+                -- inst.AnimState:ClearOverrideSymbol("swap_object")
+
+                inst.sg:RemoveStateTag("abouttoattack")
+            end),
+        },
+
+        events =
+        {
+            EventHandler("attacked", function(inst, data)
+                inst.sg.statemem.damage_taken = inst.sg.statemem.damage_taken + data.damage
+                if inst.sg.statemem.damage_taken >= 100 then
+                    -- Too much damage cause katash drop his electric grenade
+                    inst.sg:GoToState("attacked_drop_grenade")
+                end
+            end),
+        },
+
+        onexit = function(inst)
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+            inst.AnimState:ClearOverrideSymbol("swap_object")
+        end,
+    },
+
+    State {
+        name = "attacked_drop_grenade",
+        tags = { "hit", "busy" },
+
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+
+            inst.AnimState:PlayAnimation("hit")
+
+            inst.SoundEmitter:PlaySound(inst.sounds.slip)
+        end,
+
+        timeline = {
+            TimeEvent(0 * FRAMES, function(inst)
+                local proj = SpawnAt("athetos_grenade_elec", inst, nil, Vector3(0, 0.3, 0))
+                proj.Physics:SetVel(0, 5, 0)
+                proj:ExplodeCountdown(0.8)
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+    },
+
+    State {
+        name = "knockback_stage1",
+        tags = { "busy", },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+
+            local lastattacker = inst.components.combat.lastattacker
+
+            if lastattacker then
+                inst:ForceFacePoint(lastattacker:GetPosition())
+            end
+
+            inst.AnimState:SetMultColour(1, 0, 0, 1)
+
+            inst.AnimState:PlayAnimation("hit")
+            inst.SoundEmitter:PlaySound(inst.sounds.knockback_stage1)
+
+            inst.sg.statemem.speed = 16
+            inst.Physics:SetMotorVel(-inst.sg.statemem.speed, 0, 0)
+
+            ShakeAllCameras(CAMERASHAKE.FULL, .35, .02, 0.5, inst, 40)
+        end,
+
+        onupdate = function(inst)
+            if inst.sg.statemem.speed > 0 then
+                inst.sg.statemem.speed = math.max(0, inst.sg.statemem.speed - FRAMES * 16)
+                inst.Physics:SetMotorVel(-inst.sg.statemem.speed, 0, 0)
+            else
+                inst.Physics:Stop()
+            end
+        end,
+
+        timeline = {
+            TimeEvent(8 * FRAMES, function(inst)
+                local p = inst.AnimState:GetCurrentAnimationTime() / inst.AnimState:GetCurrentAnimationLength()
+                inst.AnimState:SetPercent("hit", p)
+            end),
+
+            TimeEvent(60 * FRAMES, function(inst)
+                inst.sg:GoToState("knockback_stage2")
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+
+            end),
+        },
+
+        onexit = function(inst)
+            inst.Physics:Stop()
+            inst.AnimState:SetMultColour(1, 1, 1, 1)
+        end,
+    },
+
+    State {
+        name = "knockback_stage2",
+        tags = { "busy", },
+
+        onenter = function(inst)
+            -- TODO: Unlink katash and telepath
+
+            inst.components.locomotor:Stop()
+
+            inst.AnimState:PlayAnimation("knockback_high")
+            inst.SoundEmitter:PlaySound(inst.sounds.knockback_stage2)
+
+            inst.sg.statemem.speed = 16
+            inst.Physics:SetMotorVel(-inst.sg.statemem.speed, 0, 0)
+        end,
+
+
+        timeline = {
+            TimeEvent(8 * FRAMES, function(inst)
+                inst.SoundEmitter:PlaySound("dontstarve/movement/bodyfall_dirt")
+                inst.Physics:Stop()
+            end),
+
+            TimeEvent(33 * FRAMES, function(inst)
+                inst.AnimState:PlayAnimation("wakeup")
+                inst.AnimState:SetTime(10 * FRAMES)
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:IsCurrentAnimation("wakeup") then
+                    inst.sg:GoToState("idle_no_mindcontrol")
+                end
+            end),
+        },
+
+        onexit = function(inst)
+            inst.Physics:Stop()
+        end,
+    },
+
+    State {
+        name = "idle_no_mindcontrol",
+        tags = { "busy" },
+
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+
+            inst.AnimState:PlayAnimation("idle_groggy01_pre")
+            inst.AnimState:PushAnimation("idle_groggy01_loop", true)
+
+            inst.sg:SetTimeout(8)
+        end,
+
+        ontimeout = function(inst)
+
+        end,
+
+        timeline = {
+            TimeEvent(8, function(inst)
+                -- TODO: Be mind controled again
+            end),
+        },
+
+        events =
+        {
+            EventHandler("attacked", function(inst)
+
+            end),
+        },
+    },
 }
 
-
-CommonStates.AddIdle(states)
+CommonStates.AddHitState(states)
 
 return StateGraph("SGgaleboss_katash_2", states, events, "idle")

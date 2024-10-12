@@ -19,7 +19,7 @@ local SPINATTACK_CD        = 20
 local DASHATTACK_DELAY     = 1
 local DASHATTACK_CD        = 20
 local DASHATTACK_LOW_HP_CD = 10
-local THROW_CD             = 1
+local THROW_CD             = 5
 local ROLLING_CD           = 20 --20
 
 local THROW_MIN_DIST_SQ    = 8 * 8
@@ -204,64 +204,64 @@ end
 
 function KatashBrain:OnStart()
     local root = PriorityNode({
-                                  IfNode(function()
-                                             return CanCastRolling(self.inst)
-                                         end, "CastRolling",
-                                         ActionNode(function()
-                                             CastRolling(self.inst)
-                                         end)
-                                  ),
+        IfNode(function()
+                return CanCastRolling(self.inst)
+            end, "CastRolling",
+            ActionNode(function()
+                CastRolling(self.inst)
+            end)
+        ),
 
-                                  IfNode(function()
-                                             return CanCastSpinAttack(self.inst)
-                                         end, "CastSpinAttack",
-                                         ActionNode(function()
-                                             CastSpinAttack(self.inst)
-                                         end)
-                                  ),
+        IfNode(function()
+                return CanCastSpinAttack(self.inst)
+            end, "CastSpinAttack",
+            ActionNode(function()
+                CastSpinAttack(self.inst)
+            end)
+        ),
 
-                                  IfNode(function()
-                                             return CanCastBigBall(self.inst)
-                                         end, "CastBigBall",
-                                         ActionNode(function()
-                                             CastBigBall(self.inst)
-                                         end)
-                                  ),
+        IfNode(function()
+                return CanCastBigBall(self.inst)
+            end, "CastBigBall",
+            ActionNode(function()
+                CastBigBall(self.inst)
+            end)
+        ),
 
-                                  IfNode(function()
-                                             return CanCastDash(self.inst)
-                                         end, "CastDash",
-                                         ActionNode(function()
-                                             CastDash(self.inst)
-                                         end)
-                                  ),
+        IfNode(function()
+                return CanCastDash(self.inst)
+            end, "CastDash",
+            ActionNode(function()
+                CastDash(self.inst)
+            end)
+        ),
 
 
-                                  IfNode(function()
-                                             return CanCastThrow(self.inst)
-                                         end, "CastThrow",
-                                         ActionNode(function()
-                                             CastThrow(self.inst)
-                                         end)
-                                  ),
+        IfNode(function()
+                return CanCastThrow(self.inst)
+            end, "CastThrow",
+            ActionNode(function()
+                CastThrow(self.inst)
+            end)
+        ),
 
-                                  WhileNode(function()
-                                                return ShouldFight(self.inst)
-                                            end, "ShouldFight",
-                                            ChaseAndAttack(self.inst, MAX_CHASE_TIME, MAX_CHASE_DIST)
-                                  ),
+        WhileNode(function()
+                return ShouldFight(self.inst)
+            end, "ShouldFight",
+            ChaseAndAttack(self.inst, MAX_CHASE_TIME, MAX_CHASE_DIST)
+        ),
 
-                                  WhileNode(function() return ShouldAvoidFight(self.inst) end, "ShouldAvoidFight",
-                                            RunAway(self.inst, function() return self.inst.components.combat.target end,
-                                                    RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
+        WhileNode(function() return ShouldAvoidFight(self.inst) end, "ShouldAvoidFight",
+            RunAway(self.inst, function() return self.inst.components.combat.target end,
+                RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
 
-                                  IfNode(function()
-                                             return self.inst.components.combat.target == nil
-                                         end, "Wander",
-                                         Wander(self.inst, GetHomeLocation, WANDER_MAX_DIST)
-                                  ),
+        IfNode(function()
+                return self.inst.components.combat.target == nil
+            end, "Wander",
+            Wander(self.inst, GetHomeLocation, WANDER_MAX_DIST)
+        ),
 
-                              }, .25)
+    }, .25)
 
     self.bt = BT(self.inst, root)
 end

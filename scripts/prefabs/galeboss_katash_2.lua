@@ -7,13 +7,13 @@ local assets = {
 
 local function SelectTargetFn(inst)
     return FindEntity(inst, 20,
-                      function(guy)
-                          return inst.components.combat:CanTarget(guy)
-                              and (not GaleCommon.IsShadowCreature(guy) or (guy.components.combat and guy.components.combat:TargetIs(inst)))
-                      end,
-                      { "_combat", "_health" },
-                      { "INLIMBO" },
-                      { "character", "lunar_aligned", "largecreature" }
+        function(guy)
+            return inst.components.combat:CanTarget(guy)
+                and (not GaleCommon.IsShadowCreature(guy) or (guy.components.combat and guy.components.combat:TargetIs(inst)))
+        end,
+        { "_combat", "_health" },
+        { "INLIMBO" },
+        { "character", "lunar_aligned", "largecreature" }
     )
 end
 
@@ -172,20 +172,9 @@ local function KatashServerFn(inst)
     -- inst:SetBrain(brain)
 
     inst.sounds = {
-        teleport = "gale_sfx/battle/galeboss_katash/teleport",
-        talk = "gale_sfx/battle/galeboss_katash/hurt",
-        hit = "gale_sfx/battle/galeboss_katash/hurt",
-        shoot = "gale_sfx/battle/kobold_shotty",
-        shoot_bigball = "gale_sfx/battle/p1_katash_gun2",
-        shoot2 = "gale_sfx/battle/p1_katash_gun",
-        dash_pre = "gale_sfx/battle/galeboss_katash/unsheathe",
-        dash = "gale_sfx/battle/galeboss_katash/slash",
-        laugh = "gale_sfx/battle/galeboss_katash/laugh",
-        laugh_echo = "gale_sfx/battle/galeboss_katash/laugh_echo",
-        eat_good = "gale_sfx/battle/galeboss_katash/good_food",
-        eat_bad = "gale_sfx/battle/galeboss_katash/bad_food",
-        defeat = "gale_sfx/battle/galeboss_defeat/boss_explode_clean",
-        superjump = "gale_sfx/battle/galeboss_errorbot/teleport",
+        slip = "dontstarve/common/tool_slip",
+        knockback_stage1 = "",
+        knockback_stage2 = "",
     }
 
     inst:EnableMindControledParam(true)

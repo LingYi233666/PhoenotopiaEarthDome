@@ -12,15 +12,6 @@ local assets = {
     Asset("ATLAS", "images/inventoryimages/athetos_grenade_elec.xml"),
 }
 
--- local function GetDamage(inst, attacker, target)
---     if GaleCondition.GetCondition(target,"condition_metallic") then
---         return GetRandomMinMax(200,300)
---     end
-
---     return 1
--- end
-
-
 local function DoExplode(inst)
     inst.SoundEmitter:KillSound("didi")
     inst.SoundEmitter:PlaySound("gale_sfx/battle/athetos_grenade_elec/explode")
@@ -173,15 +164,12 @@ local function DoExplode(inst)
     end)
 end
 
-local function OnThrown(inst)
-    inst.AnimState:SetLightOverride(1)
-    inst.AnimState:PlayAnimation("throw", true)
-
+local function ExplodeCountdown(inst, duration)
     -- Play start sfx
     inst.SoundEmitter:PlaySound("gale_sfx/battle/athetos_grenade_elec/didi", "didi")
 
     inst.persists = false
-    inst:DoTaskInTime(1.5, DoExplode)
+    inst:DoTaskInTime(duration, DoExplode)
 
     inst:DoPeriodicTask(2 * FRAMES, function()
         if inst.should_red then
@@ -194,6 +182,13 @@ local function OnThrown(inst)
     end)
 
     inst.components.inventoryitem.canbepickedup = false
+end
+
+local function OnThrown(inst)
+    inst.AnimState:SetLightOverride(1)
+    inst.AnimState:PlayAnimation("throw", true)
+
+    inst:ExplodeCountdown(1.5)
 end
 
 local function OnHit(inst, other)
@@ -227,6 +222,8 @@ return GaleEntity.CreateNormalWeapon({
     end,
 
     serverfn = function(inst)
+        inst.ExplodeCountdown = ExplodeCountdown
+
         inst.components.inventoryitem:SetSinks(true)
 
         inst.components.equippable.equipstack = true
