@@ -112,6 +112,52 @@ local function CheckSwapItem(inst)
     end
 end
 
+local function OnHammered(inst)
+    inst.components.lootdropper:DropLoot()
+    inst.components.container:DropEverything()
+
+    SpawnAt("collapse_small", inst):SetMaterial("wood")
+
+    inst:Remove()
+end
+
+local function OnHit(inst)
+    inst.components.container:DropEverything()
+    inst.components.container:Close()
+end
+
+-- local DESTSOUNDS =
+-- {
+--     { --magic
+--         soundpath = "dontstarve/common/destroy_magic",
+--         ing = { "nightmarefuel", "livinglog" },
+--     },
+--     { --cloth
+--         soundpath = "dontstarve/common/destroy_clothing",
+--         ing = { "silk", "beefalowool" },
+--     },
+--     { --tool
+--         soundpath = "dontstarve/common/destroy_tool",
+--         ing = { "twigs" },
+--     },
+--     { --gem
+--         soundpath = "dontstarve/common/gem_shatter",
+--         ing = { "redgem", "bluegem", "greengem", "purplegem", "yellowgem", "orangegem" },
+--     },
+--     { --wood
+--         soundpath = "dontstarve/common/destroy_wood",
+--         ing = { "log", "boards" },
+--     },
+--     { --stone
+--         soundpath = "dontstarve/common/destroy_stone",
+--         ing = { "rocks", "cutstone" },
+--     },
+--     { --straw
+--         soundpath = "dontstarve/common/destroy_straw",
+--         ing = { "cutgrass", "cutreeds" },
+--     },
+-- }
+
 return GaleEntity.CreateNormalEntity({
         prefabname = "gale_destruct_item_table",
         assets = assets,
@@ -135,6 +181,15 @@ return GaleEntity.CreateNormalEntity({
 
             inst:AddComponent("container")
             inst.components.container:WidgetSetup("gale_destruct_item_table")
+
+            inst:AddComponent("lootdropper")
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+            inst.components.workable:SetWorkLeft(2)
+            inst.components.workable:SetOnFinishCallback(OnHammered)
+            inst.components.workable:SetOnWorkCallback(OnHit)
+
 
             inst:ListenForEvent("itemget", CheckSwapItem)
             inst:ListenForEvent("itemlose", CheckSwapItem)

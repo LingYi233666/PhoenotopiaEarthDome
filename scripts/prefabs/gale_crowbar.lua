@@ -143,6 +143,7 @@ local function ServerFn(inst)
     inst:AddComponent("gale_multithruster")
     inst.components.gale_multithruster.onstartfn = OnStartMultithruster
     inst.components.gale_multithruster.onstopfn = OnStopMultithruster
+    inst.components.gale_multithruster.condition_bleed_stack = 5
 
     local ChargeAttackIfNotCompleted = GaleChargeableWeaponFns.MeleeAttackNonCompletedWrapper()
     local ChargeAttackIfCompleted = GaleChargeableWeaponFns.MeleeAttackCompletedWrapper()

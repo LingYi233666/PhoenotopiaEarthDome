@@ -1,4 +1,5 @@
 local GaleCommon = require("util/gale_common")
+local GaleCondition = require("util/gale_conditions")
 
 local GaleMultiThruster = Class(function(self, inst)
     self.inst = inst
@@ -7,6 +8,8 @@ local GaleMultiThruster = Class(function(self, inst)
 
     self.attack_range = 1.25
     self.instant_mults = { 0.75, 0.75 }
+
+    self.condition_bleed_stack = 0
 
     self.onstartfn = nil
     self.onstopfn = nil
@@ -53,11 +56,12 @@ function GaleMultiThruster:GetHitPos(doer)
     return hit_pos
 end
 
-function GaleMultiThruster:DoThrust(doer, target)
+function GaleMultiThruster:DoThrust(doer)
     local hit_pos = self:GetHitPos(doer)
 
+    local victims = {}
     if self.attack_range > 0 then
-        GaleCommon.AoeDoAttack(doer, hit_pos, self.attack_range, function(doer, other)
+        victims = GaleCommon.AoeDoAttack(doer, hit_pos, self.attack_range, function(doer, other)
                 return self.inst,
                     nil,
                     nil,
@@ -70,7 +74,15 @@ function GaleMultiThruster:DoThrust(doer, target)
             end)
     end
 
-    if self.oncastfn == nil or self.oncastfn(self.inst, doer, target) then
+    if self.condition_bleed_stack > 0 then
+        for _, v in pairs(victims) do
+            if not IsEntityDead(v, true) then
+                GaleCondition.AddCondition(v, "condition_bleed", self.condition_bleed_stack)
+            end
+        end
+    end
+
+    if self.oncastfn == nil or self.oncastfn(self.inst, doer, victims) then
         return true
     end
 end

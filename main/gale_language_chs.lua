@@ -1286,6 +1286,7 @@ STRINGS.GALE_CHATTYNODES.ATHETOS_OPERATOR_MEDICAL = {
 
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_GUN_JAMMED = "哎呀，枪卡壳了！"
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT = "不知为何，我无法拆解此物品。"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_DONT_KNOW_HOW_TO_DESTRUCT = "我不知道如何使用这个拆解台。"
 
 -- //////////////////////////////////////////////////////////////////////
 --                              Melodies

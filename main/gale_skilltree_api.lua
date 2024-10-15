@@ -23,8 +23,12 @@ local skilltree_Assets = {
     Asset("ATLAS", "images/ui/skill_slot/burger_eater.xml"),
     Asset("IMAGE", "images/ui/skill_slot/carry_charge.tex"),
     Asset("ATLAS", "images/ui/skill_slot/carry_charge.xml"),
+    Asset("IMAGE", "images/ui/skill_slot/combat_leap.tex"),
+    Asset("ATLAS", "images/ui/skill_slot/combat_leap.xml"),
     Asset("IMAGE", "images/ui/skill_slot/dark_vision.tex"),
     Asset("ATLAS", "images/ui/skill_slot/dark_vision.xml"),
+    Asset("IMAGE", "images/ui/skill_slot/destruct_table.tex"),
+    Asset("ATLAS", "images/ui/skill_slot/destruct_table.xml"),
     Asset("IMAGE", "images/ui/skill_slot/dimension_jump.tex"),
     Asset("ATLAS", "images/ui/skill_slot/dimension_jump.xml"),
     Asset("IMAGE", "images/ui/skill_slot/doctor.tex"),
@@ -45,6 +49,8 @@ local skilltree_Assets = {
     Asset("ATLAS", "images/ui/skill_slot/mimic_lv2.xml"),
     Asset("IMAGE", "images/ui/skill_slot/mimic_lv3.tex"),
     Asset("ATLAS", "images/ui/skill_slot/mimic_lv3.xml"),
+    Asset("IMAGE", "images/ui/skill_slot/multithrust.tex"),
+    Asset("ATLAS", "images/ui/skill_slot/multithrust.xml"),
     Asset("IMAGE", "images/ui/skill_slot/parry.tex"),
     Asset("ATLAS", "images/ui/skill_slot/parry.xml"),
     Asset("IMAGE", "images/ui/skill_slot/picker_butterfly.tex"),
@@ -1028,6 +1034,14 @@ AddModRPCHandler("gale_rpc", "dark_vision_ui2server", function(inst, enable)
 end)
 
 AddModRPCHandler("gale_rpc", "use_destruct_item_table", function(inst, destruct_table)
+    if not inst:HasTag("gale_destruct_item_table_builder") then
+        if inst.components.talker then
+            inst.components.talker:Say(STRINGS.CHARACTERS.GENERIC.ANNOUNCE_DONT_KNOW_HOW_TO_DESTRUCT)
+        end
+        return
+    end
+
+
     local target = destruct_table.components.container:GetItemInSlot(1)
     if not target then
         return
@@ -2111,9 +2125,9 @@ AddStategraphState("wilson", State {
         end
 
         inst.components.locomotor:Stop()
-        if not inst.SoundEmitter:PlayingSound("make") then
-            inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
-        end
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
+        inst.SoundEmitter:PlaySound("gale_sfx/skill/construction", "construction")
+
         inst.AnimState:PlayAnimation("build_pre")
         inst.AnimState:PushAnimation("build_loop", true)
 
@@ -2129,7 +2143,7 @@ AddStategraphState("wilson", State {
             end
         end
 
-        inst.sg:SetTimeout(1)
+        inst.sg:SetTimeout(1.5)
     end,
 
     ontimeout = function(inst)
@@ -2157,6 +2171,8 @@ AddStategraphState("wilson", State {
 
     onexit = function(inst)
         inst.SoundEmitter:KillSound("make")
+        inst.SoundEmitter:KillSound("construction")
+
         if inst.sg.statemem.destruct_tool then
             inst.sg.statemem.destruct_tool.components.container.canbeopened = true
         end
