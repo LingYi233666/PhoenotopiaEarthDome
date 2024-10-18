@@ -1041,71 +1041,12 @@ AddModRPCHandler("gale_rpc", "use_destruct_item_table", function(inst, destruct_
         return
     end
 
-
-    local target = destruct_table.components.container:GetItemInSlot(1)
-    if not target then
-        return
-    end
-
-    local empty_paper = destruct_table.components.container:GetItemInSlot(2)
-    local pencil = destruct_table.components.container:GetItemInSlot(3)
-    local other_consumed_items = {}
-
-    local blueprint_name = target.prefab .. "_blueprint"
-
-    -- local rewards_data = {}
-    local rewards_data = GaleCommon.GetDestructRecipesByEntity(target)
-
-    -- print("empty_paper = ", empty_paper)
-    -- print("pencil = ", pencil)
-    -- print("blueprint_name = ", blueprint_name)
-    -- print("Prefabs[blueprint_name]:", Prefabs[blueprint_name])
-    -- print("Prefabs[rope_blueprint]:", Prefabs["rope_blueprint"])
-    -- print("rope_blueprint" == blueprint_name)
-
-    -- for k, v in pairs(GLOBAL.Prefabs) do
-    --     print(k, v)
-    -- end
-
-    if empty_paper and pencil and GLOBAL.Prefabs[blueprint_name] then
-        -- print("Add blueprint to rewards !")
-        table.insert(other_consumed_items, empty_paper)
-        table.insert(other_consumed_items, pencil)
-
-        if rewards_data[blueprint_name] == nil then
-            rewards_data[blueprint_name] = 0
-        end
-        rewards_data[blueprint_name] = rewards_data[blueprint_name] + 1
-    end
-
-    print("Destruct rewards_data:")
-    dumptable(rewards_data)
-
-    local num_rewards = 0
-
-    for name, cnt in pairs(rewards_data) do
-        num_rewards = num_rewards + cnt
-    end
-
-
-
-    if num_rewards <= 0 then
-        if inst.components.talker then
-            inst.components.talker:Say(STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT)
-        end
-
-        return
-    end
-
     if inst.sg:HasStateTag("busy") then
         return
     end
 
     inst.sg:GoToState("gale_destruct_item", {
-        target               = target,
-        rewards_data         = rewards_data,
-        other_consumed_items = other_consumed_items,
-        destruct_tool        = destruct_table,
+        destruct_tool = destruct_table,
     })
 end)
 
@@ -1118,12 +1059,7 @@ AddClientModRPCHandler("gale_rpc", "dark_vision_server2sui", function()
 end)
 
 
-
-TheInput:AddKeyHandler(function(key, down)
-    if not IsHUDScreen() then
-        return
-    end
-
+local function HandleKeyToCastSkill(key, down)
     -- Handle normal skill casting
     if ThePlayer and ThePlayer:IsValid() and ThePlayer.replica and ThePlayer.replica.gale_skiller then
         local name = ThePlayer.replica.gale_skiller.keyhandler[key]
@@ -1142,6 +1078,15 @@ TheInput:AddKeyHandler(function(key, down)
             SendModRPCToServer(MOD_RPC["gale_rpc"]["cast_skill"], name, down, x, y, z, ent)
         end
     end
+end
+
+
+TheInput:AddKeyHandler(function(key, down)
+    if not IsHUDScreen() then
+        return
+    end
+
+    HandleKeyToCastSkill(key, down)
 end)
 
 TheInput:AddGeneralControlHandler(function(control, pressed)
@@ -2119,10 +2064,6 @@ AddStategraphState("wilson", State {
 
     onenter = function(inst, data)
         data = data or {}
-        if not data.target or not data.rewards_data then
-            inst.sg:GoToState("idle")
-            return
-        end
 
         inst.components.locomotor:Stop()
         inst.SoundEmitter:PlaySound("dontstarve/wilson/make_trap", "make")
@@ -2130,10 +2071,6 @@ AddStategraphState("wilson", State {
 
         inst.AnimState:PlayAnimation("build_pre")
         inst.AnimState:PushAnimation("build_loop", true)
-
-        inst.sg.statemem.target = data.target
-        inst.sg.statemem.other_consumed_items = data.other_consumed_items or {}
-        inst.sg.statemem.rewards_data = data.rewards_data
 
         if data.destruct_tool then
             inst.sg.statemem.destruct_tool = data.destruct_tool
@@ -2149,18 +2086,14 @@ AddStategraphState("wilson", State {
     ontimeout = function(inst)
         inst.sg:RemoveStateTag("busy")
 
-        if inst.sg.statemem.target:IsValid() then
-            inst.sg.statemem.target:Remove()
-            for k, v in pairs(inst.sg.statemem.other_consumed_items) do
-                if v:IsValid() then
-                    v:Remove()
-                end
-            end
+        if inst.sg.statemem.destruct_tool
+            and inst.sg.statemem.destruct_tool:IsValid()
+            and inst.sg.statemem.destruct_tool.components.gale_item_destructor then
+            local success = inst.sg.statemem.destruct_tool.components.gale_item_destructor:Destruct(inst)
 
-            for name, cnt in pairs(inst.sg.statemem.rewards_data) do
-                for i = 1, cnt do
-                    local item = SpawnAt(name, inst)
-                    inst.components.inventory:GiveItem(item, nil, inst:GetPosition())
+            if not success then
+                if inst.components.talker then
+                    inst.components.talker:Say(STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT)
                 end
             end
         end
@@ -2173,7 +2106,8 @@ AddStategraphState("wilson", State {
         inst.SoundEmitter:KillSound("make")
         inst.SoundEmitter:KillSound("construction")
 
-        if inst.sg.statemem.destruct_tool then
+        if inst.sg.statemem.destruct_tool
+            and inst.sg.statemem.destruct_tool.components.container then
             inst.sg.statemem.destruct_tool.components.container.canbeopened = true
         end
     end,

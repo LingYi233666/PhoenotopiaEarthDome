@@ -138,21 +138,40 @@ local function OnProjectileHit(inst, attacker, target)
             local face_vec = GaleCommon.GetFaceVector(inst)
             local side_vec = face_vec:Cross(Vector3(0, 1, 0))
 
-            local fly_times = math.random() <= 0.5 and { 0.33, 0.44 } or { 0.44, 0.33 }
-            for i = -1, 1, 2 do
-                local frag = SpawnAt("gale_spear_projectile_fragment", inst)
-                local tarpos = GetHeadPoint(inst) + side_vec * i
+            -- local fly_times = math.random() <= 0.5 and { 0.33, 0.44 } or { 0.44, 0.33 }
+            -- for i = -1, 1, 2 do
+            --     local frag = SpawnAt("gale_spear_projectile_fragment", inst)
+            --     local tarpos = GetHeadPoint(inst) + side_vec * i
 
-                if i == -1 then
-                    frag.max_fly_time = fly_times[1]
-                else
-                    frag.max_fly_time = fly_times[2]
-                end
+            --     if i == -1 then
+            --         frag.max_fly_time = fly_times[1]
+            --     else
+            --         frag.max_fly_time = fly_times[2]
+            --     end
 
 
-                frag.components.complexprojectile:Launch(tarpos, attacker)
-                frag.Transform:SetPosition(GetHeadPoint(inst):Get())
-                frag:ForceFacePoint(tarpos:Get())
+            --     frag.components.complexprojectile:Launch(tarpos, attacker)
+            --     frag.Transform:SetPosition(GetHeadPoint(inst):Get())
+            --     frag:ForceFacePoint(tarpos:Get())
+            -- end
+
+            local start_degree = -60
+            local stop_degree = 60
+            local num_frag = 5
+            local step = (stop_degree - start_degree) / num_frag
+
+            for i = 1, num_frag do
+                local cur_degree = start_degree + i * step + math.random(-5, 5)
+                local direction = Vector3FromTheta(cur_degree * DEGREES)
+                local spawn_pos = GetHeadPoint(inst)
+                local target_pos = spawn_pos + face_vec * direction.x + side_vec * direction.z
+
+                local frag = SpawnAt("gale_spear_projectile_fragment", spawn_pos)
+                frag.max_fly_time = GetRandomMinMax(0.3, 0.5)
+
+                frag.components.complexprojectile:Launch(target_pos, attacker)
+                frag.Transform:SetPosition(spawn_pos:Get())
+                frag:ForceFacePoint(target_pos:Get())
             end
         end
     elseif target then

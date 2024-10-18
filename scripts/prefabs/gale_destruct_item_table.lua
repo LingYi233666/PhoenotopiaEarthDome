@@ -126,37 +126,37 @@ local function OnHit(inst)
     inst.components.container:Close()
 end
 
--- local DESTSOUNDS =
--- {
---     { --magic
---         soundpath = "dontstarve/common/destroy_magic",
---         ing = { "nightmarefuel", "livinglog" },
---     },
---     { --cloth
---         soundpath = "dontstarve/common/destroy_clothing",
---         ing = { "silk", "beefalowool" },
---     },
---     { --tool
---         soundpath = "dontstarve/common/destroy_tool",
---         ing = { "twigs" },
---     },
---     { --gem
---         soundpath = "dontstarve/common/gem_shatter",
---         ing = { "redgem", "bluegem", "greengem", "purplegem", "yellowgem", "orangegem" },
---     },
---     { --wood
---         soundpath = "dontstarve/common/destroy_wood",
---         ing = { "log", "boards" },
---     },
---     { --stone
---         soundpath = "dontstarve/common/destroy_stone",
---         ing = { "rocks", "cutstone" },
---     },
---     { --straw
---         soundpath = "dontstarve/common/destroy_straw",
---         ing = { "cutgrass", "cutreeds" },
---     },
--- }
+local function SelectItemInput(inst, doer)
+    local container = inst.components.container
+
+    local main_item = container:GetItemInSlot(1)
+    local papyrus = container:GetItemInSlot(2)
+    local featherpencil = container:GetItemInSlot(3)
+
+    if papyrus == nil or featherpencil == nil then
+        return main_item
+    end
+
+    return main_item, { papyrus, featherpencil }
+end
+
+local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
+    if subitems[1] and subitems[1].prefab == "papyrus"
+        and subitems[2] and subitems[2].prefab == "featherpencil" then
+        local blueprint_name = target.prefab .. "_blueprint"
+        if Prefabs[blueprint_name] then
+            table.insert(consumes, subitems[1])
+            table.insert(consumes, subitems[2])
+
+            if not rewards[blueprint_name] then
+                rewards[blueprint_name] = 0
+            end
+            rewards[blueprint_name] = rewards[blueprint_name] + 1
+        else
+            print(blueprint_name .. " not exists in Prefabs !")
+        end
+    end
+end
 
 return GaleEntity.CreateNormalEntity({
         prefabname = "gale_destruct_item_table",
@@ -189,6 +189,10 @@ return GaleEntity.CreateNormalEntity({
             inst.components.workable:SetWorkLeft(2)
             inst.components.workable:SetOnFinishCallback(OnHammered)
             inst.components.workable:SetOnWorkCallback(OnHit)
+
+            inst:AddComponent("gale_item_destructor")
+            inst.components.gale_item_destructor:SetSelectItemFn(SelectItemInput)
+            inst.components.gale_item_destructor:SetConsumeAndRewardFn(GetConsumeAndRewardFn)
 
 
             inst:ListenForEvent("itemget", CheckSwapItem)

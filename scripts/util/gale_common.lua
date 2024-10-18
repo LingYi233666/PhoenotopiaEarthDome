@@ -326,12 +326,14 @@ local function GetKeyFromString(str)
 end
 
 local function GetStringFromKey(key)
-    for k, v in pairs(keys) do
-        local result = rawget(_G, "KEY_" .. v)
-        if result ~= nil and result == key then
-            return v
-        end
-    end
+    -- for k, v in pairs(keys) do
+    --     local result = rawget(_G, "KEY_" .. v)
+    --     if result ~= nil and result == key then
+    --         return v
+    --     end
+    -- end
+
+    return STRINGS.UI.CONTROLSSCREEN.INPUTS[1][key]
 end
 
 local function IsTruelyDead(inst)
@@ -497,13 +499,13 @@ local function GetDestructRecipesByName(name, percent, float_to_int_fn)
 end
 
 -- Only work in server side
-local function GetDestructRecipesByEntity(target, percent, float_to_int_fn)
+local function GetDestructRecipesByEntity(target, base_percent, float_to_int_fn)
     local recipe = AllRecipes[target.prefab]
     if recipe == nil or FunctionOrValue(recipe.no_deconstruction, target) then
         return {}
     end
 
-    percent = percent or 1
+    base_percent = base_percent or 1
     float_to_int_fn = float_to_int_fn or math.floor
 
     local ingredient_percent = (target.components.finiteuses ~= nil and target.components.finiteuses:GetPercent()) or
@@ -511,7 +513,9 @@ local function GetDestructRecipesByEntity(target, percent, float_to_int_fn)
         (target.components.armor ~= nil and target.components.inventoryitem ~= nil and target.components.armor:GetPercent()) or
         1
 
-    return GetDestructRecipesByName(target.prefab, percent * ingredient_percent, float_to_int_fn)
+    local stack_factor = target.components.stackable and target.components.stackable:StackSize() or 1
+
+    return GetDestructRecipesByName(target.prefab, base_percent * ingredient_percent * stack_factor, float_to_int_fn)
 end
 
 local function SumDices(num_dices, dice_max_value)
