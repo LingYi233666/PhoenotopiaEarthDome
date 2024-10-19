@@ -133,14 +133,30 @@ local function SelectItemInput(inst, doer)
     local papyrus = container:GetItemInSlot(2)
     local featherpencil = container:GetItemInSlot(3)
 
+    if main_item == nil then
+        return
+    end
+
     if papyrus == nil or featherpencil == nil then
         return main_item
     end
 
-    return main_item, { papyrus, featherpencil }
+    local blueprint_name = main_item.prefab .. "_blueprint"
+
+    if Prefabs[blueprint_name] then
+        return main_item, { papyrus, featherpencil }
+    else
+        print("SelectItemInput:", blueprint_name .. " not exists in Prefabs !")
+    end
+
+    return main_item
 end
 
 local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
+    for name, cnt in pairs(rewards) do
+        rewards[name] = math.random(cnt)
+    end
+
     if subitems[1] and subitems[1].prefab == "papyrus"
         and subitems[2] and subitems[2].prefab == "featherpencil" then
         local blueprint_name = target.prefab .. "_blueprint"
@@ -153,7 +169,7 @@ local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
             end
             rewards[blueprint_name] = rewards[blueprint_name] + 1
         else
-            print(blueprint_name .. " not exists in Prefabs !")
+            print("GetConsumeAndRewardFn:", blueprint_name .. " not exists in Prefabs !")
         end
     end
 end
@@ -191,6 +207,7 @@ return GaleEntity.CreateNormalEntity({
             inst.components.workable:SetOnWorkCallback(OnHit)
 
             inst:AddComponent("gale_item_destructor")
+            inst.components.gale_item_destructor.base_percent = 1.0
             inst.components.gale_item_destructor:SetSelectItemFn(SelectItemInput)
             inst.components.gale_item_destructor:SetConsumeAndRewardFn(GetConsumeAndRewardFn)
 

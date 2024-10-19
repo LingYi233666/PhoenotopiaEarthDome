@@ -438,6 +438,7 @@ GaleModAddRecipe2(
     TECH.NONE,
     {
         builder_tag = "gale_destruct_item_table_builder",
+        placer = "gale_destruct_item_table_placer",
     },
     { "CHARACTER", "STRUCTURES" }
 )

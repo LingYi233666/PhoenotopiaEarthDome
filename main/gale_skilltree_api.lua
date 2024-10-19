@@ -1036,7 +1036,7 @@ end)
 AddModRPCHandler("gale_rpc", "use_destruct_item_table", function(inst, destruct_table)
     if not inst:HasTag("gale_destruct_item_table_builder") then
         if inst.components.talker then
-            inst.components.talker:Say(STRINGS.CHARACTERS.GENERIC.ANNOUNCE_DONT_KNOW_HOW_TO_DESTRUCT)
+            inst.components.talker:Say(GetString(inst, "ANNOUNCE_DONT_KNOW_HOW_TO_DESTRUCT"))
         end
         return
     end
@@ -1059,7 +1059,7 @@ AddClientModRPCHandler("gale_rpc", "dark_vision_server2sui", function()
 end)
 
 
-local function HandleKeyToCastSkill(key, down)
+local function HandleInputToCastSkills(key, down)
     -- Handle normal skill casting
     if ThePlayer and ThePlayer:IsValid() and ThePlayer.replica and ThePlayer.replica.gale_skiller then
         local name = ThePlayer.replica.gale_skiller.keyhandler[key]
@@ -1086,8 +1086,15 @@ TheInput:AddKeyHandler(function(key, down)
         return
     end
 
-    HandleKeyToCastSkill(key, down)
+    HandleInputToCastSkills(key, down)
 end)
+
+TheInput:AddMouseButtonHandler(function(button, down, x, y)
+    if not IsHUDScreen() then return end
+
+    HandleInputToCastSkills(button, down)
+end)
+
 
 TheInput:AddGeneralControlHandler(function(control, pressed)
     if not IsHUDScreen() then
@@ -2089,11 +2096,12 @@ AddStategraphState("wilson", State {
         if inst.sg.statemem.destruct_tool
             and inst.sg.statemem.destruct_tool:IsValid()
             and inst.sg.statemem.destruct_tool.components.gale_item_destructor then
-            local success = inst.sg.statemem.destruct_tool.components.gale_item_destructor:Destruct(inst)
+            local success, reason = inst.sg.statemem.destruct_tool.components.gale_item_destructor:Destruct(inst)
 
             if not success then
                 if inst.components.talker then
-                    inst.components.talker:Say(STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT)
+                    local text = GetString(inst, reason or "ANNOUNCE_CANT_DESTRUCT")
+                    inst.components.talker:Say(text)
                 end
             end
         end
@@ -2187,6 +2195,71 @@ AddPrefabPostInitAny(function(inst)
         return
     end
 end)
+
+for _, v in pairs({ "hammer", "axe", "goldenaxe", "pickaxe", "goldenpickaxe", "multitool_axe_pickaxe" }) do
+    AddPrefabPostInit(v, function(inst)
+        if not TheWorld.ismastersim then
+            return
+        end
+
+        local function OnStartHelmSplitter(inst, attacker)
+            local targetpos = attacker.sg.statemem.targetpos
+            if targetpos then
+                local duration = 13 * FRAMES
+                local dist = (attacker:GetPosition() - targetpos):Length()
+                local dist_adjust = dist - inst.components.gale_helmsplitter:GetForwardOffset()
+                local speed = dist_adjust / duration
+                if speed > 0 then
+                    attacker.Physics:SetMotorVel(speed, 0, 0)
+                end
+            end
+        end
+
+
+        local function OnStopHelmSplitter(inst, attacker)
+            attacker.Physics:Stop()
+        end
+
+        local function OnCastHelmSplitter(inst, attacker, target)
+            attacker.Physics:Stop()
+        end
+
+
+        inst:AddComponent("gale_helmsplitter")
+        inst.components.gale_helmsplitter.onstartfn = OnStartHelmSplitter
+        inst.components.gale_helmsplitter.onstopfn = OnStopHelmSplitter
+        inst.components.gale_helmsplitter.oncastfn = OnCastHelmSplitter
+    end)
+end
+
+for _, v in pairs({ "spear", "spear_wathgrithr", "fence_rotator" }) do
+    AddPrefabPostInit(v, function(inst)
+        if not TheWorld.ismastersim then
+            return
+        end
+
+        local function OnStartMultithruster(inst, doer)
+            if not inst.magicgas then
+                inst.magicgas = SpawnPrefab("gale_magicgas_vfx")
+                inst.magicgas.entity:SetParent(doer.entity)
+                inst.magicgas.entity:AddFollower()
+                inst.magicgas.Follower:FollowSymbol(doer.GUID, "swap_object", 15, -190, 0)
+            end
+        end
+
+        local function OnStopMultithruster(inst, doer)
+            if inst.magicgas then
+                inst.magicgas:Remove()
+            end
+            inst.magicgas = nil
+        end
+
+        inst:AddComponent("gale_multithruster")
+        inst.components.gale_multithruster.onstartfn = OnStartMultithruster
+        inst.components.gale_multithruster.onstopfn = OnStopMultithruster
+        inst.components.gale_multithruster.condition_bleed_stack = 5
+    end)
+end
 
 AddComponentPostInit("transparentonsanity", function(self)
     local old_CalcaulteTargetAlpha = self.CalcaulteTargetAlpha

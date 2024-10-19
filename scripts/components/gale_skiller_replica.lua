@@ -67,6 +67,8 @@ function GaleSkiller:SaveKeySetting()
         table.insert(tab, { k, v })
     end
     TheSim:SetPersistentString(self.save_path, json.encode(tab), true)
+
+    print("Replica gale_skiller save key config success !")
 end
 
 function GaleSkiller:LoadKeySetting()

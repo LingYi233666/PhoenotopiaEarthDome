@@ -1285,7 +1285,11 @@ STRINGS.GALE_CHATTYNODES.ATHETOS_OPERATOR_MEDICAL = {
 -- //////////////////////////////////////////////////////////////////////
 
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_GUN_JAMMED = "哎呀，枪卡壳了！"
+
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT = "不知为何，我无法拆解此物品。"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT_NO_TARGET = "没有需要拆解的东西。"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT_NO_CONSUMES = "没有需要拆解的东西。"
+STRINGS.CHARACTERS.GENERIC.ANNOUNCE_CANT_DESTRUCT_NO_REWARDS = "我拆不出什么有用的东西。"
 STRINGS.CHARACTERS.GENERIC.ANNOUNCE_DONT_KNOW_HOW_TO_DESTRUCT = "我不知道如何使用这个拆解台。"
 
 -- //////////////////////////////////////////////////////////////////////
@@ -1345,7 +1349,7 @@ STRINGS.GALE_UI.MENU_SUB_SUPPORT_THEM = "支持他们"
 STRINGS.GALE_UI.KEY_SET_UI = {
 	TITLE = "设置键位",
 	TEXT_BEFORE = "请按下对应的键位后再按确定来完成键位设置。",
-	TEXT_AFTER = "当前选的是%s键。您可以点击确定键完成键位设置，或者重新选择按键。",
+	TEXT_AFTER = "当前选的键位是%s。您可以点击确定键完成键位设置，或者重新选择按键。",
 
 	DO_SET_SKILL_KEY = "确定",
 	CLEAR_SKILL_KEY = "清除按键",
@@ -1483,7 +1487,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	COMBAT_LEAP = {
 		NAME = "跳跃攻击",
-		DESC = "进行跳跃攻击，造成小范围伤害。能在装备撬棍、锤类武器时使用。",
+		DESC = "进行跳跃攻击，造成小范围伤害。能在装备撬棍、锤类、斧类、镐类武器时使用。",
 	},
 
 	MULTITHRUST = {
