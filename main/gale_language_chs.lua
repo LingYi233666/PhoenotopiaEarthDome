@@ -1477,7 +1477,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	SPEAR_FRAGMENT = {
 		NAME = "流星碎片",
-		DESC = "爆裂长枪的爆炸将产生额外两个碎片，\n呈垂直方向射出。",
+		DESC = "爆裂长枪的爆炸将产生额外5个碎片，射向目标身后。",
 	},
 
 	SPEAR_REMAIN = {

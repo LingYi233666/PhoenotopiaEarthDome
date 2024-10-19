@@ -155,19 +155,19 @@ local function OnProjectileHit(inst, attacker, target)
             --     frag:ForceFacePoint(tarpos:Get())
             -- end
 
-            local start_degree = -60
-            local stop_degree = 60
+            local start_degree = -20
+            local stop_degree = 20
             local num_frag = 5
             local step = (stop_degree - start_degree) / num_frag
 
             for i = 1, num_frag do
                 local cur_degree = start_degree + i * step + math.random(-5, 5)
                 local direction = Vector3FromTheta(cur_degree * DEGREES)
-                local spawn_pos = GetHeadPoint(inst)
+                local spawn_pos = GetHeadPoint(inst, 3)
                 local target_pos = spawn_pos + face_vec * direction.x + side_vec * direction.z
 
                 local frag = SpawnAt("gale_spear_projectile_fragment", spawn_pos)
-                frag.max_fly_time = GetRandomMinMax(0.3, 0.5)
+                frag.max_fly_time = GetRandomMinMax(0.2, 0.3)
 
                 frag.components.complexprojectile:Launch(target_pos, attacker)
                 frag.Transform:SetPosition(spawn_pos:Get())
