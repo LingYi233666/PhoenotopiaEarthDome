@@ -152,9 +152,54 @@ local function SelectItemInput(inst, doer)
     return main_item
 end
 
+local factor_prefabnames = {
+    mandrake = 0,
+    cookedmandrake = 0,
+    dragon_scales = 0.5,
+    shroom_skin = 0.5,
+    dreadstone = 0.5,
+    purebrilliance = 0.5,
+}
+
+local function RemoveZeroValues(tab)
+    local keys = {}
+    for k, v in pairs(tab) do
+        if v <= 0 then
+            table.insert(keys, k)
+        end
+    end
+
+    for _, key in pairs(keys) do
+        tab[key] = nil
+    end
+end
+
 local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
+    -- local name_with_one_cnt = {}
+
+    -- for name, cnt in pairs(rewards) do
+    --     if cnt == 1 then
+    --         table.insert(name_with_one_cnt, name)
+    --     end
+    -- end
+
+    -- if name_with_one_cnt == GetTableSize(rewards) then
+
+    -- else
+    --     for name, cnt in pairs(rewards) do
+    --         rewards[name] = math.random(1, cnt)
+    --     end
+
+    -- end
+
     for name, cnt in pairs(rewards) do
         rewards[name] = math.random(cnt)
+    end
+
+    for name, factor in pairs(factor_prefabnames) do
+        if rewards[name] then
+            rewards[name] = math.floor(rewards[name] * factor)
+        end
     end
 
     if subitems[1] and subitems[1].prefab == "papyrus"
@@ -172,6 +217,8 @@ local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
             print("GetConsumeAndRewardFn:", blueprint_name .. " not exists in Prefabs !")
         end
     end
+
+    RemoveZeroValues(rewards)
 end
 
 return GaleEntity.CreateNormalEntity({

@@ -67,7 +67,7 @@ function GaleItemDestructor:GetConsumeAndReward(target, subitems)
     subitems = subitems or {}
 
     local consumes = { target }
-    local rewards = GaleCommon.GetDestructRecipesByEntity(target, self.base_percent)
+    local rewards = GaleCommon.GetDestructRecipesByEntity(target, self.base_percent, math.ceil)
 
     local banned_item_names = {}
     for name, cnt in pairs(rewards) do
@@ -122,28 +122,29 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
             end
         end
 
-        if target.components.inventory ~= nil then
-            target.components.inventory:DropEverything()
+        ------------------------------------------
+        -- Before remove do sth
+
+        if v.components.inventory ~= nil then
+            v.components.inventory:DropEverything()
         end
 
-        if target.components.container ~= nil then
-            target.components.container:DropEverything(nil, true)
+        if v.components.container ~= nil then
+            v.components.container:DropEverything(nil, true)
         end
 
-        if target.components.spawner ~= nil and target.components.spawner:IsOccupied() then
-            target.components.spawner:ReleaseChild()
+        if v.components.spawner ~= nil and v.components.spawner:IsOccupied() then
+            v.components.spawner:ReleaseChild()
         end
 
-        if target.components.occupiable ~= nil and target.components.occupiable:IsOccupied() then
-            local item = target.components.occupiable:Harvest()
+        if v.components.occupiable ~= nil and v.components.occupiable:IsOccupied() then
+            local item = v.components.occupiable:Harvest()
             if item ~= nil then
-                item.Transform:SetPosition(target.Transform:GetWorldPosition())
+                item.Transform:SetPosition(v.Transform:GetWorldPosition())
                 item.components.inventoryitem:OnDropped()
             end
         end
 
-        ------------------------------------------
-        -- Before remove do sth
         if v.components.trap ~= nil then
             v.components.trap:Harvest()
         end
