@@ -32,7 +32,7 @@ function GalebossKatashSpawner:SetKatashShouldInCave(val)
     self.katash_should_in_cave:set(val)
 end
 
-function GalebossKatashSpawner:GetKatashShouldInCave(val)
+function GalebossKatashSpawner:GetKatashShouldInCave()
     return self.katash_should_in_cave:value()
 end
 

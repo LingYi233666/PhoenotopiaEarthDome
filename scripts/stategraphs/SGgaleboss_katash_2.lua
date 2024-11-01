@@ -11,8 +11,8 @@ local events = {
     -- CommonHandlers.OnDeath(),
     CommonHandlers.OnAttacked(),
     EventHandler("minhealth", function(inst, data)
-        if not inst.sg:HasStateTag("defeated") then
-            inst.sg:GoToState("defeated")
+        if not inst.sg:HasStateTag("knockback") and inst.mind_controled then
+            inst.sg:GoToState("knockback_stage1")
         end
     end),
 }
@@ -21,6 +21,51 @@ local function SetVel(inst, vel)
     local predict_pos = inst:GetPosition() + vel
     local lx, ly, lz = inst.entity:WorldToLocalSpace(predict_pos.x, 0, predict_pos.z)
     inst.Physics:SetMotorVel(lx, 0, lz)
+end
+
+local function VelUpdatePunchLoop(inst, target_pos)
+    inst:ForceFacePoint(target_pos)
+
+    local cur_vel = Vector3(inst.Physics:GetVelocity())
+    local towards = (target_pos - inst:GetPosition()):GetNormalized()
+    local dist = (target_pos - inst:GetPosition()):Length()
+    local acc = Remap(math.clamp(dist, 1, 8), 1, 8, 20, 15)
+
+    if GetTime() - (inst.components.combat.lastwasattackedtime or 0) <= 0.3 then
+        acc = acc * 0.1
+    end
+
+    local next_vel = cur_vel + towards * FRAMES * acc
+
+    if next_vel:Dot(towards) > 0 then
+        if next_vel:Length() >= 6 then
+            next_vel = next_vel:GetNormalized() * 6
+        end
+    else
+        if next_vel:Length() >= 6 then
+            next_vel = next_vel:GetNormalized() * 6
+        end
+    end
+
+    SetVel(inst, next_vel)
+end
+
+local function UpbodyDoAttack(inst)
+    local victims = GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst.components.combat:GetHitRange(),
+        nil,
+        function(inst, v)
+            local tar_deg = GaleCommon.GetFaceAngle(inst, v)
+            local face_angle = 90
+            return inst.components.combat:CanTarget(v) and
+                tar_deg >= -face_angle / 2 and
+                tar_deg <= face_angle / 2
+        end)
+
+    for k, v in pairs(victims) do
+        if v.components.sanity and not IsEntityDead(v, true) then
+            v.components.sanity:DoDelta(-1, true)
+        end
+    end
 end
 
 local PUNCH_LOOP_ANIM_SPEED = 2.0
@@ -40,7 +85,13 @@ local states = {
                 inst.components.locomotor:StopMoving()
             end
 
-            local anim_list = idle_anims[math.random(1, #idle_anims)]
+            local anim_list
+
+            if inst.mind_controled then
+                anim_list = idle_anims[math.random(1, #idle_anims)]
+            else
+                anim_list = { "idle_groggy_pre", "idle_groggy" }
+            end
 
             if pushanim then
                 for k, v in pairs(anim_list) do
@@ -149,30 +200,7 @@ local states = {
         onupdate = function(inst)
             local target = inst.components.combat.target
             if target then
-                inst:ForceFacePoint(target:GetPosition())
-
-                local cur_vel = Vector3(inst.Physics:GetVelocity())
-                local towards = (target:GetPosition() - inst:GetPosition()):GetNormalized()
-                local dist = (target:GetPosition() - inst:GetPosition()):Length()
-                local acc = Remap(math.clamp(dist, 1, 8), 1, 8, 20, 15)
-
-                if GetTime() - (inst.components.combat.lastwasattackedtime or 0) <= 0.3 then
-                    acc = acc * 0.1
-                end
-
-                local next_vel = cur_vel + towards * FRAMES * acc
-
-                if next_vel:Dot(towards) > 0 then
-                    if next_vel:Length() >= 6 then
-                        next_vel = next_vel:GetNormalized() * 6
-                    end
-                else
-                    if next_vel:Length() >= 6 then
-                        next_vel = next_vel:GetNormalized() * 6
-                    end
-                end
-
-                SetVel(inst, next_vel)
+                VelUpdatePunchLoop(inst, target:GetPosition())
             else
                 inst.AnimState:PlayAnimation("idle_walk_pst")
                 inst.sg:GoToState("idle", true)
@@ -198,21 +226,7 @@ local states = {
         events =
         {
             EventHandler("upbody_doattack", function(inst)
-                local victims = GaleCommon.AoeDoAttack(inst, inst:GetPosition(), inst.components.combat:GetHitRange(),
-                    nil,
-                    function(inst, v)
-                        local tar_deg = GaleCommon.GetFaceAngle(inst, v)
-                        local face_angle = 90
-                        return inst.components.combat:CanTarget(v) and
-                            tar_deg >= -face_angle / 2 and
-                            tar_deg <= face_angle / 2
-                    end)
-
-                for k, v in pairs(victims) do
-                    if v.components.sanity and not IsEntityDead(v, true) then
-                        v.components.sanity:DoDelta(-1, true)
-                    end
-                end
+                UpbodyDoAttack(inst)
                 inst.sg:RemoveStateTag("abouttoattack")
             end),
 
@@ -318,8 +332,16 @@ local states = {
             inst.components.locomotor:StopMoving()
 
             inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:PushAnimation("idle_groggy_pre", false)
+            inst.AnimState:PushAnimation("idle_groggy", true)
 
             inst.SoundEmitter:PlaySound(inst.sounds.slip)
+
+            inst.sg:SetTimeout(1)
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle")
         end,
 
         timeline = {
@@ -329,20 +351,11 @@ local states = {
                 proj:ExplodeCountdown(0.8)
             end),
         },
-
-        events =
-        {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
     },
 
     State {
         name = "knockback_stage1",
-        tags = { "busy", },
+        tags = { "busy", "knockback" },
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
@@ -399,10 +412,11 @@ local states = {
 
     State {
         name = "knockback_stage2",
-        tags = { "busy", },
+        tags = { "busy", "knockback" },
 
         onenter = function(inst)
             -- TODO: Unlink katash and telepath
+            inst:EnableMindControledParam(false)
 
             inst.components.locomotor:Stop()
 
@@ -430,7 +444,7 @@ local states = {
         {
             EventHandler("animover", function(inst)
                 if inst.AnimState:IsCurrentAnimation("wakeup") then
-                    inst.sg:GoToState("idle_no_mindcontrol")
+                    inst.sg:GoToState("idle")
                 end
             end),
         },
@@ -440,36 +454,35 @@ local states = {
         end,
     },
 
-    State {
-        name = "idle_no_mindcontrol",
-        tags = { "busy" },
+    -- State {
+    --     name = "idle_no_mindcontrol",
+    --     tags = { "busy", "idle_no_mindcontrol" },
 
-        onenter = function(inst)
-            inst.components.locomotor:StopMoving()
+    --     onenter = function(inst)
+    --         inst.components.locomotor:StopMoving()
 
-            inst.AnimState:PlayAnimation("idle_groggy01_pre")
-            inst.AnimState:PushAnimation("idle_groggy01_loop", true)
+    --         inst.AnimState:PlayAnimation("idle_groggy01_pre")
+    --         inst.AnimState:PushAnimation("idle_groggy01_loop", true)
 
-            inst.sg:SetTimeout(8)
-        end,
+    --         inst.sg:SetTimeout(8)
+    --     end,
 
-        ontimeout = function(inst)
+    --     ontimeout = function(inst)
+    --         -- TODO: Be mind controled again
+    --     end,
 
-        end,
+    --     timeline = {
+    --         -- TimeEvent(8, function(inst)
+    --         -- end),
+    --     },
 
-        timeline = {
-            TimeEvent(8, function(inst)
-                -- TODO: Be mind controled again
-            end),
-        },
+    --     events =
+    --     {
+    --         EventHandler("attacked", function(inst)
 
-        events =
-        {
-            EventHandler("attacked", function(inst)
-
-            end),
-        },
-    },
+    --         end),
+    --     },
+    -- },
 }
 
 CommonStates.AddHitState(states)

@@ -70,6 +70,8 @@ local function EnableUpBody(inst, enabled)
 end
 
 local function EnableMindControledParam(inst, enabled)
+    inst.mind_controled = enabled
+
     if enabled then
         inst.components.gale_spdamage_psychic:SetBaseDamage(34)
     else
@@ -84,25 +86,14 @@ end
 local function AnimClientFn(inst)
     inst.Transform:SetFourFaced()
 
-    -- inst.AnimState:AddOverrideBuild("player_pistol")
-    -- inst.AnimState:AddOverrideBuild("player_actions_roll")
     inst.AnimState:AddOverrideBuild("player_lunge")
     inst.AnimState:AddOverrideBuild("player_attack_leap")
     inst.AnimState:AddOverrideBuild("player_superjump")
     inst.AnimState:AddOverrideBuild("player_multithrust")
     inst.AnimState:AddOverrideBuild("player_parryblock")
-    -- inst.AnimState:AddOverrideBuild("gale_phantom_add")
-
-    -- inst.AnimState:SetSymbolAddColour("handswipes_fx", 255 / 255, 0 / 255, 255 / 255, 1)
-    -- inst.AnimState:SetSymbolLightOverride("handswipes_fx", 1)
 
     inst.AnimState:OverrideSymbol("headbase", "galeboss_katash", "headbase_with_hair")
     inst.AnimState:OverrideSymbol("headbase_hat", "galeboss_katash", "headbase_with_hair")
-
-
-    -- inst.AnimState:Show("ARM_carry")
-    -- inst.AnimState:Hide("ARM_normal")
-    -- inst.AnimState:OverrideSymbol("swap_object", "swap_gale_blaster_katash", "swap_gale_blaster_katash")
 
     inst.AnimState:Hide("ARM_carry")
     inst.AnimState:Show("ARM_normal")
@@ -111,8 +102,6 @@ local function AnimClientFn(inst)
     inst.AnimState:Hide("HEAD_HAT")
     inst.AnimState:HideSymbol("hair")
     inst.AnimState:HideSymbol("hair_hat")
-
-    -- inst.AnimState:SetSymbolAddColour("face", 1, 0, 1, 1)
 end
 
 local function KatashClientFn(inst)

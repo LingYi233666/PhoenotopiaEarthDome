@@ -96,6 +96,7 @@ GalebossKatashSpawner.Phase = table.invert(phase_preset)
 --      When opened, spawn a bomb and summon katash.
 --  KATASH_GO_TO_CAVE:
 --      Init container storage: notebook.
+--      Update shard
 
 -- local function GenerateBasicResources(count)
 --     local loot_presets = {
@@ -161,7 +162,7 @@ local box_items = {
 
 local function OnPhaseChange(self, old_phase, new_phase, onload)
     print(string.format("[GalebossKatashSpawner] phase change: %s --> %s%s", phase_preset[old_phase],
-                        phase_preset[new_phase], onload and " (onload)" or ""))
+        phase_preset[new_phase], onload and " (onload)" or ""))
     print(self:GetDebugString())
 
     if not onload then
@@ -174,7 +175,7 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
             for prefab, count in pairs(box_items[phase_preset[new_phase]]) do
                 for i = 1, count do
                     local item = SpawnAt(prefab == "random_resource" and GenerateBasicResources() or prefab,
-                                         self.entities.safebox)
+                        self.entities.safebox)
                     self.entities.safebox.components.container:GiveItem(item, nil, nil, true)
                 end
             end
@@ -189,27 +190,35 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
                 local pos = self.entities.safebox:GetPosition()
 
                 local offset = FindWalkableOffset(pos, math.random() * TWOPI, GetRandomMinMax(3, 20), 40, nil, false,
-                                                  function(newpos)
-                                                      local ents = TheSim:FindEntities(newpos.x, newpos.y, newpos.z, 3)
-                                                      for _, v in pairs(ents) do
-                                                          if v.prefab == "galeboss_katash_skymine" then
-                                                              return false
-                                                          end
+                    function(newpos)
+                        local ents = TheSim:FindEntities(newpos.x, newpos.y, newpos.z, 3)
+                        for _, v in pairs(ents) do
+                            if v.prefab == "galeboss_katash_skymine" then
+                                return false
+                            end
 
-                                                          if v.Physics and (
-                                                                  v.Physics:GetCollisionGroup() == COLLISION.OBSTACLES or
-                                                                  v.Physics:GetCollisionGroup() == COLLISION.SMALLOBSTACLES) then
-                                                              return false
-                                                          end
-                                                      end
+                            if v.Physics and (
+                                    v.Physics:GetCollisionGroup() == COLLISION.OBSTACLES or
+                                    v.Physics:GetCollisionGroup() == COLLISION.SMALLOBSTACLES) then
+                                return false
+                            end
+                        end
 
-                                                      return true
-                                                  end, false, false)
+                        return true
+                    end, false, false)
                 if offset ~= nil then
                     SpawnAt("galeboss_katash_skymine", self.entities.safebox, nil, offset)
                 end
             end
         end
+
+        if new_phase == self.Phase.KATASH_GO_TO_CAVE then
+            Shard_SyncKatashInCave(true)
+        end
+
+        -- if new_phase == self.Phase.KATASH_RETURN_FROM_CAVE then
+        --     Shard_SyncKatashInCave(false)
+        -- end
     end
 end
 
@@ -266,7 +275,7 @@ function GalebossKatashSpawner:PopContainerItem(ent, count, must_drop_prefabs, c
             else
                 for radius = 30, 50 do
                     local offset = FindWalkableOffset(ent:GetPosition(), math.random() * TWOPI, radius, 5,
-                                                      nil, false, nil, true, true)
+                        nil, false, nil, true, true)
                     if offset then
                         pos = pos + offset
                         break
@@ -348,7 +357,7 @@ function GalebossKatashSpawner:TryPushStoryLine()
             self:SetPhase(self.phase + 1)
 
             TheWorld.components.timer:StartTimer("galeboss_katash_spawner_phase_cd",
-                                                 TUNING.TOTAL_DAY_TIME * GetRandomMinMax(1, 1.5))
+                TUNING.TOTAL_DAY_TIME * GetRandomMinMax(1, 1.5))
         end
     elseif self.phase == self.Phase.BOX_WITH_KATASH then
         if self.statemem.katash_defeated then

@@ -12,7 +12,7 @@ AddPrefabPostInit("forest", function(inst)
 end)
 
 AddPrefabPostInit("shard_network", function(inst)
-	inst:AddComponent("galeboss_katash_spawner_shard")
+	inst:AddComponent("shard_galeboss_katash_spawner")
 end)
 
 AddPrefabPostInit("cave", function(inst)
@@ -20,5 +20,21 @@ AddPrefabPostInit("cave", function(inst)
 		return
 	end
 
-	-- inst:AddComponent("galeboss_katash_spawner_cave")
+	inst:AddComponent("galeboss_katash_spawner_cave")
 end)
+
+AddShardModRPCHandler("gale_rpc", "katash_should_in_cave", function(shardid, val)
+	if TheWorld and TheWorld.shard and TheWorld.shard.shard_galeboss_katash_spawner then
+		TheWorld.shard.shard_galeboss_katash_spawner:SetKatashShouldInCave(val)
+	end
+end)
+
+function GLOBAL.Shard_SyncKatashInCave(val)
+	if Shard_IsMaster() then
+		if TheWorld and TheWorld.shard and TheWorld.shard.shard_galeboss_katash_spawner then
+			TheWorld.shard.shard_galeboss_katash_spawner:SetKatashShouldInCave(val)
+		end
+	else
+		SendModRPCToShard(SHARD_MOD_RPC["gale_rpc"]["katash_should_in_cave"], SHARDID.MASTER, val)
+	end
+end
