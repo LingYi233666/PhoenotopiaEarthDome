@@ -16,16 +16,34 @@ containers.params.gale_lamp =
     type = "chest",
 }
 
-containers.params.gale_lamp_lv2 = deepcopy(containers.params.gale_lamp)
+containers.params.gale_lamp_lv2 =
+{
+    widget =
+    {
+        slotpos = {},
+        animbank = "ui_chest_3x3",
+        animbuild = "ui_gale_lamp_lv2_3x3",
+        pos = Vector3(0, 200, 0),
+        side_align_tip = 160,
+    },
+    type = "chest",
+}
 
 local assets = {
     Asset("ANIM", "anim/gale_lamp.zip"),
+    Asset("ANIM", "anim/gale_lamp_lv2.zip"),
+    Asset("ANIM", "anim/gale_lamp_lv2_joystick.zip"),
+    Asset("ANIM", "anim/ui_gale_lamp_lv2_3x3.zip"),
 
     Asset("IMAGE", "images/inventoryimages/gale_lamp.tex"),
     Asset("ATLAS", "images/inventoryimages/gale_lamp.xml"),
-
     Asset("IMAGE", "images/inventoryimages/gale_lamp_light.tex"),
     Asset("ATLAS", "images/inventoryimages/gale_lamp_light.xml"),
+
+    Asset("IMAGE", "images/inventoryimages/gale_lamp_lv2.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_lamp_lv2.xml"),
+    Asset("IMAGE", "images/inventoryimages/gale_lamp_lv2_light.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_lamp_lv2_light.xml"),
 }
 
 local function onopen(inst)
@@ -132,8 +150,8 @@ local function OnPercentUsedChange(inst, data)
 
         inst.AnimState:SetPercent("idle_2_on", inst.components.fueled:GetPercent())
 
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/gale_lamp_light.xml"
-        inst.components.inventoryitem:ChangeImageName("gale_lamp_light")
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. inst.prefab .. "_light.xml"
+        inst.components.inventoryitem:ChangeImageName(inst.prefab .. "_light")
 
         if inst.glitch_on_wet_task == nil then
             if inst:HasTag("glitch_on_wet") then
@@ -148,8 +166,8 @@ local function OnPercentUsedChange(inst, data)
 
         inst.AnimState:PlayAnimation("idle_2_off")
 
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/gale_lamp.xml"
-        inst.components.inventoryitem:ChangeImageName("gale_lamp")
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/" .. inst.prefab .. ".xml"
+        inst.components.inventoryitem:ChangeImageName(inst.prefab)
         if inst.glitch_on_wet_task then
             inst.glitch_on_wet_task:Cancel()
             inst.glitch_on_wet_task = nil
@@ -181,6 +199,8 @@ local function MakeLamp(prefabname,
                 inst:AddTag(tag)
             end
 
+            inst.AnimState:SetSymbolMultColour("light", 0, 0, 0, 0)
+
             if client_fn then
                 client_fn(inst)
             end
@@ -201,8 +221,8 @@ local function MakeLamp(prefabname,
             inst.components.container:WidgetSetup(prefabname, containers.params[prefabname])
             inst.components.container.onopenfn = onopen
             inst.components.container.onclosefn = onclose
-            inst.components.container.skipclosesnd = true
-            inst.components.container.skipopensnd = true
+            -- inst.components.container.skipclosesnd = true
+            -- inst.components.container.skipopensnd = true
 
             inst:ListenForEvent("percentusedchange", OnPercentUsedChange)
 
@@ -253,7 +273,7 @@ end
 return
     MakeLamp("gale_lamp", "gale_lamp", "gale_lamp", "idle_2_off", { "glitch_on_wet" }, TUNING.TOTAL_DAY_TIME * 0.33,
         "gale_lamp_light"),
-    MakeLamp("gale_lamp_lv2", "gale_lamp", "gale_lamp", "idle_2_off", nil, TUNING.TOTAL_DAY_TIME,
+    MakeLamp("gale_lamp_lv2", "gale_lamp_lv2", "gale_lamp_lv2", "idle_2_off", nil, TUNING.TOTAL_DAY_TIME,
         "gale_lamp_light_lv2"),
     MakeLampLight("gale_lamp_light", firelevels),
     MakeLampLight("gale_lamp_light_lv2", firelevels_advance)

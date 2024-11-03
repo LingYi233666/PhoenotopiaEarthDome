@@ -53,6 +53,7 @@ local GaleItemDestructor = Class(function(self, inst)
 
     self.select_item_fn = nil
     self.consume_reward_fn = nil
+    self.on_destruct_fn = nil
 end)
 
 function GaleItemDestructor:SetSelectItemFn(fn)
@@ -61,6 +62,10 @@ end
 
 function GaleItemDestructor:SetConsumeAndRewardFn(fn)
     self.consume_reward_fn = fn
+end
+
+function GaleItemDestructor:SetOnDestructFn(fn)
+    self.on_destruct_fn = fn
 end
 
 function GaleItemDestructor:GetConsumeAndReward(target, subitems)
@@ -108,6 +113,13 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
 
     if GetTableSize(rewards) == 0 then
         return false, "ANNOUNCE_CANT_DESTRUCT_NO_REWARDS"
+    end
+
+    local raw_rewards = GaleCommon.GetDestructRecipesByName(target.prefab, 1.0, math.ceil)
+    for name, cnt in pairs(raw_rewards) do
+        if DESTSOUNDS_MAP[name] then
+            self.inst.SoundEmitter:PlaySound(DESTSOUNDS_MAP[name])
+        end
     end
 
 
@@ -181,10 +193,10 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
                 doer.components.inventory:GiveItem(item, nil, self.inst:GetPosition())
             end
         end
+    end
 
-        if DESTSOUNDS_MAP[name] then
-            self.inst.SoundEmitter:PlaySound(DESTSOUNDS_MAP[name])
-        end
+    if self.on_destruct_fn then
+        self.on_destruct_fn(self.inst, rewards, raw_rewards)
     end
 
     return true

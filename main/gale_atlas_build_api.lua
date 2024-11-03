@@ -8,12 +8,12 @@ GLOBAL.addition_assets_server_dict = addition_assets_server_dict
 -- dumptable(addition_assets_server_dict)
 
 local function AutoAddAtlasBuild_Internal(xml_path, search_dict, add_to_client_also)
-    print("AutoAddAtlasBuild_Internal:", xml_path)
-
     if search_dict[xml_path] then
         return
     end
     search_dict[xml_path] = true
+
+    print("AutoAddAtlasBuild_Internal:", xml_path)
 
 
     local prefabname = TheWorld.ismastersim and "GALE_ATLAS_BUILD_ADD_SERVER_" or

@@ -17,16 +17,21 @@ end
 
 
 local GaleLampUi = require("widgets/gale_lamp_ui")
+local GaleLampLv2Ui = require("widgets/gale_lamp_lv2_ui")
 
 AddClassPostConstruct("widgets/containerwidget", function(self)
     local old_Open = self.Open
     local old_Close = self.Close
     self.Open = function(self, container, doer, ...)
         local old_ret = old_Open(self, container, doer, ...)
-        if container.prefab == "gale_lamp" or container.prefab == "gale_lamp_lv2" then
+        if container.prefab == "gale_lamp" then
             self.GaleLampUi = self:AddChild(GaleLampUi(doer, container))
 
-            TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_open")
+            -- TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_open")
+        elseif container.prefab == "gale_lamp_lv2" then
+            self.GaleLampUi = self:AddChild(GaleLampLv2Ui(doer, container))
+
+            -- TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_open")
         end
         return old_ret
     end
@@ -36,7 +41,7 @@ AddClassPostConstruct("widgets/containerwidget", function(self)
             self.GaleLampUi:Kill()
             self.GaleLampUi = nil
 
-            TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_close")
+            -- TheFocalPoint.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_close")
         end
 
         return old_Close(self, ...)

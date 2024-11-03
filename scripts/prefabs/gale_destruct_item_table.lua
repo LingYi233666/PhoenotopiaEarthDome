@@ -112,6 +112,35 @@ local function CheckSwapItem(inst)
     end
 end
 
+
+
+local function OnItemGet(inst, data)
+    CheckSwapItem(inst)
+
+    local item = data.item
+    if item then
+        if not inst.listenfns then
+            inst.listenfns = {}
+        end
+
+        inst.listenfns[item] = function()
+            CheckSwapItem(inst)
+        end
+
+        inst:ListenForEvent("imagechange", inst.listenfns[item], item)
+    end
+end
+
+local function OnItemLose(inst, data)
+    CheckSwapItem(inst)
+
+    local item = data.prev_item
+    if item and inst.listenfns[item] then
+        inst:RemoveEventCallback("imagechange", inst.listenfns[item], item)
+        inst.listenfns[item] = nil
+    end
+end
+
 local function OnHammered(inst)
     inst.components.lootdropper:DropLoot()
     inst.components.container:DropEverything()
@@ -221,6 +250,76 @@ local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
     RemoveZeroValues(rewards)
 end
 
+
+-- local MATERIAL_NAMES =
+-- {
+--     "wood",
+--     "metal",
+--     "rock",
+--     "stone",
+--     "straw",
+--     "pot",
+--     "none",
+-- }
+
+local MATERIAL_SOUNDS_MAP =
+{
+    livinglog = "wood",
+
+    silk = "straw",
+    beefalowool = "straw",
+
+    twigs = "wood",
+
+    redgem = "pot",
+    bluegem = "pot",
+    greengem = "pot",
+    purplegem = "pot",
+    yellowgem = "pot",
+    orangegem = "pot",
+    opalpreciousgem = "pot",
+
+    log = "wood",
+    boards = "wood",
+
+
+    rocks    = "stone",
+    cutstone = "stone",
+
+    cutgrass = "straw",
+    cutreeds = "straw",
+}
+
+
+local function OnDestructFn(inst, rewards, raw_rewards)
+    local sound_cands = {}
+
+    local fx = inst:SpawnChild("collapse_small")
+
+    if not fx.Follower then
+        fx.entity:AddFollower()
+    end
+
+    fx.Follower:FollowSymbol(inst.GUID, "swap_object", 0, 100, 0, true)
+
+
+    for name, cnt in pairs(rewards) do
+        if MATERIAL_SOUNDS_MAP[name] then
+            table.insert(sound_cands, MATERIAL_SOUNDS_MAP[name])
+        end
+    end
+
+    for name, cnt in pairs(raw_rewards) do
+        if MATERIAL_SOUNDS_MAP[name] then
+            table.insert(sound_cands, MATERIAL_SOUNDS_MAP[name])
+        end
+    end
+
+    if #sound_cands > 0 then
+        fx:SetMaterial(sound_cands[math.random(#sound_cands)])
+    end
+end
+
 return GaleEntity.CreateNormalEntity({
         prefabname = "gale_destruct_item_table",
         assets = assets,
@@ -257,10 +356,11 @@ return GaleEntity.CreateNormalEntity({
             inst.components.gale_item_destructor.base_percent = 1.0
             inst.components.gale_item_destructor:SetSelectItemFn(SelectItemInput)
             inst.components.gale_item_destructor:SetConsumeAndRewardFn(GetConsumeAndRewardFn)
+            inst.components.gale_item_destructor:SetOnDestructFn(OnDestructFn)
 
 
-            inst:ListenForEvent("itemget", CheckSwapItem)
-            inst:ListenForEvent("itemlose", CheckSwapItem)
+            inst:ListenForEvent("itemget", OnItemGet)
+            inst:ListenForEvent("itemlose", OnItemLose)
             CheckSwapItem(inst)
         end,
     }),

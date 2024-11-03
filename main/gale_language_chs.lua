@@ -279,6 +279,16 @@ STRINGS.GALE_ITEM_DESC.GALE_LAMP = {
 	COMPLEX = "可以通过转动曲柄来提供电能的提灯，\n右键提灯打开面板，鼠标按住并转动曲柄即可使用，\n其中，顺时针转动可以使提灯发光，\n逆时针转动则会使提灯快速熄灭。",
 }
 
+
+STRINGS.NAMES.GALE_LAMP_LV2 = "核能手摇提灯"
+STRINGS.RECIPE_DESC.GALE_LAMP_LV2 = "更加明亮、耐用的手摇提灯。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_LAMP_LV2 = "这是托马斯先生的主意。"
+STRINGS.GALE_ITEM_DESC.GALE_LAMP_LV2 = {
+	SIMPLE = "更加明亮、耐用的手摇提灯。",
+	COMPLEX = "托马斯改造后的手摇提灯。\n充电效率大幅度提升，充电一次就能长亮一整天。\n右键提灯打开面板，鼠标按住并转动曲柄即可使用，\n其中，顺时针转动可以使提灯发光，\n逆时针转动则会使提灯快速熄灭。",
+}
+
+
 STRINGS.NAMES.GALE_FRAN_DOOR = "传送器"
 STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_FRAN_DOOR = "好想念芙兰博士啊。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_FRAN_DOOR = "就像百慕大三角一样，真神奇！"

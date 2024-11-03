@@ -99,6 +99,21 @@ GaleModAddRecipe2(
     { "CHARACTER", "TOOLS", "LIGHT" }
 )
 
+GaleModAddRecipe2(
+    "gale_lamp_lv2",
+    {
+        Ingredient("gale_lamp", 1, "images/inventoryimages/gale_lamp.xml"),
+        Ingredient("bluegem", 2),
+        Ingredient("thulecite", 1),
+        Ingredient("trinket_6", 3),
+    },
+    TECH.SCIENCE_TWO,
+    {
+        builder_tag = "gale",
+    },
+    { "CHARACTER", "TOOLS", "LIGHT" }
+)
+
 -- GaleModAddRecipe2(
 --     "gale_fran_door",
 --     {

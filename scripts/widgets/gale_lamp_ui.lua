@@ -44,8 +44,6 @@ local GaleLampUi = Class(Widget, function(self, owner, lamp)
     self.middle:GetAnimState():SetMultColour(150 / 255, 133 / 255, 97 / 255, 1)
     self.middle:SetScale(0.6)
 
-
-
     local joy_scale = 0.5
     self.joystick = self:AddChild(UIAnim())
     self.joystick:GetAnimState():SetBank("joystick")
