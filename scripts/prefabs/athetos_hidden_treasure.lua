@@ -392,6 +392,14 @@ end
 --     TheSim:LoadPrefabs({ prefabname })
 -- end
 
+local function EnableOpenLoopSound(inst, enbale)
+    if enbale and not inst.SoundEmitter:PlayingSound("open_loop") then
+        inst.SoundEmitter:PlaySound("gale_sfx/athetos_treasure/open_loop", "open_loop")
+    elseif not enbale and inst.SoundEmitter:PlayingSound("open_loop") then
+        inst.SoundEmitter:KillSound("open_loop")
+    end
+end
+
 local function TreasureClientFn(inst)
     -- MakeObstaclePhysics(inst,0.5,2)
 
@@ -445,9 +453,6 @@ local function TreasureClientFn(inst)
         --     AutoAddAtlasBuild(xml_path, addition_assets_client_dict)
         -- end)
     end
-
-
-    -- inst.AnimState:SetSymbolMultColour("board", 0, 0, 0, 0)
 end
 
 
@@ -459,20 +464,18 @@ local function TreasureServerFn(inst)
     inst.img_seg = 0
     inst.target_img_seg = 0
 
+    -- inst.AnimState:SetSymbolMultColour("board", 0, 0, 0, 0)
+
     -- inst.board_anim = inst:SpawnChild("athetos_revealed_treasure_boardanim")
     -- inst.board_anim.entity:AddFollower()
-    -- inst.board_anim.Follower:FollowSymbol(inst.GUID, "board", 0, 0, 0, true)
+    -- inst.board_anim.Follower:FollowSymbol(inst.GUID, "board", nil, nil, nil, true)
     -- inst.board_anim.AnimState:SetPercent("board_open2", 0)
     -- inst.board_anim.components.highlightchild:SetOwner(inst)
 
 
-    inst.EnableOpenLoopSound = function(inst, enbale)
-        if enbale and not inst.SoundEmitter:PlayingSound("open_loop") then
-            inst.SoundEmitter:PlaySound("gale_sfx/athetos_treasure/open_loop", "open_loop")
-        elseif not enbale and inst.SoundEmitter:PlayingSound("open_loop") then
-            inst.SoundEmitter:KillSound("open_loop")
-        end
-    end
+    inst.EnableOpenLoopSound = EnableOpenLoopSound
+
+    inst:AddComponent("updatelooper")
 
     inst:AddComponent("inspectable")
 

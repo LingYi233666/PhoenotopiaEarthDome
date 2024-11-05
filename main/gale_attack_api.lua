@@ -391,7 +391,9 @@ table.insert(SERVER_SG, State {
     end,
     timeline = {
         TimeEvent(FRAMES, function(inst)
-            local cur_buffered_action = inst:GetBufferedAction()
+            -- local cur_buffered_action = inst:GetBufferedAction()
+
+            local cur_buffered_action = inst.bufferedaction
             if not cur_buffered_action then
                 print("Buffered action missing in charge attack SG, use storage")
                 print("Storage is:", inst.sg.statemem.buffaction_storage)

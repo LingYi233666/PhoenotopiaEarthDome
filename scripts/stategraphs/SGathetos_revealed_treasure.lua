@@ -56,10 +56,44 @@ end
 
 local function SetBoardSeg(inst, img_seg)
     inst.img_seg = img_seg
+
     local tex_name = string.format("board_%d.tex", inst.img_seg)
     local xml_path = GetBoardXML(tex_name)
     inst.AnimState:OverrideSymbol("board", xml_path, tex_name)
+
     -- inst.board_anim.AnimState:SetPercent("board_open2", img_seg / 139)
+end
+
+local function BoardUpdateFn(inst, dt)
+    local max_speed = 1
+
+    -- local xml_path = resolvefilepath("images/override_symbols/athetos_revealed_treasure_boards1.xml")
+    if inst.img_seg > inst.target_img_seg then
+        inst.img_seg = math.ceil(math.max(0, inst.img_seg - inst.sg.statemem.cur_speed))
+        -- inst.img_seg = math.max(0, inst.img_seg - inst.sg.statemem.cur_speed)
+    elseif inst.img_seg < inst.target_img_seg then
+        inst.img_seg = math.floor(math.min(inst.target_img_seg, inst.img_seg + inst.sg.statemem.cur_speed))
+        -- inst.img_seg = math.min(inst.target_img_seg, inst.img_seg + inst.sg.statemem.cur_speed)
+    end
+
+
+    if inst.img_seg == 0 then
+        inst.AnimState:ClearOverrideSymbol("board")
+    else
+        SetBoardSeg(inst, inst.img_seg)
+    end
+
+
+    -- dt = math.max(0,dt - FRAMES)
+    -- inst.sg.statemem.cur_speed = math.min(max_speed, inst.sg.statemem.cur_speed + FRAMES * 3)
+
+
+    if inst.img_seg == inst.target_img_seg then
+        inst:EnableOpenLoopSound(false)
+        inst.SoundEmitter:PlaySound("gale_sfx/athetos_treasure/reach_end")
+
+        inst.sg:GoToState("idle")
+    end
 end
 
 local states =
@@ -100,6 +134,8 @@ local states =
             inst:EnableOpenLoopSound(true)
             inst.sg.statemem.cur_speed = 1
             -- print("Enter moving")
+
+            -- inst.components.updatelooper:AddOnUpdateFn(BoardUpdateFn)
         end,
 
         onupdate = function(inst)
@@ -108,8 +144,10 @@ local states =
             -- local xml_path = resolvefilepath("images/override_symbols/athetos_revealed_treasure_boards1.xml")
             if inst.img_seg > inst.target_img_seg then
                 inst.img_seg = math.ceil(math.max(0, inst.img_seg - inst.sg.statemem.cur_speed))
+                -- inst.img_seg = math.max(0, inst.img_seg - inst.sg.statemem.cur_speed)
             elseif inst.img_seg < inst.target_img_seg then
                 inst.img_seg = math.floor(math.min(inst.target_img_seg, inst.img_seg + inst.sg.statemem.cur_speed))
+                -- inst.img_seg = math.min(inst.target_img_seg, inst.img_seg + inst.sg.statemem.cur_speed)
             end
 
 
@@ -123,7 +161,7 @@ local states =
 
 
             -- dt = math.max(0,dt - FRAMES)
-            inst.sg.statemem.cur_speed = math.min(max_speed, inst.sg.statemem.cur_speed + FRAMES * 3)
+            -- inst.sg.statemem.cur_speed = math.min(max_speed, inst.sg.statemem.cur_speed + FRAMES * 3)
 
 
 
@@ -137,6 +175,12 @@ local states =
 
         onexit = function(inst)
             inst:EnableOpenLoopSound(false)
+
+            if inst.sg.statemem.task then
+                inst.sg.statemem.task:Cancel()
+            end
+
+            -- inst.components.updatelooper:RemoveOnUpdateFn(BoardUpdateFn)
         end,
     },
 
