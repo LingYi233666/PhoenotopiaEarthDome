@@ -6,17 +6,21 @@ local assets = {
     Asset("ANIM", "anim/torso_amulets.zip"),
 }
 
+local function DoDeltaChargeProgress(inst, owner, delta)
+    inst.power_charge_progress = inst.power_charge_progress + delta
+    if inst.power_charge_progress >= 1 then
+        inst.power_charge_progress = 0
+        inst.power_charged = inst.power_charged + 1
+
+        GaleCondition.AddCondition(owner, "condition_power")
+    end
+end
+
 local function OnOwnerHitOther(inst, owner, data)
     local damage = data.damage
     if GetTime() - inst.last_trigger_time > 1
         and GaleCondition.GetConditionStacks(owner, "condition_power") < 10 then
-        inst.power_charge_progress = inst.power_charge_progress + 0.1
-        if inst.power_charge_progress >= 1 then
-            inst.power_charge_progress = 0
-            inst.power_charged = inst.power_charged + 1
-
-            GaleCondition.AddCondition(owner, "condition_power")
-        end
+        DoDeltaChargeProgress(inst, owner, 0.1)
 
         inst.last_trigger_time = GetTime()
     end
@@ -25,13 +29,47 @@ end
 local function OnOwnerChargeAttack(inst, owner, data)
     if GetTime() - inst.last_trigger_time > 3
         and GaleCondition.GetConditionStacks(owner, "condition_power") < 10 then
-        inst.power_charge_progress = 0
-        inst.power_charged = inst.power_charged + 1
+        DoDeltaChargeProgress(inst, owner, 1)
 
-        GaleCondition.AddCondition(owner, "condition_power")
 
         inst.last_trigger_time = GetTime()
     end
+end
+
+local function OnOwnerBattleStateChange(inst, owner, data)
+    if data.state == "over" then
+        inst.power_charge_progress = 0
+        inst.power_charged = 0
+    end
+end
+
+local function MakeAmulet()
+
+end
+
+local function OnEquip(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_body", "torso_amulets", "redamulet")
+
+    inst.last_trigger_time = GetTime()
+
+    inst:ListenForEvent("onhitother", inst._on_owner_hit_other_wrapper, owner)
+    inst:ListenForEvent("gale_weaponcharge_doattack", inst._on_owner_charge_attack, owner)
+    inst:ListenForEvent("battlestate_change", inst._on_owner_battle_state_change, owner)
+end
+
+local function OnUnequip(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("swap_body")
+
+    inst:RemoveEventCallback("onhitother", inst._on_owner_hit_other_wrapper, owner)
+    inst:RemoveEventCallback("gale_weaponcharge_doattack", inst._on_owner_charge_attack, owner)
+    inst:RemoveEventCallback("battlestate_change", inst._on_owner_battle_state_change, owner)
+
+    if GaleCondition.GetConditionStacks(owner, "condition_power") > 0 then
+        GaleCondition.RemoveCondition(owner, "condition_power", inst.power_charged)
+    end
+
+    inst.power_charge_progress = 0
+    inst.power_charged = 0
 end
 
 return GaleEntity.CreateNormalEquipedItem({
@@ -59,38 +97,11 @@ return GaleEntity.CreateNormalEquipedItem({
         equipslot = EQUIPSLOTS.AMULET or EQUIPSLOTS.BODY,
 
         onequip_priority = {
-            {
-                function(inst, owner)
-                    owner.AnimState:OverrideSymbol("swap_body", "torso_amulets", "redamulet")
-
-                    inst.last_trigger_time = GetTime()
-
-                    inst:ListenForEvent("onhitother", inst._on_owner_hit_other_wrapper, owner)
-                    inst:ListenForEvent("gale_weaponcharge_doattack", inst._on_owner_hit_other_wrapper, owner)
-                    inst:ListenForEvent("battlestate_change", inst._on_owner_exit_battle, owner)
-                end,
-                1,
-            }
+            { OnEquip, 1 }
         },
 
         onunequip_priority = {
-            {
-                function(inst, owner)
-                    owner.AnimState:ClearOverrideSymbol("swap_body")
-
-                    inst:RemoveEventCallback("onhitother", inst._on_owner_hit_other_wrapper, owner)
-                    inst:RemoveEventCallback("gale_weaponcharge_doattack", inst._on_owner_hit_other_wrapper, owner)
-                    inst:RemoveEventCallback("battlestate_change", inst._on_owner_exit_battle, owner)
-
-                    if GaleCondition.GetConditionStacks(owner, "condition_power") > 0 then
-                        GaleCondition.RemoveCondition(owner, "condition_power", inst.power_charged)
-                    end
-
-                    inst.power_charge_progress = 0
-                    inst.power_charged = 0
-                end,
-                1,
-            }
+            { OnUnequip, 1, }
         },
     },
 
@@ -107,15 +118,12 @@ return GaleEntity.CreateNormalEquipedItem({
             OnOwnerHitOther(inst, owner, data)
         end
 
-        inst._on_owner_exit_battle = function(owner, data)
-            if data.state == "over" then
-                inst.power_charge_progress = 0
-                inst.power_charged = 0
-            end
-        end
-
         inst._on_owner_charge_attack = function(owner, data)
             OnOwnerChargeAttack(inst, owner, data)
+        end
+
+        inst._on_owner_battle_state_change = function(owner, data)
+            OnOwnerBattleStateChange(inst, owner, data)
         end
     end,
 })

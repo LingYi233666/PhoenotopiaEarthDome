@@ -183,9 +183,7 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
 
         if new_phase == self.Phase.BOX_WITH_LOCK then
             self.entities.safebox:SetLocked(true)
-        end
-
-        if new_phase == self.Phase.BOX_WITH_DRONES then
+        elseif new_phase == self.Phase.BOX_WITH_DRONES then
             for i = 1, 10 do
                 local pos = self.entities.safebox:GetPosition()
 
@@ -210,15 +208,19 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
                     SpawnAt("galeboss_katash_skymine", self.entities.safebox, nil, offset)
                 end
             end
-        end
+        elseif new_phase == self.Phase.KATASH_GO_TO_CAVE then
+            Shard_SyncKatashInCave(true)
+        elseif new_phase == self.Phase.KATASH_RETURN_FROM_CAVE then
 
-        if new_phase == self.Phase.KATASH_GO_TO_CAVE then
+        end
+    end
+
+    if new_phase == self.Phase.KATASH_GO_TO_CAVE then
+        if not TheWorld.shard.components.shard_galeboss_katash_spawner:GetKatashShouldInCave() then
+            print("Katash should in cave, but the shard not update, so update it.")
+            print("This should occur in old savefiles.")
             Shard_SyncKatashInCave(true)
         end
-
-        -- if new_phase == self.Phase.KATASH_RETURN_FROM_CAVE then
-        --     Shard_SyncKatashInCave(false)
-        -- end
     end
 end
 
@@ -375,6 +377,8 @@ function GalebossKatashSpawner:TryPushStoryLine()
         end
     elseif self.phase == self.Phase.KATASH_DEAD then
 
+    else
+        print("TryPushStoryLine() has nothing to do.")
     end
 end
 

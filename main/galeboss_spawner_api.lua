@@ -24,16 +24,12 @@ AddPrefabPostInit("cave", function(inst)
 end)
 
 AddShardModRPCHandler("gale_rpc", "katash_should_in_cave", function(shardid, val)
-	if TheWorld and TheWorld.shard and TheWorld.shard.shard_galeboss_katash_spawner then
-		TheWorld.shard.shard_galeboss_katash_spawner:SetKatashShouldInCave(val)
-	end
+	Shard_SyncKatashInCave(val)
 end)
 
 function GLOBAL.Shard_SyncKatashInCave(val)
 	if Shard_IsMaster() then
-		if TheWorld and TheWorld.shard and TheWorld.shard.shard_galeboss_katash_spawner then
-			TheWorld.shard.shard_galeboss_katash_spawner:SetKatashShouldInCave(val)
-		end
+		TheWorld:PushEvent("master_shardkatashincave", { incave = val })
 	else
 		SendModRPCToShard(SHARD_MOD_RPC["gale_rpc"]["katash_should_in_cave"], SHARDID.MASTER, val)
 	end

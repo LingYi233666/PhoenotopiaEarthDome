@@ -6,6 +6,10 @@ local assets = {
 }
 
 local function SelectTargetFn(inst)
+    if inst:HasTag("temporary_freedom") then
+        return
+    end
+
     return FindEntity(inst, 20,
         function(guy)
             return inst.components.combat:CanTarget(guy)
@@ -18,16 +22,27 @@ local function SelectTargetFn(inst)
 end
 
 local function KeepTargetFn(inst, target)
-    return inst.components.combat:CanTarget(target)
+    return not inst:HasTag("temporary_freedom")
+        and inst.components.combat:CanTarget(target)
         and inst:IsNear(target, 40)
 end
 
 
 local function OnAttacked(inst, data)
+    if inst:HasTag("temporary_freedom") then
+        return
+    end
+
     local attacker = data ~= nil and data.attacker or nil
 
     if attacker ~= nil then
         inst.components.combat:SetTarget(attacker)
+    end
+end
+
+local function OnTimerDone(inst, data)
+    if data.name == "mind_controled_again" then
+        -- TODO: into re-mindcontrol SG
     end
 end
 
@@ -69,6 +84,33 @@ local function EnableUpBody(inst, enabled)
     return ent
 end
 
+
+local function EnableBladeAnim(inst, enable)
+    inst.AnimState:ClearOverrideSymbol("swap_object")
+
+    if enable then
+        inst.AnimState:Show("ARM_carry")
+        inst.AnimState:Hide("ARM_normal")
+
+        if not (inst.swapanim_ent and inst.swapanim_ent:IsValid()) then
+            inst.swapanim_ent = inst:SpawnChild("galeboss_katash_blade_swapanims")
+            inst.swapanim_ent.entity:AddFollower()
+            inst.swapanim_ent.Follower:FollowSymbol(inst.GUID, "swap_object", nil, nil, nil, true, nil, 0, 8)
+            inst.swapanim_ent.components.highlightchild:SetOwner(inst)
+            if inst.components.colouradder ~= nil then
+                inst.components.colouradder:AttachChild(inst.swapanim_ent)
+            end
+        end
+    else
+        inst.AnimState:Hide("ARM_carry")
+        inst.AnimState:Show("ARM_normal")
+        if inst.swapanim_ent and inst.swapanim_ent:IsValid() then
+            inst.swapanim_ent:Remove()
+        end
+        inst.swapanim_ent = nil
+    end
+end
+
 local function EnableMindControledParam(inst, enabled)
     inst.mind_controled = enabled
 
@@ -76,6 +118,33 @@ local function EnableMindControledParam(inst, enabled)
         inst.components.gale_spdamage_psychic:SetBaseDamage(34)
     else
         inst.components.gale_spdamage_psychic:SetBaseDamage(0)
+    end
+end
+
+-- local function EscapeFromMindControlTemporary(inst, escape_time)
+
+-- end
+
+local function SelectLeapDestination(inst, arrived_dests)
+    arrived_dests = arrived_dests or {}
+
+    local function custom_check(pt)
+        for _, v in pairs(arrived_dests) do
+            if (v - pt):Length() < 4 then
+                return false
+            end
+        end
+
+        return true
+    end
+
+    for r = 15, 5, -1 do
+        local offset = FindWalkableOffset(inst:GetPosition(), math.random() * TWOPI, r, 10, nil, false, custom_check,
+            false, false)
+
+        if offset then
+            return inst:GetPosition() + offset
+        end
     end
 end
 
@@ -126,8 +195,10 @@ local function KatashClientFn(inst)
 end
 
 local function KatashServerFn(inst)
+    inst.EnableBladeAnim = EnableBladeAnim
     inst.EnableUpBody = EnableUpBody
     inst.EnableMindControledParam = EnableMindControledParam
+    inst.SelectLeapDestination = SelectLeapDestination
     inst.OnLoad = OnLoad
 
     inst:AddComponent("timer")
@@ -169,6 +240,7 @@ local function KatashServerFn(inst)
     inst:EnableMindControledParam(true)
 
     inst:ListenForEvent("attacked", OnAttacked)
+    inst:ListenForEvent("timerdone", OnTimerDone)
 end
 
 ----------------------------------------------------------------------------------------

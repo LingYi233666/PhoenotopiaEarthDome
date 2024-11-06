@@ -582,13 +582,15 @@ table.insert(SERVER_SG, State {
                 })
             inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke", nil,
                 nil, true)
-        end), TimeEvent(13 * FRAMES, function(inst)
-        inst:PerformBufferedAction()
-        PushSpecialAtkEvent(inst)
-    end), TimeEvent(18 * FRAMES, function(inst)
-        inst.sg:RemoveStateTag("abouttoattack")
-        inst.sg:RemoveStateTag("attack")
-    end)
+        end),
+        TimeEvent(13 * FRAMES, function(inst)
+            inst:PerformBufferedAction()
+            PushSpecialAtkEvent(inst)
+        end),
+        TimeEvent(18 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("abouttoattack")
+            inst.sg:RemoveStateTag("attack")
+        end)
     },
 
     events = {

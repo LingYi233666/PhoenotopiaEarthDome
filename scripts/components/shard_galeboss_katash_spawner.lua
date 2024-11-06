@@ -25,6 +25,10 @@ local GalebossKatashSpawner = Class(function(self, inst)
 
             self:SetKatashShouldInCave(data.katash_should_in_cave)
         end
+
+        inst:ListenForEvent("master_shardkatashincave", function(world, data)
+            self:SetKatashShouldInCave(data.incave)
+        end)
     end
 end)
 

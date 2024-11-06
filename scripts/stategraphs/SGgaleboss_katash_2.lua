@@ -69,6 +69,7 @@ local function UpbodyDoAttack(inst)
 end
 
 local PUNCH_LOOP_ANIM_SPEED = 2.0
+local LEAP_DURATION = 13 * FRAMES
 
 local idle_anims = {
     -- { "idle_groggy_pre", "idle_groggy" },
@@ -241,6 +242,79 @@ local states = {
     },
 
     State {
+        name = "attack_leap",
+        tags = { "busy", "attack", "abouttoattack", },
+
+        onenter = function(inst, data)
+            inst.components.locomotor:Stop()
+
+            inst:EnableBladeAnim(true)
+
+            inst.AnimState:PlayAnimation("atk_leap_pre")
+            inst.AnimState:PushAnimation("atk_leap_lag", true)
+
+            inst.sg.statemem.target_pos    = data.target_pos
+            inst.sg.statemem.count         = data.count or 1
+            inst.sg.statemem.arrived_dests = data.arrived_dests or {}
+
+            inst:ForceFacePoint(data.target_pos)
+
+            inst.sg:SetTimeout(40 * FRAMES)
+        end,
+
+        ontimeout = function(inst)
+            inst.sg.statemem.count = inst.sg.statemem.count - 1
+            table.insert(inst.sg.statemem.arrived_dests, inst.sg.statemem.target_pos)
+
+
+            local target_pos = inst:SelectLeapDestination(inst.sg.statemem.arrived_dests)
+
+
+            if target_pos then
+                inst.sg:GoToState("attack_leap", {
+                    target_pos = target_pos,
+                    count = inst.sg.statemem.count,
+                    arrived_dests = inst.sg.statemem.arrived_dests,
+                })
+            else
+                inst.sg:GoToState("idle", true)
+            end
+        end,
+
+        timeline = {
+            TimeEvent(20 * FRAMES, function(inst)
+                inst.AnimState:PlayAnimation("atk_leap")
+                inst.AnimState:PushAnimation("idle_groggy_pre", false)
+                inst.AnimState:PushAnimation("idle_groggy")
+
+                local speed = (inst:GetPosition() - inst.sg.statemem.target_pos):Length() / LEAP_DURATION
+
+                inst.Physics:SetMotorVel(speed, 0, 0)
+            end),
+
+            TimeEvent(20 * FRAMES + LEAP_DURATION, function(inst)
+                inst.Physics:Stop()
+
+                ShakeAllCameras(CAMERASHAKE.VERTICAL, .7, .015, .8, inst, 20)
+                inst.SoundEmitter:PlaySound("dontstarve/common/destroy_smoke")
+                -- TODO: Do attack
+                -- TODO: Spawn splash rocks
+
+                inst.sg:RemoveStateTag("abouttoattack")
+            end),
+        },
+
+        events =
+        {
+
+        },
+
+        onexit = function(inst)
+            inst:EnableBladeAnim(false)
+        end,
+    },
+
+    State {
         name = "attack_throw",
         tags = { "busy", "attack", "abouttoattack", },
 
@@ -291,7 +365,8 @@ local states = {
         timeline = {
             TimeEvent(16 * FRAMES, function(inst)
                 inst.AnimState:PlayAnimation("throw")
-                inst.AnimState:PushAnimation("idle_loop", true)
+                inst.AnimState:PushAnimation("idle_groggy_pre", false)
+                inst.AnimState:PushAnimation("idle_groggy")
             end),
 
             TimeEvent(20 * FRAMES, function(inst)
@@ -415,8 +490,13 @@ local states = {
         tags = { "busy", "knockback" },
 
         onenter = function(inst)
+            -- Katash temporary escape from telepath and become free
             -- TODO: Unlink katash and telepath
+            -- TODO: Brain should do nothing if katash is temporary free
             inst:EnableMindControledParam(false)
+            inst:AddTag("temporary_freedom")
+            inst.components.timer:StartTimer("mind_controled_again", math.random(10, 15))
+            inst.components.combat:DropTarget()
 
             inst.components.locomotor:Stop()
 
@@ -454,35 +534,44 @@ local states = {
         end,
     },
 
-    -- State {
-    --     name = "idle_no_mindcontrol",
-    --     tags = { "busy", "idle_no_mindcontrol" },
+    State {
+        name = "mind_controled_again",
+        tags = { "busy", },
 
-    --     onenter = function(inst)
-    --         inst.components.locomotor:StopMoving()
+        onenter = function(inst)
+            print(inst, "will be mind-controled by telepath again !")
+            inst.Physics:Stop()
 
-    --         inst.AnimState:PlayAnimation("idle_groggy01_pre")
-    --         inst.AnimState:PushAnimation("idle_groggy01_loop", true)
+            inst.sg:SetTimeout(3)
+        end,
 
-    --         inst.sg:SetTimeout(8)
-    --     end,
 
-    --     ontimeout = function(inst)
-    --         -- TODO: Be mind controled again
-    --     end,
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle")
+        end,
 
-    --     timeline = {
-    --         -- TimeEvent(8, function(inst)
-    --         -- end),
-    --     },
 
-    --     events =
-    --     {
-    --         EventHandler("attacked", function(inst)
+        timeline = {
+            TimeEvent(8 * FRAMES, function(inst)
 
-    --         end),
-    --     },
-    -- },
+            end),
+
+            TimeEvent(33 * FRAMES, function(inst)
+
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+
+            end),
+        },
+
+        onexit = function(inst)
+            inst:RemoveTag("temporary_freedom")
+        end,
+    },
 }
 
 CommonStates.AddHitState(states)
