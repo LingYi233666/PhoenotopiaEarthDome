@@ -82,6 +82,7 @@ local function DoExplode(inst)
             for _, v in pairs(hitted_ents) do
                 -- SpawnAt("electrichitsparks",v)
                 already_hitted[v] = true
+                v:PushEvent("escape_mind_control", { attacker = inst.components.complexprojectile.attacker })
                 v:RemoveDebuff("mindcontroller")
             end
 

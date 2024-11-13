@@ -73,6 +73,7 @@ function GaleItemDestructor:GetConsumeAndReward(target, subitems)
 
     local consumes = { target }
     local rewards = GaleCommon.GetDestructRecipesByEntity(target, self.base_percent, math.ceil)
+    local rewards_saverecord = {}
 
     local banned_item_names = {}
     for name, cnt in pairs(rewards) do
@@ -89,10 +90,10 @@ function GaleItemDestructor:GetConsumeAndReward(target, subitems)
     end
 
     if self.consume_reward_fn then
-        self.consume_reward_fn(self.inst, target, subitems, consumes, rewards)
+        self.consume_reward_fn(self.inst, target, subitems, consumes, rewards, rewards_saverecord)
     end
 
-    return consumes, rewards
+    return consumes, rewards, rewards_saverecord
 end
 
 function GaleItemDestructor:Destruct(doer, target, subitems)
@@ -106,12 +107,12 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
 
     subitems = subitems or {}
 
-    local consumes, rewards = self:GetConsumeAndReward(target, subitems)
+    local consumes, rewards, rewards_saverecord = self:GetConsumeAndReward(target, subitems)
     if #consumes == 0 then
         return false, "ANNOUNCE_CANT_DESTRUCT_NO_CONSUMES"
     end
 
-    if GetTableSize(rewards) == 0 then
+    if GetTableSize(rewards) + GetTableSize(rewards_saverecord) == 0 then
         return false, "ANNOUNCE_CANT_DESTRUCT_NO_REWARDS"
     end
 
@@ -120,6 +121,10 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
         if DESTSOUNDS_MAP[name] then
             self.inst.SoundEmitter:PlaySound(DESTSOUNDS_MAP[name])
         end
+    end
+
+    if self.on_destruct_fn then
+        self.on_destruct_fn(self.inst, target, subitems, rewards, raw_rewards, rewards_saverecord)
     end
 
 
@@ -195,8 +200,16 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
         end
     end
 
-    if self.on_destruct_fn then
-        self.on_destruct_fn(self.inst, rewards, raw_rewards)
+    for save_record, cnt in pairs(rewards_saverecord) do
+        for i = 1, cnt do
+            local item = SpawnSaveRecord(save_record)
+            local x, y, z = self.inst:GetPosition()
+            item.Transform:SetPosition(x, y, z)
+
+            if doer and doer.components.inventory then
+                doer.components.inventory:GiveItem(item, nil, Vector3(x, y, z))
+            end
+        end
     end
 
     return true

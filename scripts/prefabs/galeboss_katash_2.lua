@@ -6,7 +6,7 @@ local assets = {
 }
 
 local function SelectTargetFn(inst)
-    if inst:HasTag("temporary_freedom") then
+    if not inst.mind_controlled then
         return
     end
 
@@ -22,14 +22,14 @@ local function SelectTargetFn(inst)
 end
 
 local function KeepTargetFn(inst, target)
-    return not inst:HasTag("temporary_freedom")
+    return inst.mind_controlled
         and inst.components.combat:CanTarget(target)
         and inst:IsNear(target, 40)
 end
 
 
 local function OnAttacked(inst, data)
-    if inst:HasTag("temporary_freedom") then
+    if not inst.mind_controlled then
         return
     end
 
@@ -41,8 +41,9 @@ local function OnAttacked(inst, data)
 end
 
 local function OnTimerDone(inst, data)
-    if data.name == "mind_controled_again" then
+    if data.name == "mind_controlled_again" then
         -- TODO: into re-mindcontrol SG
+        inst.sg:GoToState("mind_controlled_again")
     end
 end
 
@@ -112,7 +113,7 @@ local function EnableBladeAnim(inst, enable)
 end
 
 local function EnableMindControledParam(inst, enabled)
-    inst.mind_controled = enabled
+    inst.mind_controlled = enabled
 
     if enabled then
         inst.components.gale_spdamage_psychic:SetBaseDamage(34)

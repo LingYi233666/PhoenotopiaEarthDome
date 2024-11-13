@@ -10,8 +10,15 @@ local events = {
     -- CommonHandlers.OnLocomote(true, false),
     -- CommonHandlers.OnDeath(),
     CommonHandlers.OnAttacked(),
+
+    EventHandler("escape_mind_control", function(inst, data)
+        if not inst.sg:HasStateTag("knockback") and inst.mind_controlled then
+            inst.sg:GoToState("knockback_stage1_electric")
+        end
+    end),
+
     EventHandler("minhealth", function(inst, data)
-        if not inst.sg:HasStateTag("knockback") and inst.mind_controled then
+        if not inst.sg:HasStateTag("knockback") and inst.mind_controlled then
             inst.sg:GoToState("knockback_stage1")
         end
     end),
@@ -88,10 +95,10 @@ local states = {
 
             local anim_list
 
-            if inst.mind_controled then
+            if inst.mind_controlled then
                 anim_list = idle_anims[math.random(1, #idle_anims)]
             else
-                anim_list = { "idle_groggy_pre", "idle_groggy" }
+                anim_list = { "idle_groggy01_pre", "idle_groggy01_loop" }
             end
 
             if pushanim then
@@ -187,7 +194,7 @@ local states = {
 
             inst.sg.statemem.up_body = inst:EnableUpBody(true)
             inst.sg.statemem.up_body.sg:GoToState("upbody_punch_loop")
-            -- inst.sg.statemem.
+            inst.sg.statemem.delay = data.delay or 0
 
             inst.AnimState:PlayAnimation("idle_walk_pre")
             inst.AnimState:PushAnimation("idle_walk", true)
@@ -199,6 +206,11 @@ local states = {
         end,
 
         onupdate = function(inst)
+            if inst.sg.statemem.delay > 0 then
+                inst.sg.statemem.delay = inst.sg.statemem.delay - FRAMES
+                return
+            end
+
             local target = inst.components.combat.target
             if target then
                 VelUpdatePunchLoop(inst, target:GetPosition())
@@ -232,6 +244,10 @@ local states = {
             end),
 
             EventHandler("attacked", function(inst, data)
+                if inst.sg.statemem.delay > 0 then
+                    return
+                end
+
                 if data.attacker then
                     local towards = (data.attacker:GetPosition() - inst:GetPosition()):GetNormalized()
                     inst.Physics:Stop()
@@ -263,14 +279,12 @@ local states = {
         end,
 
         ontimeout = function(inst)
-            inst.sg.statemem.count = inst.sg.statemem.count - 1
-            table.insert(inst.sg.statemem.arrived_dests, inst.sg.statemem.target_pos)
-
-
             local target_pos = inst:SelectLeapDestination(inst.sg.statemem.arrived_dests)
 
-
             if target_pos then
+                inst.sg.statemem.count = inst.sg.statemem.count - 1
+                table.insert(inst.sg.statemem.arrived_dests, inst.sg.statemem.target_pos)
+
                 inst.sg:GoToState("attack_leap", {
                     target_pos = target_pos,
                     count = inst.sg.statemem.count,
@@ -486,6 +500,39 @@ local states = {
     },
 
     State {
+        name = "knockback_stage1_electric",
+        tags = { "busy", "knockback" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+
+            inst.AnimState:PlayAnimation("shock")
+            inst.AnimState:PushAnimation("shock_pst", false)
+            inst.SoundEmitter:PlaySound(inst.sounds.knockback_stage1)
+
+            ShakeAllCameras(CAMERASHAKE.FULL, .35, .02, 0.5, inst, 40)
+        end,
+
+        onupdate = function(inst)
+
+        end,
+
+        timeline = {
+            TimeEvent(8 * FRAMES, function(inst)
+
+            end),
+
+            TimeEvent(60 * FRAMES, function(inst)
+                inst.sg:GoToState("knockback_stage2")
+            end),
+        },
+
+        onexit = function(inst)
+            inst.Physics:Stop()
+        end,
+    },
+
+    State {
         name = "knockback_stage2",
         tags = { "busy", "knockback" },
 
@@ -494,8 +541,7 @@ local states = {
             -- TODO: Unlink katash and telepath
             -- TODO: Brain should do nothing if katash is temporary free
             inst:EnableMindControledParam(false)
-            inst:AddTag("temporary_freedom")
-            inst.components.timer:StartTimer("mind_controled_again", math.random(10, 15))
+            inst.components.timer:StartTimer("mind_controlled_again", math.random(10, 15))
             inst.components.combat:DropTarget()
 
             inst.components.locomotor:Stop()
@@ -535,28 +581,28 @@ local states = {
     },
 
     State {
-        name = "mind_controled_again",
+        name = "mind_controlled_again_1",
         tags = { "busy", },
 
         onenter = function(inst)
+            -- TODO: Telepath should start mind-contrlling, with light in its eye
             print(inst, "will be mind-controled by telepath again !")
             inst.Physics:Stop()
 
-            inst.sg:SetTimeout(3)
+            inst.AnimState:PlayAnimation("idle_sanity_pre")
+            inst.AnimState:PushAnimation("idle_sanity_loop")
+
+            inst.sg:SetTimeout(1)
         end,
 
 
         ontimeout = function(inst)
-            inst.sg:GoToState("idle")
+            inst.sg:GoToState("mind_controlled_again_2")
         end,
 
 
         timeline = {
             TimeEvent(8 * FRAMES, function(inst)
-
-            end),
-
-            TimeEvent(33 * FRAMES, function(inst)
 
             end),
         },
@@ -569,7 +615,41 @@ local states = {
         },
 
         onexit = function(inst)
-            inst:RemoveTag("temporary_freedom")
+            -- inst:EnableMindControledParam(true)
+        end,
+    },
+
+    State {
+        name = "mind_controlled_again_2",
+        tags = { "busy", },
+
+        onenter = function(inst)
+            -- TODO: Telepath is mind-contrlling, a line linked to katash
+            inst.Physics:Stop()
+
+            inst.AnimState:PlayAnimation("idle_lunacy_pre")
+            inst.AnimState:PushAnimation("idle_lunacy_loop")
+
+            inst.sg:SetTimeout(3)
+        end,
+
+
+        ontimeout = function(inst)
+            -- TODO: Splash fx
+            inst.sg:GoToState("punch_loop", {
+                delay = 3,
+            })
+        end,
+
+
+        timeline = {
+            TimeEvent(8 * FRAMES, function(inst)
+
+            end),
+        },
+
+        onexit = function(inst)
+            inst:EnableMindControledParam(true)
         end,
     },
 }

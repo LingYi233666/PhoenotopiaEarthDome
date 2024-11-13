@@ -62,11 +62,19 @@ local container_param = {
 
     itemtestfn = function(container, item, slot)
         if slot == nil then
-            return item.prefab == "papyrus" or item.prefab == "featherpencil" or IsDestructible(item)
+            return item.prefab == "papyrus"
+                or item.prefab == "featherpencil"
+                or item.prefab == "blueprint"
+                or item.prefab == "athetos_production_process"
+                or IsDestructible(item)
         end
 
         if slot == 1 then
-            return IsDestructible(item) and item.prefab ~= "papyrus" and item.prefab ~= "featherpencil"
+            return (IsDestructible(item)
+                    or item.prefab == "blueprint"
+                    or item.prefab == "athetos_production_process")
+                and item.prefab ~= "papyrus"
+                and item.prefab ~= "featherpencil"
         elseif slot == 2 then
             return item.prefab == "papyrus"
         elseif slot == 3 then
@@ -170,7 +178,18 @@ local function SelectItemInput(inst, doer)
         return main_item
     end
 
-    local blueprint_name = main_item.prefab .. "_blueprint"
+    local main_item_prefab = main_item.prefab
+
+    if main_item_prefab == "blueprint"
+        or main_item_prefab == "athetos_production_process" then
+        if papyrus == nil or featherpencil == nil then
+            return
+        end
+
+        return main_item, { papyrus, featherpencil }
+    end
+
+    local blueprint_name = main_item_prefab .. "_blueprint"
 
     if Prefabs[blueprint_name] then
         return main_item, { papyrus, featherpencil }
@@ -203,7 +222,7 @@ local function RemoveZeroValues(tab)
     end
 end
 
-local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
+local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards, rewards_saverecord)
     -- local name_with_one_cnt = {}
 
     -- for name, cnt in pairs(rewards) do
@@ -220,6 +239,14 @@ local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards)
     --     end
 
     -- end
+
+    if target.prefab == "blueprint" or target.prefab == "athetos_production_process" then
+        consumes = shallowcopy(subitems)
+        rewards = {}
+        rewards_saverecord = {}
+        rewards_saverecord[target:GetSaveRecord()] = 1
+        return
+    end
 
     for name, cnt in pairs(rewards) do
         rewards[name] = math.random(cnt)
@@ -291,7 +318,12 @@ local MATERIAL_SOUNDS_MAP =
 }
 
 
-local function OnDestructFn(inst, rewards, raw_rewards)
+local function OnDestructFn(inst, target, subitems, rewards, raw_rewards, rewards_saverecord)
+    if target.prefab == "blueprint" or target.prefab == "athetos_production_process" then
+        inst.SoundEmitter:PlaySound("dontstarve/common/together/draw")
+        return
+    end
+
     local sound_cands = {}
 
     local fx = inst:SpawnChild("collapse_small")
@@ -301,7 +333,6 @@ local function OnDestructFn(inst, rewards, raw_rewards)
     end
 
     fx.Follower:FollowSymbol(inst.GUID, "swap_object", 0, 100, 0, true)
-
 
     for name, cnt in pairs(rewards) do
         if MATERIAL_SOUNDS_MAP[name] then

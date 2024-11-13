@@ -1462,7 +1462,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	DESTRUCT_TABLE = {
 		NAME = "逆向工程",
-		DESC = "可以制作物品拆解台来拆解物品，搭配莎草纸和羽毛笔还能同时获得其蓝图。",
+		DESC = "可以制作物品拆解台来拆解物品，搭配莎草纸和羽毛笔还能同时获得其蓝图。亦或是复制一张蓝图。",
 	},
 
 	QUICK_CHARGE = {
