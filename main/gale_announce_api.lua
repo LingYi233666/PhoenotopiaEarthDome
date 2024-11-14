@@ -33,15 +33,30 @@ end)
 
 
 AddClientModRPCHandler("gale_rpc", "announce_advance",
-                       function(type, sender_name, message, r, g, b, a, icondata, whisper
-                       )
-                           message = message or "gale_rpc announce empty msg"
-                           icondata = icondata or "default"
-                           r = r or 1
-                           g = g or 1
-                           b = b or 1
-                           a = a or 1
+    function(type, sender_name, message, r, g, b, a, icondata, whisper)
+        message = message or "gale_rpc announce empty msg"
+        icondata = icondata or "default"
+        r = r or 1
+        g = g or 1
+        b = b or 1
+        a = a or 1
 
-                           ChatHistory:AddToHistory(type, nil, nil, sender_name, message, { r, g, b, a }, icondata,
-                                                    whisper, true)
-                       end)
+        ChatHistory:AddToHistory(type, nil, nil, sender_name, message, { r, g, b, a }, icondata,
+            whisper, true)
+    end
+)
+
+AddClientModRPCHandler("gale_rpc", "chatter_message",
+    function(talker, name_colour_R, name_colour_G, name_colour_B, message, colour_R, colour_G, colour_B,
+             user_vanity, user_vanity_bg, priority)
+        local name_colour = { 1, 1, 1 }
+        local colour = { 1, 1, 1 }
+        if name_colour_R and name_colour_G and name_colour_B then
+            name_colour = { name_colour_R, name_colour_G, name_colour_B }
+        end
+        if colour_R and colour_G and colour_B then
+            colour = { colour_R, colour_G, colour_B }
+        end
+        ChatHistory:OnChatterMessage(talker, name_colour, message, colour, user_vanity, user_vanity_bg, priority)
+    end
+)

@@ -318,7 +318,13 @@ local MATERIAL_SOUNDS_MAP =
 }
 
 
-local function OnDestructFn(inst, target, subitems, rewards, raw_rewards, rewards_saverecord)
+local function OnDestructFn(inst, doer, target, subitems, rewards, raw_rewards, rewards_saverecord)
+    if doer then
+        if doer.components.sanity then
+            doer.components.sanity:DoDelta(-TUNING.SANITY_SUPERTINY, true)
+        end
+    end
+
     if target.prefab == "blueprint" or target.prefab == "athetos_production_process" then
         inst.SoundEmitter:PlaySound("dontstarve/common/together/draw")
         return

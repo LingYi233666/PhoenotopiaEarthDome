@@ -124,7 +124,7 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
     end
 
     if self.on_destruct_fn then
-        self.on_destruct_fn(self.inst, target, subitems, rewards, raw_rewards, rewards_saverecord)
+        self.on_destruct_fn(self.inst, doer, target, subitems, rewards, raw_rewards, rewards_saverecord)
     end
 
 

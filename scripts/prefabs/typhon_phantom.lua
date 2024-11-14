@@ -206,12 +206,12 @@ local function SelectTargetFnPhantom(inst)
 
 
     return FindEntity(inst, 12,
-                      function(guy)
-                          return inst:CanTarget(guy)
-                      end,
-                      { "_combat", "_health" },
-                      { "INLIMBO" },
-                      { "character", "lunar_aligned", "largecreature" }
+        function(guy)
+            return inst:CanTarget(guy)
+        end,
+        { "_combat", "_health" },
+        { "INLIMBO" },
+        { "character", "lunar_aligned", "largecreature" }
     )
 end
 
@@ -463,15 +463,15 @@ local function CheckEmergencyEvade(inst)
                 --  If ready to melee attack,might dash to nearby
                 if not inst.components.combat:InCooldown() then
                     local offset = FindWalkableOffset(hositile_pos, math.random() * PI * 2, hositile:GetPhysicsRadius(),
-                                                      10,
-                                                      nil, false, nil, false, true)
+                        10,
+                        nil, false, nil, false, true)
                     table.insert(possible_evade_pos, hositile_pos + (offset or Vector3(0, 0, 0)))
                 end
             end
 
             -- Evade away
             local offset = FindWalkableOffset(inst:GetPosition(), math.random() * PI * 2, GetRandomMinMax(5, 10), 33,
-                                              nil, false, nil, false, true)
+                nil, false, nil, false, true)
             table.insert(possible_evade_pos, inst:GetPosition() + (offset or Vector3(0, 0, 0)))
         end
 
@@ -518,8 +518,9 @@ end
 local function OnTalk(inst, data)
     for k, v in pairs(AllPlayers) do
         if inst:IsNear(v, 45) then
+            -- TODO: Try ChatHistory:OnChatterMessage() with "gale_rpc", "chatter_message"
             SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["announce_advance"], v.userid, ChatTypes.Message,
-                               inst:GetDisplayName(), data.message, 1, 1, 1, 1, "profileflair")
+                inst:GetDisplayName(), data.message, 1, 1, 1, 1, "profileflair")
         end
     end
 end

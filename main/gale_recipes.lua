@@ -457,3 +457,31 @@ GaleModAddRecipe2(
     },
     { "CHARACTER", "STRUCTURES" }
 )
+
+
+GaleModAddRecipe2(
+    "athetos_amulet_berserker_fixed",
+    {
+        Ingredient("athetos_amulet_berserker_broken", 1, "images/inventoryimages/athetos_amulet_berserker_broken.xml"),
+        Ingredient("wagpunk_bits", 3),
+    },
+    TECH.SCIENCE_TWO,
+    {
+
+    },
+    { "WEAPONS" }
+)
+
+GaleModAddRecipe2(
+    "athetos_amulet_berserker",
+    {
+        Ingredient("redgem", 1),
+        Ingredient("transistor", 2),
+        Ingredient("wagpunk_bits", 6),
+    },
+    TECH.LOST,
+    {
+
+    },
+    { "WEAPONS" }
+)
