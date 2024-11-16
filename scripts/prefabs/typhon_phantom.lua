@@ -220,7 +220,7 @@ local function KeepTargetFnPhantom(inst, target)
 
     return inst.components.combat:CanTarget(target)
         and (leader == nil or leader:IsNear(inst, 15))
-        and inst:IsNear(target, 47)
+        and inst:IsNear(target, 36)
 end
 
 local function OnAttackedPhantom(inst, data)

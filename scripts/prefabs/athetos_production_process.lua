@@ -48,7 +48,7 @@ local function OnTeach(inst, learner)
     end
 
     SendModRPCToClient(CLIENT_MOD_RPC["gale_rpc"]["play_clientside_sound"], learner.userid,
-                       "gale_sfx/other/athetos_production_process_unlock", true, true)
+        "gale_sfx/other/athetos_production_process_unlock", true, true)
 end
 
 local function CanBlueprintSpecificRecipe(recipe)
@@ -134,6 +134,9 @@ local prefabs = {
 local force_include_recipes = {
 
 }
+local force_exclude_recipes = {
+    "athetos_amulet_berserker_fixed", "athetos_amulet_berserker"
+}
 
 local recipe_map = {
     -- product = {
@@ -141,13 +144,15 @@ local recipe_map = {
     --     plan_name2,
     -- }
 
-    gale_fran_door_item = {
-        "gale_fran_door_item",
-    },
+    -- gale_fran_door_item = {
+    --     "gale_fran_door_item",
+    -- },
 
 }
 for k, v in pairs(AllRecipes) do
-    if (k:find("athetos_") or k:find("msf_") or table.contains(force_include_recipes, k)) and CanBlueprintSpecificRecipe(v) then
+    if (k:find("athetos_") or k:find("msf_") or table.contains(force_include_recipes, k))
+        and not table.contains(force_exclude_recipes, k)
+        and CanBlueprintSpecificRecipe(v) then
         local product = v.product
         if recipe_map[product] == nil then
             recipe_map[product] = {}

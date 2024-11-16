@@ -20,7 +20,7 @@ local KINETIC_BLAST_DIST_MIN = 6
 local KINETIC_BLAST_DIST_MAX = 18
 
 local DASH_FOE_MELLE_DIST_MIN = 4
-local DASH_FOE_MELLE_DIST_MAX = 25
+local DASH_FOE_MELLE_DIST_MAX = 20
 
 local WANDER_TIMING = { minwaittime = 6, randwaittime = 6 }
 
@@ -71,10 +71,10 @@ local function CastDashForMelle(inst)
 
         local target_pos = inst.components.combat.target:GetPosition()
         local offset = FindWalkableOffset(target_pos,
-                                          math.random() * PI * 2,
-                                          inst.components.combat.target:GetPhysicsRadius(),
-                                          10,
-                                          nil, false, nil, false, true)
+            math.random() * PI * 2,
+            inst.components.combat.target:GetPhysicsRadius(),
+            10,
+            nil, false, nil, false, true)
         local evade_pos = target_pos + (offset or Vector3(0, 0, 0))
         local speed = 25
         local timeout = (evade_pos - inst:GetPosition()):Length() / speed
@@ -92,7 +92,7 @@ local function CastKineticBlastUpperbody(inst)
         inst:EnableUpperBody(true)
         local upperbody = inst:GetUpperBody()
         upperbody.sg:GoToState("upperbody_kinetic_blast",
-                               inst.components.combat.target)
+            inst.components.combat.target)
     end
 end
 
@@ -150,9 +150,9 @@ local function GetStalkingPos(inst)
     local rotb = rot1 + strafe_angle
 
     local rota_valid = IsValidDestPt(inst, target,
-                                     Vector3(x + math.cos(rota) * 0.5, 0, z - math.sin(rota) * 0.5))
+        Vector3(x + math.cos(rota) * 0.5, 0, z - math.sin(rota) * 0.5))
     local rotb_valid = IsValidDestPt(inst, target,
-                                     Vector3(x + math.cos(rotb) * 0.5, 0, z - math.sin(rotb) * 0.5))
+        Vector3(x + math.cos(rotb) * 0.5, 0, z - math.sin(rotb) * 0.5))
 
     if rota_valid and rotb_valid then
         if DiffAngle(rot, rota) < 30 then
@@ -206,88 +206,88 @@ end
 
 function TyphonPhantomBrain:OnStart()
     local root = PriorityNode({
-                                  IfNode(function()
-                                             return CanCastKineticBlast(self.inst, 8)
-                                         end, "KineticBlast",
-                                         ActionNode(function()
-                                             CastKineticBlast(self.inst)
-                                         end)
-                                  ),
-                                  Leash(self.inst, function()
-                                            return not self.inst.components.combat:HasTarget() and
-                                                self.inst.alert_target_pos
-                                        end, 0, 0, false),
+        IfNode(function()
+                return CanCastKineticBlast(self.inst, 8)
+            end, "KineticBlast",
+            ActionNode(function()
+                CastKineticBlast(self.inst)
+            end)
+        ),
+        Leash(self.inst, function()
+            return not self.inst.components.combat:HasTarget() and
+                self.inst.alert_target_pos
+        end, 0, 0, false),
 
-                                  WhileNode(function() return ShouldStalk(self.inst) end, "Stalking",
-                                            ParallelNode {
-                                                SequenceNode {
-                                                    ParallelNodeAny {
-                                                        WaitNode(MIN_STALKING_TIME),
-                                                        ConditionWaitNode(function() return IsStalkingFar(self.inst) end),
-                                                    },
-                                                    ConditionWaitNode(function() return IsStalkingTooClose(self.inst) end),
-                                                    ActionNode(function() self.inst.components.combat:ResetCooldown() end),
-                                                },
-                                                -- FailIfSuccessDecorator(ActionNode(function()
-                                                --     local target = self.inst.components.combat.target
-                                                --     if target and not self.inst.sg:HasStateTag("busy") then
-                                                --         self.inst:EnableUpperBody(true)
-                                                --         local upperbody = self.inst:GetUpperBody()
-                                                --         upperbody:ForceFacePoint(target:GetPosition())
-                                                --     end
-                                                -- end)),
-                                                FailIfSuccessDecorator(PriorityNode {
-                                                    IfNode(function()
-                                                               if self.inst.kinetic_blast_cooldown == nil then
-                                                                   self.inst.kinetic_blast_cooldown = GetRandomMinMax(2,
-                                                                                                                      3)
-                                                               end
-                                                               return CanCastKineticBlast(self.inst,
-                                                                                          self.inst
-                                                                                          .kinetic_blast_cooldown)
-                                                           end, "KineticBlast",
-                                                           ActionNode(function()
-                                                               CastKineticBlastUpperbody(self.inst)
-                                                               self.inst.kinetic_blast_cooldown = GetRandomMinMax(2, 3)
-                                                           end)
-                                                    ),
-                                                    Leash(self.inst, GetStalkingPos, 0, 0, false),
-                                                    -- Wander(self.inst, nil, nil, WANDER_TIMING),
-                                                }),
+        WhileNode(function() return ShouldStalk(self.inst) end, "Stalking",
+            ParallelNode {
+                SequenceNode {
+                    ParallelNodeAny {
+                        WaitNode(MIN_STALKING_TIME),
+                        ConditionWaitNode(function() return IsStalkingFar(self.inst) end),
+                    },
+                    ConditionWaitNode(function() return IsStalkingTooClose(self.inst) end),
+                    ActionNode(function() self.inst.components.combat:ResetCooldown() end),
+                },
+                -- FailIfSuccessDecorator(ActionNode(function()
+                --     local target = self.inst.components.combat.target
+                --     if target and not self.inst.sg:HasStateTag("busy") then
+                --         self.inst:EnableUpperBody(true)
+                --         local upperbody = self.inst:GetUpperBody()
+                --         upperbody:ForceFacePoint(target:GetPosition())
+                --     end
+                -- end)),
+                FailIfSuccessDecorator(PriorityNode {
+                    IfNode(function()
+                            if self.inst.kinetic_blast_cooldown == nil then
+                                self.inst.kinetic_blast_cooldown = GetRandomMinMax(2,
+                                    3)
+                            end
+                            return CanCastKineticBlast(self.inst,
+                                self.inst
+                                .kinetic_blast_cooldown)
+                        end, "KineticBlast",
+                        ActionNode(function()
+                            CastKineticBlastUpperbody(self.inst)
+                            self.inst.kinetic_blast_cooldown = GetRandomMinMax(2, 3)
+                        end)
+                    ),
+                    Leash(self.inst, GetStalkingPos, 0, 0, false),
+                    -- Wander(self.inst, nil, nil, WANDER_TIMING),
+                }),
 
-                                            }),
+            }),
 
 
-                                  WhileNode(function()
-                                                if self.inst.components.combat.target == nil then
-                                                    return false
-                                                end
+        WhileNode(function()
+                if self.inst.components.combat.target == nil then
+                    return false
+                end
 
-                                                -- if self.inst:IsBlockedOnPath() then
-                                                --     return false
-                                                -- end
+                -- if self.inst:IsBlockedOnPath() then
+                --     return false
+                -- end
 
-                                                if not self.inst.components.combat:InCooldown() then
-                                                    return true
-                                                end
+                if not self.inst.components.combat:InCooldown() then
+                    return true
+                end
 
-                                                return false
-                                            end, "ShouldFight",
-                                            PriorityNode {
-                                                IfNode(function()
-                                                           return CanCastDashForMelle(self.inst)
-                                                       end, "DashForMelle",
-                                                       ActionNode(function()
-                                                           CastDashForMelle(self.inst)
-                                                       end)
-                                                ),
-                                                ChaseAndAttack(self.inst, 60)
-                                            }
-                                  ),
-                                  Follow(self.inst, function() return self.inst.components.follower.leader end,
-                                         1, 5, 8, true),
-                                  Wander(self.inst, nil, nil, WANDER_TIMING),
-                              }, .25)
+                return false
+            end, "ShouldFight",
+            PriorityNode {
+                IfNode(function()
+                        return CanCastDashForMelle(self.inst)
+                    end, "DashForMelle",
+                    ActionNode(function()
+                        CastDashForMelle(self.inst)
+                    end)
+                ),
+                ChaseAndAttack(self.inst, 60)
+            }
+        ),
+        Follow(self.inst, function() return self.inst.components.follower.leader end,
+            1, 5, 8, true),
+        Wander(self.inst, nil, nil, WANDER_TIMING),
+    }, .25)
 
     self.bt = BT(self.inst, root)
 end

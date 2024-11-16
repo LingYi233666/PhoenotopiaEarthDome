@@ -463,7 +463,8 @@ GaleModAddRecipe2(
     "athetos_amulet_berserker_fixed",
     {
         Ingredient("athetos_amulet_berserker_broken", 1, "images/inventoryimages/athetos_amulet_berserker_broken.xml"),
-        Ingredient("wagpunk_bits", 3),
+        Ingredient("transistor", 1),
+        Ingredient("wagpunk_bits", 2),
     },
     TECH.SCIENCE_TWO,
     {

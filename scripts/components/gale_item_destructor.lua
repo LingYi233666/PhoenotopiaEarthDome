@@ -203,7 +203,7 @@ function GaleItemDestructor:Destruct(doer, target, subitems)
     for save_record, cnt in pairs(rewards_saverecord) do
         for i = 1, cnt do
             local item = SpawnSaveRecord(save_record)
-            local x, y, z = self.inst:GetPosition()
+            local x, y, z = self.inst.Transform:GetWorldPosition()
             item.Transform:SetPosition(x, y, z)
 
             if doer and doer.components.inventory then

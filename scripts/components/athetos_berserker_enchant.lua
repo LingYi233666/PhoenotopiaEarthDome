@@ -33,7 +33,7 @@ end
 
 function AthetosBerserkerEnchant:AddEnchant(stacks)
     stacks = math.min(stacks or 1, self.power_increased_max - self.power_increased)
-    if self.target and self.target:IsValid() then
+    if stacks > 0 and self.target and self.target:IsValid() then
         GaleCondition.AddCondition(self.target, "condition_power", stacks)
         self.power_increased = self.power_increased + stacks
     end
@@ -59,7 +59,7 @@ function AthetosBerserkerEnchant:SetTarget(target)
     self.target = target
 
     self._on_hit_other = function(_, data)
-        self:DoDelta(FunctionOrValue(self.charge_hitother, self.inst, data))
+        self:DoDelta(FunctionOrValue(self.charge_hitother, self.inst, self.target, data))
     end
 
     self._on_exit_battle = function(_, data)

@@ -106,5 +106,8 @@ AddPrefabPostInit("daywalker", function(inst)
     end
 
     inst:AddComponent("athetos_berserker_enchant")
+    inst.components.athetos_berserker_enchant:SetChargeFn(function()
+        return math.random(7, 13) + math.random(7, 13)
+    end)
     inst.components.athetos_berserker_enchant:SetTarget(inst)
 end)

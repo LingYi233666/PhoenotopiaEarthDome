@@ -241,9 +241,10 @@ local function GetConsumeAndRewardFn(inst, target, subitems, consumes, rewards, 
     -- end
 
     if target.prefab == "blueprint" or target.prefab == "athetos_production_process" then
-        consumes = shallowcopy(subitems)
-        rewards = {}
-        rewards_saverecord = {}
+        table.removearrayvalue(consumes, target)
+        table.insert(consumes, subitems[1])
+        table.insert(consumes, subitems[2])
+
         rewards_saverecord[target:GetSaveRecord()] = 1
         return
     end

@@ -653,61 +653,61 @@ STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_RABBIT    = "我好怀念在普林
 if STRINGS.CHARACTERS.GALLOP then
 	STRINGS.CHARACTERS.GALLOP.DESCRIBE.GALE_TRINKET_RABBIT = "我要在我的被窝里放满兔子。"
 end
-STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                         = {
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_RABBIT                          = {
 	SIMPLE = "模仿兔子制作的模型。",
 	COMPLEX = "模仿兔子制作的模型。\n因为有点过于光滑，所以一眼就能看出是假的。\n富有弹性，手感相当好的小孩玩具。\n据说是加洛普的最爱。",
 }
 
-STRINGS.NAMES.GALE_TRINKET_DUCK                                    = "橡皮鸭"
-STRINGS.RECIPE_DESC.GALE_TRINKET_DUCK                              = "嘎嘎嘎。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_DUCK              = "泡澡必备用品。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_DUCK                 = "亚泰的射击场里就有一个！"
-STRINGS.GALE_ITEM_DESC.GALE_TRINKET_DUCK                           = {
+STRINGS.NAMES.GALE_TRINKET_DUCK                                     = "橡皮鸭"
+STRINGS.RECIPE_DESC.GALE_TRINKET_DUCK                               = "嘎嘎嘎。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_TRINKET_DUCK               = "泡澡必备用品。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_TRINKET_DUCK                  = "亚泰的射击场里就有一个！"
+STRINGS.GALE_ITEM_DESC.GALE_TRINKET_DUCK                            = {
 	SIMPLE = "用橡胶素材制作的可爱小鸭子玩具。",
 	COMPLEX = "用橡胶素材制作的可爱小鸭子玩具。\n用力捏就会发出叫声。\n能够消除遭受电击时造成的麻痹状态，一次性使用。",
 }
 
-STRINGS.NAMES.GALE_DURI_FLOWER                                     = "心跳香草"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER               = "闻起来像薄荷。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER                  = "高墙的厨师曾经用这个调味来着。"
+STRINGS.NAMES.GALE_DURI_FLOWER                                      = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER                = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER                   = "高墙的厨师曾经用这个调味来着。"
 
-STRINGS.NAMES.GALE_DURI_FLOWER_PETAL                               = "心跳香草"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER_PETAL         = "闻起来像薄荷。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER_PETAL            = "高墙的厨师曾经用这个调味来着。"
-STRINGS.GALE_ITEM_DESC.GALE_DURI_FLOWER_PETAL                      = {
+STRINGS.NAMES.GALE_DURI_FLOWER_PETAL                                = "心跳香草"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DURI_FLOWER_PETAL          = "闻起来像薄荷。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DURI_FLOWER_PETAL             = "高墙的厨师曾经用这个调味来着。"
+STRINGS.GALE_ITEM_DESC.GALE_DURI_FLOWER_PETAL                       = {
 	SIMPLE = "可用于调味的食材。",
 	COMPLEX = "散发着薄荷清香的药草。\n主要用于给炖菜等料理调味，\n也能直接生吃。",
 }
 
-STRINGS.NAMES.GALE_DESTRUCT_ITEM_TABLE                             = "物品拆解台"
-STRINGS.RECIPE_DESC.GALE_DESTRUCT_ITEM_TABLE                       = "用于拆解物品，也可以获得其蓝图。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE       = "绿宝石法杖的完美替代品。"
-STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE          = "该做一些逆向工程了。"
+STRINGS.NAMES.GALE_DESTRUCT_ITEM_TABLE                              = "物品拆解台"
+STRINGS.RECIPE_DESC.GALE_DESTRUCT_ITEM_TABLE                        = "用于拆解物品，也可以获得其蓝图。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE        = "绿宝石法杖的完美替代品。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_DESTRUCT_ITEM_TABLE           = "该做一些逆向工程了。"
 
-STRINGS.NAMES.ATHETOS_AMULET_BERSERKER                             = "狂战士手环"
-STRINGS.RECIPE_DESC.ATHETOS_AMULET_BERSERKER                       = "能提高连续攻击的威力。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER       = ""
-STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER          = ""
-STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER                    = {
-	SIMPLE = "攻击越是连续，越能提升攻击力。",
-	COMPLEX = "",
+STRINGS.NAMES.ATHETOS_AMULET_BERSERKER                              = "狂战士戒指"
+STRINGS.RECIPE_DESC.ATHETOS_AMULET_BERSERKER                        = "能提高连续攻击的威力。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER        = "这个戒指有我脖子这么粗了。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER           = "如果我把它塞到衣襟内，就能为美工省下不少功夫。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER                     = {
+	SIMPLE = "在连续攻击时，能提高攻击力。",
+	COMPLEX = "深受远古武斗家喜爱的高科技戒指。\n在连续攻击时，能提高攻击力。\n这戒指是为猪人勇士打造的，因此尺寸足够大，\n可以当做护符佩戴。",
 }
 
-STRINGS.NAMES.ATHETOS_AMULET_BERSERKER_FIXED                       = "修复的狂战士手环"
-STRINGS.RECIPE_DESC.ATHETOS_AMULET_BERSERKER_FIXED                 = "能提高连续攻击的威力。"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED = ""
-STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED    = ""
-STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER_FIXED              = {
-	SIMPLE = "攻击越是连续，越能提升攻击力。",
-	COMPLEX = "",
+STRINGS.NAMES.ATHETOS_AMULET_BERSERKER_FIXED                        = "修复的狂战士戒指"
+STRINGS.RECIPE_DESC.ATHETOS_AMULET_BERSERKER_FIXED                  = "能提高连续攻击的威力。"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED  = "这个戒指有我脖子这么粗了。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED     = "上次是托马斯修好的。"
+STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER_FIXED               = {
+	SIMPLE = "在连续攻击时，能提高攻击力。",
+	COMPLEX = "无国界之军的首领为表友善，赠予猪人勇士的戒指。\n在连续攻击时，能提高攻击力。\n据说天堂破碎之战后，\n猪人勇士深入地底，寻找逆转战局的力量——\n可能这就是他疯狂的开端。",
 }
 
-STRINGS.NAMES.ATHETOS_AMULET_BERSERKER_BROKEN                      = "损坏的狂战士手环"
-STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED = ""
-STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER_FIXED    = ""
-STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER_FIXED              = {
-	SIMPLE = "原本能提高连续攻击的威力，但是现在已无法使用。",
-	COMPLEX = "",
+STRINGS.NAMES.ATHETOS_AMULET_BERSERKER_BROKEN                       = "不明戒指"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_AMULET_BERSERKER_BROKEN = "我不知道那头猪为什么带着这个戒指。"
+STRINGS.CHARACTERS.GALE.DESCRIBE.ATHETOS_AMULET_BERSERKER_BROKEN    = "很像是特拉鲁姆的兽人卖给我的手环！"
+STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER_BROKEN              = {
+	SIMPLE = "已经损坏、功能不详的大戒指。",
+	COMPLEX = "讨伐梦魇疯猪时获得的金属大戒指。\n因为已经损坏，所以不知道有什么功能。\n表面上有着大量回路和鲜红色的纹样。\n也许你能修好它？",
 }
 
 -- Foods are below...
@@ -1487,7 +1487,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	DESTRUCT_TABLE = {
 		NAME = "逆向工程",
-		DESC = "可以制作物品拆解台来拆解物品，搭配莎草纸和羽毛笔还能同时获得其蓝图。亦或是复制一张蓝图。",
+		DESC = "可以制作物品拆解台来拆解物品。搭配莎草纸和羽毛笔还能同时获得其蓝图，亦或是复制一张蓝图。",
 	},
 
 	QUICK_CHARGE = {
