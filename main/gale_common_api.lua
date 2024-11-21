@@ -98,6 +98,7 @@ end))
 
 
 AddIngredientValues({ "gale_duri_flower_petal" }, { veggie = 0.5 })
+AddIngredientValues({ "athetos_mushroom_cap" }, { veggie = 0.5 })
 
 
 AddPrefabPostInit("daywalker", function(inst)
