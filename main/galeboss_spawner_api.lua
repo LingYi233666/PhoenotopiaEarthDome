@@ -44,12 +44,11 @@ AddPrefabPostInit("daywalker", function(inst)
 	inst.components.athetos_berserker_enchant:SetChargeFn(function()
 		return math.random(7, 13) + math.random(7, 13)
 	end)
-	inst.components.athetos_berserker_enchant:SetTarget(inst)
 
-	if TheWorld.components.daywalkerspawner
-		and not TheWorld.components.daywalkerspawner.athetos_amulet_berserker_dropped then
+	if TheWorld.components.daywalkerspawner and not TheWorld.components.daywalkerspawner.athetos_amulet_berserker_dropped then
 		-- Change hand symbols with athetos_amulet_berserker
 		inst.AnimState:OverrideSymbol("ww_hand", "daywalker_phase2_berserker_amulet", "ww_hand")
+		inst.components.athetos_berserker_enchant:SetTarget(inst)
 	end
 
 
@@ -59,6 +58,7 @@ AddPrefabPostInit("daywalker", function(inst)
 		if TheWorld.components.daywalkerspawner and not TheWorld.components.daywalkerspawner.athetos_amulet_berserker_dropped then
 			-- Change hand symbols with athetos_amulet_berserker
 			inst.AnimState:OverrideSymbol("ww_hand", "daywalker_phase2_berserker_amulet", "ww_hand")
+			inst.components.athetos_berserker_enchant:SetTarget(inst)
 		end
 		return rets
 	end
@@ -72,6 +72,8 @@ AddPrefabPostInit("daywalker", function(inst)
 				and not TheWorld.components.daywalkerspawner.athetos_amulet_berserker_dropped then
 				-- Change hand symbols without athetos_amulet_berserker
 				inst.AnimState:ClearOverrideSymbol("ww_hand")
+				inst.components.athetos_berserker_enchant:DropTarget()
+
 
 				if inst.components.lootdropper then
 					inst.components.lootdropper:SpawnLootPrefab("athetos_amulet_berserker_broken", pos)
