@@ -5,6 +5,9 @@ local assets = {
     Asset("ANIM", "anim/amulets.zip"),
     Asset("ANIM", "anim/torso_amulets.zip"),
     Asset("ANIM", "anim/athetos_amulet_berserker.zip"),
+    Asset("ANIM", "anim/daywalker_phase2_berserker_amulet.zip"),
+
+
 
     Asset("IMAGE", "images/inventoryimages/athetos_amulet_berserker.tex"),
     Asset("ATLAS", "images/inventoryimages/athetos_amulet_berserker.xml"),
