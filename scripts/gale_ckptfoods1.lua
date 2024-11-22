@@ -407,6 +407,41 @@ local foods = {
         floater = { nil, 0.1 },
         card_def = { ingredients = { { "berries", 1 }, { "monstermeat", 3 } } },
     },
+
+    -- TODO: Add anims
+    -- gale_ckptfood_super_mushroom_dinner = {
+    --     test = function(cooker, names, tags)
+    --         return GetNum(names, "athetos_mushroom_cap") > 0
+    --     end,
+    --     priority = 0,
+    --     foodtype = FOODTYPE.VEGGIE,
+    --     health = 250,
+    --     hunger = TUNING.CALORIES_SMALL,
+    --     perishtime = TUNING.PERISH_SLOW,
+    --     sanity = TUNING.SANITY_TINY,
+    --     cooktime = CookTime(30),
+    --     oneat_desc = STRINGS.UI.COOKBOOK.FOOD_EFFECTS_GAIN_POWER_AND_RECOVER_STAMINA_OVER_TIME,
+    --     oneatenfn = function(inst, eater)
+    --         local max_power = 10
+    --         local cur_power = GaleCondition.GetConditionStacks(eater, "condition_power")
+    --         local delta_power = max_power - cur_power
+    --         if delta_power > 0 then
+    --             GaleCondition.AddCondition(eater, "condition_power", math.min(4, delta_power))
+    --         end
+
+    --         if eater.components.gale_stamina then
+    --             local cur_stack = GaleCondition.GetConditionStacks(eater, "condition_stamina_recover")
+    --             local max_stack = 120
+    --             if cur_stack < max_stack then
+    --                 GaleCondition.AddCondition(eater, "condition_stamina_recover", max_stack - cur_stack)
+    --             end
+    --         end
+    --     end,
+    --     potlevel = "high",
+    --     stacksize = 2,
+    --     floater = { nil, 0.1 },
+    --     card_def = { ingredients = { { "berries", 1 }, { "athetos_mushroom_cap", 3 } } },
+    -- },
 }
 
 for k, v in pairs(foods) do
