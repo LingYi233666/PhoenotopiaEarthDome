@@ -7,6 +7,8 @@ local function onenable(self, enable)
 end
 
 local PUNCH_RANGE_BASE = 2
+local NORMAL_DAMAGE_BASE = 34
+local PLANAR_DAMAGE_BASE = 17
 
 local GaleSkillElectricPunch = Class(
     function(self, inst)
@@ -167,6 +169,18 @@ function GaleSkillElectricPunch:SetEnabled(enable)
         -- self.inst.AnimState:SetSymbolLightOverride("hand", 0)
         -- self.inst.AnimState:SetSymbolAddColour("hand", 0, 0, 0, 0)
     end
+
+    self:UpdateDamage()
+end
+
+function GaleSkillElectricPunch:UpdateDamage()
+    local power_level  = self.inst.components.gale_spellpower_level and
+        self.inst.components.gale_spellpower_level:GetLevel() or 0
+    local bonus_damage = 1 * power_level
+
+    self.punch_weapon.components.weapon:SetDamage(NORMAL_DAMAGE_BASE + bonus_damage)
+    self.punch_weapon.components.weapon:SetElectric(1, 2)
+    self.punch_weapon.components.planardamage:SetBaseDamage(PLANAR_DAMAGE_BASE + bonus_damage)
 end
 
 function GaleSkillElectricPunch:CreateWeapon()
@@ -185,15 +199,15 @@ function GaleSkillElectricPunch:CreateWeapon()
     self.punch_weapon:AddTag("NOBLOCK")
 
     self.punch_weapon:AddComponent("weapon")
-    self.punch_weapon.components.weapon:SetDamage(34)
     self.punch_weapon.components.weapon:SetRange(0)
-    self.punch_weapon.components.weapon:SetElectric(1, 2)
     self.punch_weapon.components.weapon:SetOnAttack(function(wp, attacker, target)
         SpawnPrefab("electrichitsparks"):AlignToTarget(target, attacker, true)
+        self:UpdateDamage()
     end)
 
     self.punch_weapon:AddComponent("planardamage")
-    self.punch_weapon.components.planardamage:SetBaseDamage(17)
+
+    self:UpdateDamage()
 
     self.inst:AddChild(self.punch_weapon)
 

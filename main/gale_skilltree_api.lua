@@ -542,7 +542,7 @@ GLOBAL.GALE_SKILL_NODES = {
     KINETIC_BLAST = GaleNode({
         ui_pos = Vector3(0, 3),
         ingredients = {
-            Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
             if not inst.sg:HasStateTag("dead")
@@ -580,7 +580,7 @@ GLOBAL.GALE_SKILL_NODES = {
     HYPER_BURN = GaleNode({
         ui_pos = Vector3(1, 3),
         ingredients = {
-            Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
             local tar_pos = Vector3(x, y, z)
@@ -633,7 +633,7 @@ GLOBAL.GALE_SKILL_NODES = {
     ELECTRIC_PUNCH = GaleNode({
         ui_pos = Vector3(1, 2),
         ingredients = {
-            Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
             local cooldown = 1
@@ -671,7 +671,7 @@ GLOBAL.GALE_SKILL_NODES = {
     MIMIC_LV1 = GaleNode({
         ui_pos = Vector3(0, 3),
         ingredients = {
-            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 1, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
             if not inst.sg:HasStateTag("dead")
@@ -713,14 +713,14 @@ GLOBAL.GALE_SKILL_NODES = {
     MIMIC_LV2 = GaleNode({
         ui_pos = Vector3(1, 3),
         ingredients = {
-            Ingredient("athetos_neuromod", 4, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
         },
     }),
 
     REGENERATION = GaleNode({
         ui_pos = Vector3(1, 2),
         ingredients = {
-            Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnLearned = function(inst, is_load)
             inst:ListenForEvent("attacked", GLOBAL.GALE_SKILL_NODES.REGENERATION.data.on_owner_attacked)
@@ -729,7 +729,13 @@ GLOBAL.GALE_SKILL_NODES = {
             inst:RemoveEventCallback("attacked", GLOBAL.GALE_SKILL_NODES.REGENERATION.data.on_owner_attacked)
         end,
         on_owner_attacked = function(inst, data)
+            local power_level = inst.components.gale_spellpower_level and
+                inst.components.gale_spellpower_level:GetLevel() or 0
+
+
             local last_regeneration_time = inst.components.gale_skiller.skillmem.LastRegenerationTime
+
+
             local stacks = 10
             if last_regeneration_time ~= nil then
                 local duration = 5
@@ -737,7 +743,7 @@ GLOBAL.GALE_SKILL_NODES = {
 
                 -- print("delta_time = ",delta_time)
                 if delta_time <= duration then
-                    stacks = math.floor(10 * delta_time / duration)
+                    stacks = math.floor((10 + power_level) * delta_time / duration)
                 end
             end
             -- print("REGENERATION on_owner_attacked",inst,stacks)
@@ -752,7 +758,7 @@ GLOBAL.GALE_SKILL_NODES = {
     DIMENSION_JUMP = GaleNode({
         ui_pos = Vector3(0, 0),
         ingredients = {
-            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 1, "images/inventoryimages/athetos_neuromod.xml"),
         },
     }),
 
@@ -768,7 +774,7 @@ GLOBAL.GALE_SKILL_NODES = {
     LINKAGE = GaleNode({
         ui_pos = Vector3(0, 2),
         ingredients = {
-            Ingredient("athetos_neuromod", 3, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 1, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed = function(inst, x, y, z, ent)
             if not inst.sg:HasStateTag("dead")
@@ -808,7 +814,7 @@ GLOBAL.GALE_SKILL_NODES = {
     DARK_VISION = GaleNode({
         ui_pos = Vector3(1, 2),
         ingredients = {
-            Ingredient("athetos_neuromod", 2, "images/inventoryimages/athetos_neuromod.xml"),
+            Ingredient("athetos_neuromod", 1, "images/inventoryimages/athetos_neuromod.xml"),
         },
         OnPressed_Client = function(inst, x, y, z, ent)
             if inst.components.gale_skill_dark_vision then
@@ -1742,7 +1748,15 @@ AddStategraphState("wilson",
 
                 inst.AnimState:Resume()
 
-                local proj = SpawnAt("gale_skill_kinetic_blast_projectile", inst)
+                -- Config and launch kinetic blast projectile
+                local proj         = SpawnAt("gale_skill_kinetic_blast_projectile", inst)
+                local power_level  = inst.components.gale_spellpower_level and
+                    inst.components.gale_spellpower_level:GetLevel() or 0
+                local bonus_damage = 34 * power_level
+
+                proj.damages[1]    = proj.damages[1] + bonus_damage
+                proj.damages[2]    = proj.damages[2] + bonus_damage
+
                 proj.components.complexprojectile:Launch(inst.sg.statemem.target_pos, inst)
 
                 ShakeAllCameras(CAMERASHAKE.FULL, .35, .01, 0.25, inst, 33)

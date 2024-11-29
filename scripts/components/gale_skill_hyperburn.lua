@@ -64,41 +64,46 @@ function GaleSkillHyperBurn:Launch(end_pos)
     -- local fire_damage_multi = onocean and 0.25 or 1
     local damage_mult = onocean and 0.25 or 1
 
+
+    local power_level  = self.inst.components.gale_spellpower_level and
+        self.inst.components.gale_spellpower_level:GetLevel() or 0
+    local bonus_damage = 5 * power_level
+
     GaleCommon.AoeForEach(self.inst, end_pos, attack_dist, nil, { "INLIMBO", "FX" }, nil,
-                          function(attacker, target)
-                              if target.components.combat and target.components.health then
-                                  if attacker.components.combat:CanTarget(target) and
-                                      not attacker.components.combat:IsAlly(target) then
-                                      if target.components.burnable then
-                                          target.components.burnable:Ignite(true, nil, attacker)
-                                      end
+        function(attacker, target)
+            if target.components.combat and target.components.health then
+                if attacker.components.combat:CanTarget(target) and
+                    not attacker.components.combat:IsAlly(target) then
+                    if target.components.burnable then
+                        target.components.burnable:Ignite(true, nil, attacker)
+                    end
 
-                                      if not target.components.health:IsDead() then
-                                          target.components.combat:GetAttacked(attacker,
-                                                                               damage_mult * GetRandomMinMax(16, 20))
-                                      end
+                    if not target.components.health:IsDead() then
+                        target.components.combat:GetAttacked(attacker,
+                            damage_mult * (GetRandomMinMax(16, 20) + bonus_damage))
+                    end
 
-                                      if not target.components.health:IsDead() then
-                                          target.components.health:DoFireDamage(
-                                              damage_mult * GetRandomMinMax(16, 20), attacker,
-                                              true)
-                                      end
-                                  end
-                              elseif target.components.burnable then
-                                  if target:HasTag("campfire") and target.components.fueled then
-                                      target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
-                                  else
-                                      target.components.burnable:Ignite(true, nil, attacker)
-                                  end
-                              elseif target.components.perishable and target:HasTag("frozen") then
-                                  target.components.perishable:AddTime(-TUNING.PERISH_SUPERFAST)
-                              end
-                          end,
-                          function(attacker, target)
-                              return (target.components.combat and target.components.health)
-                                  or target.components.burnable
-                                  or (target.components.perishable and target:HasTag("frozen"))
-                          end
+                    if not target.components.health:IsDead() then
+                        target.components.health:DoFireDamage(
+                            damage_mult * (GetRandomMinMax(16, 20) + bonus_damage), attacker,
+                            true)
+                    end
+                end
+            elseif target.components.burnable then
+                if target:HasTag("campfire") and target.components.fueled then
+                    target.components.fueled:DoDelta(GetRandomMinMax(40, 80))
+                else
+                    target.components.burnable:Ignite(true, nil, attacker)
+                end
+            elseif target.components.perishable and target:HasTag("frozen") then
+                target.components.perishable:AddTime(-TUNING.PERISH_SUPERFAST)
+            end
+        end,
+        function(attacker, target)
+            return (target.components.combat and target.components.health)
+                or target.components.burnable
+                or (target.components.perishable and target:HasTag("frozen"))
+        end
     )
 
     local explofx = SpawnAt("gale_skill_hyperburn_explo_fx", end_pos)

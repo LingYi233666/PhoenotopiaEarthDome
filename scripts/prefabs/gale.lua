@@ -294,6 +294,8 @@ local master_postinit = function(inst)
 	inst.components.gale_status_bonus.base_value.sanity = TUNING.GALE_SANITY
 	inst.components.gale_status_bonus.base_value.gale_stamina = 100
 
+	inst:AddComponent("gale_spellpower_level")
+
 	inst:AddComponent("gale_skill_mimic")
 
 	inst:AddComponent("gale_skill_phantom_create")
