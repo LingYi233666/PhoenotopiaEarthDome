@@ -24,54 +24,54 @@ local function onparry_start_time(self, val)
 end
 
 local GaleSkillParry = Class(function(self, inst)
-                                 self.inst = inst
+    self.inst = inst
 
 
-                                 self.parry_start_time = nil
-                                 self.parry_history = {}
+    self.parry_start_time = nil
+    self.parry_history = {}
 
-                                 self.parrytestfn = DefaultParrtTestFnWrapper(120)
-                                 self.parrycallback = nil
+    self.parrytestfn = DefaultParrtTestFnWrapper(120)
+    self.parrycallback = nil
 
-                                 ----------------------------------------------------------------------------------
+    ----------------------------------------------------------------------------------
 
-                                 self._on_attacked = function(inst, data)
-                                     local damage = data.damage
-                                     local redirected = data.redirected
-                                     local attacker = data.attacker
+    self._on_attacked = function(inst, data)
+        local damage = data.damage
+        local redirected = data.redirected
+        local attacker = data.attacker
 
-                                     if redirected then
-                                         if GetTime() - self.parry_start_time <= GOOD_PARRY_TIME_THRESHOLD then
-                                             inst.SoundEmitter:PlaySound(
-                                                 "dontstarve/creatures/lava_arena/trails/hide_pre", nil, 0.5)
-                                             inst:SpawnChild("gale_greatparry_vfx").Transform:SetPosition(0.5, 0, 0)
-                                         else
-                                             if inst.components.gale_stamina then
-                                                 inst.components.gale_stamina:DoDelta(-damage / 2)
-                                                 inst.components.gale_stamina:Pause(1)
-                                             end
-                                         end
+        if redirected then
+            if GetTime() - self.parry_start_time <= GOOD_PARRY_TIME_THRESHOLD then
+                inst.SoundEmitter:PlaySound(
+                    "dontstarve/creatures/lava_arena/trails/hide_pre", nil, 0.5)
+                inst:SpawnChild("gale_greatparry_vfx").Transform:SetPosition(0.5, 0, 0)
+            else
+                if inst.components.gale_stamina then
+                    inst.components.gale_stamina:DoDelta(-damage / 2)
+                    inst.components.gale_stamina:Pause(1)
+                end
+            end
 
-                                         table.insert(self.parry_history, MergeMaps(data, { time = GetTime() }))
+            table.insert(self.parry_history, MergeMaps(data, { time = GetTime() }))
 
-                                         if self.parrycallback then
-                                             self.parrycallback(self.inst, attacker, damage)
-                                         end
-                                     end
-                                 end
+            if self.parrycallback then
+                self.parrycallback(self.inst, attacker, damage)
+            end
+        end
+    end
 
-                                 self._not_parry_state = function()
-                                     if not (inst.sg:HasStateTag("preparrying") or inst.sg:HasStateTag("parrying")) then
-                                         self:StopParry()
-                                     end
-                                 end
+    self._not_parry_state = function()
+        if not (inst.sg:HasStateTag("preparrying") or inst.sg:HasStateTag("parrying")) then
+            self:StopParry()
+        end
+    end
 
-                                 self._force_stop = function()
-                                     self:StopParry()
-                                 end
-                             end, nil, {
-                                 parry_start_time = onparry_start_time
-                             })
+    self._force_stop = function()
+        self:StopParry()
+    end
+end, nil, {
+    parry_start_time = onparry_start_time
+})
 
 function GaleSkillParry:IsParrying()
     return self.parry_start_time ~= nil
