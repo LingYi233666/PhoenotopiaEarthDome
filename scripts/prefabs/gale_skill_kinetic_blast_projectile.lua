@@ -39,6 +39,9 @@ return GaleEntity.CreateNormalEntity({
         inst:AddComponent("weapon")
         inst.components.weapon:SetDamage(GetDamageFn)
 
+        -- TODO: Maybe add some planar damages ?
+        inst:AddComponent("planardamage")
+
 
         inst:AddComponent("complexprojectile")
         inst.components.complexprojectile:SetHorizontalSpeed(8)
@@ -112,7 +115,7 @@ return GaleEntity.CreateNormalEntity({
                         and (inst.can_hit_fn == nil or inst:can_hit_fn(attacker, v)) then
                         attacker.components.combat:DoAttack(v, inst, inst, nil, nil, 99999)
                         v:PushEvent("knockback",
-                                    { knocker = inst, radius = GetRandomMinMax(1.2, 1.4) + v:GetPhysicsRadius(.5) })
+                            { knocker = inst, radius = GetRandomMinMax(1.2, 1.4) + v:GetPhysicsRadius(.5) })
 
                         local adder = SpawnPrefab("gale_hit_color_adder")
                         adder.add_colour = Vector3(1, 1, 0)

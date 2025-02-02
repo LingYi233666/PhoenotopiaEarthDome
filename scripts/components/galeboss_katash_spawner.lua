@@ -182,8 +182,10 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
         end
 
         if new_phase == self.Phase.BOX_WITH_LOCK then
+            -- Lock safe box
             self.entities.safebox:SetLocked(true)
         elseif new_phase == self.Phase.BOX_WITH_DRONES then
+            -- Spawn drones
             for i = 1, 10 do
                 local pos = self.entities.safebox:GetPosition()
 
@@ -209,19 +211,21 @@ local function OnPhaseChange(self, old_phase, new_phase, onload)
                 end
             end
         elseif new_phase == self.Phase.KATASH_GO_TO_CAVE then
+            -- Announce the shard, make cave katash spawner can spawn katash
             Shard_SyncKatashInCave(true)
         elseif new_phase == self.Phase.KATASH_RETURN_FROM_CAVE then
 
         end
     end
 
-    if new_phase == self.Phase.KATASH_GO_TO_CAVE then
-        if not TheWorld.shard.components.shard_galeboss_katash_spawner:GetKatashShouldInCave() then
-            print("Katash should in cave, but the shard not update, so update it.")
-            print("This should occur in old savefiles.")
-            Shard_SyncKatashInCave(true)
-        end
-    end
+    -- NOTE: When onload, the shard is not spawned, should find another way to sync...
+    -- if new_phase == self.Phase.KATASH_GO_TO_CAVE then
+    --     if not TheWorld.shard.components.shard_galeboss_katash_spawner:GetKatashShouldInCave() then
+    --         print("Katash should in cave, but the shard not update, so update it.")
+    --         print("This should occur in old savefiles.")
+    --         Shard_SyncKatashInCave(true)
+    --     end
+    -- end
 end
 
 function GalebossKatashSpawner:SetSafeBox(ent)
