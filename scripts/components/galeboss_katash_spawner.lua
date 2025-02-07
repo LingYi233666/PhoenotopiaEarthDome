@@ -243,6 +243,7 @@ function GalebossKatashSpawner:Spawnkatash(pos, target)
     self:Setkatash(katash)
 end
 
+-- TheWorld.components.galeboss_katash_spawner:SetPhase("KATASH_GO_TO_CAVE")
 function GalebossKatashSpawner:SetPhase(phase, onload)
     assert(phase_preset[phase] ~= nil)
     local old_phase = self.phase

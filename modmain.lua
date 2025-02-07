@@ -361,7 +361,7 @@ modimport("main/gale_useableitem_api.lua")
 modimport("main/gale_readable_paper_api.lua")
 -- modimport("main/gale_self_inspect_inv.lua")
 modimport("main/gale_scrapbook_api.lua")
-modimport("main/gale_wonkey_run_fix_api.lua")
+-- modimport("main/gale_wonkey_run_fix_api.lua")
 modimport("main/gale_common_api.lua")
 
 -- if LOC.GetLanguage() == LANGUAGE.CHINESE_S then
