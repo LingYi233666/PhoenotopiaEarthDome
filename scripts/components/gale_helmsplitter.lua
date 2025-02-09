@@ -69,14 +69,14 @@ function GaleHelmsplitter:SetImpactSound(sound)
 end
 
 ----------------------------------------------------------------------------
-function GaleHelmsplitter:StartHelmSplitting()
-    local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
-    return self.onstartfn and self.onstartfn(self.inst, owner)
+function GaleHelmsplitter:StartHelmSplitting(doer)
+    -- local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
+    return self.onstartfn and self.onstartfn(self.inst, doer)
 end
 
-function GaleHelmsplitter:StopHelmSplitting()
-    local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
-    return self.onstopfn and self.onstopfn(self.inst, owner)
+function GaleHelmsplitter:StopHelmSplitting(doer)
+    -- local owner = self.inst.components.equippable:IsEquipped() and self.inst.components.inventoryitem.owner or nil
+    return self.onstopfn and self.onstopfn(self.inst, doer)
 end
 
 function GaleHelmsplitter:GetHitPos(doer)
@@ -104,16 +104,16 @@ function GaleHelmsplitter:DoHelmSplit(doer, target)
 
     if self.attack_range > 0 then
         hit_targets = GaleCommon.AoeDoAttack(doer, hit_pos, self.attack_range, function(doer, other)
-                                                 return self.inst,
-                                                     nil,
-                                                     nil,
-                                                     GetRandomMinMax(self.instant_mults[1], self.instant_mults[2]),
-                                                     true
-                                             end,
-                                             function(doer, other)
-                                                 return doer.components.combat:CanTarget(other)
-                                                     and not doer.components.combat:IsAlly(other)
-                                             end)
+                return self.inst,
+                    nil,
+                    nil,
+                    GetRandomMinMax(self.instant_mults[1], self.instant_mults[2]),
+                    true
+            end,
+            function(doer, other)
+                return doer.components.combat:CanTarget(other)
+                    and not doer.components.combat:IsAlly(other)
+            end)
     end
 
     if self.launch_item_range > 0 and self.launch_item_speed ~= 0 then

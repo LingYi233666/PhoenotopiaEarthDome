@@ -80,8 +80,8 @@ end
 local function OnAttacked(inst, data)
     inst.components.combat:SetTarget(data.attacker)
     inst.components.combat:ShareTarget(data.attacker, 30, function(dude)
-                                           return dude:HasTag("typhon") and not IsEntityDead(dude, true)
-                                       end, 10)
+        return dude:HasTag("typhon") and not IsEntityDead(dude, true)
+    end, 10)
 end
 
 -- shadow_shield
@@ -127,7 +127,7 @@ return GaleEntity.CreateNormalEntity({
         inst.components.locomotor.runspeed = 5.75
 
         inst:AddComponent("health")
-        inst.components.health:SetMaxHealth(75)
+        inst.components.health:SetMaxHealth(20)
 
         -- inst:AddComponent("inventory")
         -- inst.components.inventory.maxslots = 1

@@ -233,6 +233,9 @@ local mimic_types = {
             inst.AnimState:SetBuild("water_rock_01")
             inst.AnimState:PlayAnimation("1_full")
 
+            inst.AnimState:Hide("paint_A")
+            inst.AnimState:Hide("paint_B")
+
             MakeInventoryFloatable(inst, "med", 0.1, { 1.1, 0.9, 1.1 })
             inst.components.floater.bob_percent = 0
 

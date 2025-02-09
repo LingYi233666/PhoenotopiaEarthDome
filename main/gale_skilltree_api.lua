@@ -1964,7 +1964,7 @@ AddStategraphState("wilson", State {
 
         inst:ForceFacePoint(inst.sg.statemem.targetpos)
 
-        inst.sg.statemem.weapon.components.gale_helmsplitter:StartHelmSplitting()
+        inst.sg.statemem.weapon.components.gale_helmsplitter:StartHelmSplitting(inst)
     end,
 
     timeline = {

@@ -3,13 +3,13 @@ local GaleEntity = require("util/gale_entity")
 
 SetSharedLootTable("typhon_phantom_organ_lv1", {
     { "nightmarefuel", 1.00 },
-    { "horrorfuel",    0.01 },
+    { "horrorfuel",    0.75 },
 })
 
 SetSharedLootTable("typhon_phantom_organ_lv2", {
     { "nightmarefuel", 1.00 },
     { "horrorfuel",    1.00 },
-    { "horrorfuel",    0.50 },
+    { "horrorfuel",    0.75 },
 })
 
 

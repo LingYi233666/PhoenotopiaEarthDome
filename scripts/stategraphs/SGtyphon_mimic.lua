@@ -4,9 +4,9 @@ local GaleCommon = require("util/gale_common")
 
 local actionhandlers = {
     ActionHandler(ACTIONS.PICKUP,
-                  function(inst, action)
-                      return "pickup_and_consume"
-                  end),
+        function(inst, action)
+            return "pickup_and_consume"
+        end),
     ActionHandler(ACTIONS.HAMMER, "attack"),
 }
 
@@ -102,19 +102,19 @@ local states = {
             local already_set = {}
             for i = 1, 3 do
                 local offset = FindWalkableOffset(inst:GetPosition(),
-                                                  math.random() * 2 * PI,
-                                                  1,
-                                                  33,
-                                                  nil,
-                                                  false,
-                                                  function(pt)
-                                                      for _, v in pairs(already_set) do
-                                                          if (pt - v):Length() < 1 then
-                                                              return false
-                                                          end
-                                                      end
-                                                      return true
-                                                  end)
+                    math.random() * 2 * PI,
+                    1,
+                    33,
+                    nil,
+                    false,
+                    function(pt)
+                        for _, v in pairs(already_set) do
+                            if (pt - v):Length() < 1 then
+                                return false
+                            end
+                        end
+                        return true
+                    end)
                 local ent = SpawnAt("typhon_mimic", inst, nil, offset)
                 if offset then
                     table.insert(already_set, offset)
@@ -276,12 +276,18 @@ local states = {
 
         events =
         {
-            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
+            EventHandler("animover", function(inst)
+                if math.random() < 0.2 then
+                    inst.sg:GoToState("taunt")
+                else
+                    inst.sg:GoToState("idle")
+                end
+            end),
         },
 
         onexit = function(inst)
             inst.Physics:Stop()
-            inst.components.combat:ResetCooldown()
+            -- inst.components.combat:ResetCooldown()
 
             inst.SoundEmitter:KillSound("dodge")
 
@@ -324,9 +330,9 @@ local states = {
             end),
             TimeEvent(19 * FRAMES, function(inst) inst.components.combat:DoAttack(inst.sg.statemem.target) end),
             TimeEvent(20 * FRAMES,
-                      function(inst)
-                          inst.components.locomotor:Stop()
-                      end),
+                function(inst)
+                    inst.components.locomotor:Stop()
+                end),
         },
 
         events =
@@ -587,7 +593,7 @@ local states = {
                     inst.sg.statemem.speed = 0
                 end
                 inst.Physics:SetMotorVel(inst.sg.statemem.reverse and -inst.sg.statemem.speed or inst.sg.statemem.speed,
-                                         inst.sg.statemem.hspeed, 0)
+                    inst.sg.statemem.hspeed, 0)
 
                 local x, y, z = inst:GetPosition():Get()
                 if not inst.components.amphibiouscreature and inst:IsOnOcean() and y <= 0.1 then
@@ -732,57 +738,57 @@ CommonStates.AddIdle(states, nil, "idle", {
 })
 
 CommonStates.AddWalkStates(states, {
-                               starttimeline = {
-                                   TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                               },
+        starttimeline = {
+            TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+        },
 
-                               walktimeline = {
-                                   TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                   TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                   TimeEvent(7 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                   TimeEvent(12 * FRAMES,
-                                             function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                               },
+        walktimeline = {
+            TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(7 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(12 * FRAMES,
+                function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+        },
 
-                               endtimeline = {
-                                   TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                               },
-                           },
-                           {
-                               startrun = "walk_pre",
-                               run = "walk_loop",
-                               stoprun = "idle",
-                           })
+        endtimeline = {
+            TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+        },
+    },
+    {
+        startrun = "walk_pre",
+        run = "walk_loop",
+        stoprun = "idle",
+    })
 
 
 
 CommonStates.AddRunStates(states, {
-                              starttimeline = {
-                                  TimeEvent(1 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                              },
+        starttimeline = {
+            TimeEvent(1 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+        },
 
-                              runtimeline = {
-                                  TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(1 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(2 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(4 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(7 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                                  TimeEvent(12 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
-                              },
-                          },
-                          {
-                              startrun = "walk_pre",
-                              run = "walk_loop",
-                              stoprun = "idle",
-                          }, nil, nil,
-                          {
-                              startonenter = AnimSpeedUp3,
-                              startonexit = AnimSpeedDown,
+        runtimeline = {
+            TimeEvent(0 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(1 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(2 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(3 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(4 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(7 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+            TimeEvent(12 * FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.step) end),
+        },
+    },
+    {
+        startrun = "walk_pre",
+        run = "walk_loop",
+        stoprun = "idle",
+    }, nil, nil,
+    {
+        startonenter = AnimSpeedUp3,
+        startonexit = AnimSpeedDown,
 
-                              runonenter = AnimSpeedUp3,
-                              runonexit = AnimSpeedDown,
-                          })
+        runonenter = AnimSpeedUp3,
+        runonexit = AnimSpeedDown,
+    })
 
 
 -- CommonStates.AddHitState(states)

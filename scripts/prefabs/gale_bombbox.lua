@@ -7,22 +7,22 @@ local assets = {
     Asset("ANIM", "anim/swap_gale_bombbox.zip"),
     Asset("ANIM", "anim/floating_items.zip"),
     Asset("ANIM", "anim/lavaarena_firebomb.zip"),
-    
 
-    Asset("IMAGE","images/inventoryimages/gale_bombbox.tex"),
-    Asset("ATLAS","images/inventoryimages/gale_bombbox.xml"),
-    Asset("IMAGE","images/inventoryimages/gale_bombbox_duplicate.tex"),
-    Asset("ATLAS","images/inventoryimages/gale_bombbox_duplicate.xml"),
-    
-    Asset("IMAGE","images/inventoryimages/gale_bomb_projectile.tex"),
-    Asset("ATLAS","images/inventoryimages/gale_bomb_projectile.xml"),
+
+    Asset("IMAGE", "images/inventoryimages/gale_bombbox.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_bombbox.xml"),
+    Asset("IMAGE", "images/inventoryimages/gale_bombbox_duplicate.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_bombbox_duplicate.xml"),
+
+    Asset("IMAGE", "images/inventoryimages/gale_bomb_projectile.tex"),
+    Asset("ATLAS", "images/inventoryimages/gale_bomb_projectile.xml"),
 }
 
 local torchfire_prefab = "torchfire_rag"
 
 local function CheckBombCnt(inst)
     local exists_bombs_cnt = 0
-    for k,v in pairs(inst.exists_bombs) do
+    for k, v in pairs(inst.exists_bombs) do
         if v == true then
             exists_bombs_cnt = exists_bombs_cnt + 1
         end
@@ -30,7 +30,7 @@ local function CheckBombCnt(inst)
 
     if exists_bombs_cnt >= 2 then
         inst:AddTag("out_of_bomb")
-    else 
+    else
         inst:RemoveTag("out_of_bomb")
     end
 
@@ -39,7 +39,7 @@ local function CheckBombCnt(inst)
 end
 
 local function CommonBombBoxClientFn(inst)
-    
+
 end
 
 local function CommonBombBoxServerFn(inst)
@@ -50,31 +50,31 @@ local function CommonBombBoxServerFn(inst)
 
     inst:AddComponent("gale_chargeable_weapon")
     -- inst.components.gale_chargeable_weapon.never_charge = true
-    inst.components.gale_chargeable_weapon.do_attack_fn = function(inst,player,target,target_pos,percent)
-        percent = GaleCondition.GetCondition(player,"condition_carry_charge") ~= nil and 1 or percent
-        
+    inst.components.gale_chargeable_weapon.do_attack_fn = function(inst, player, target, target_pos, percent)
+        percent = GaleCondition.GetCondition(player, "condition_carry_charge") ~= nil and 1 or percent
+
 
         if inst:CheckBombCnt() < 2 then
             local real_target_pos = target and target:GetPosition() or target_pos
             local delta = real_target_pos - player:GetPosition()
-            local proj = SpawnAt("gale_bomb_projectile",inst)
+            local proj = SpawnAt("gale_bomb_projectile", inst)
             proj.components.complexprojectile.usehigharc = delta:Length() >= 10
             proj.components.complexprojectile:SetHorizontalSpeed(15 + 10 * percent)
             proj.components.complexprojectile:SetGravity(-29 + 8 * percent)
-            proj.components.complexprojectile:Launch(real_target_pos,player)
-    
+            proj.components.complexprojectile:Launch(real_target_pos, player)
+
             inst.exists_bombs[proj] = true
-            inst:ListenForEvent("onremove",function()
+            inst:ListenForEvent("onremove", function()
                 inst.exists_bombs[proj] = nil
                 inst:CheckBombCnt()
-            end,proj)
+            end, proj)
             inst:CheckBombCnt()
-        else 
-            -- Can't thorw bomb 
+        else
+            -- Can't thorw bomb
         end
 
-        if GaleCondition.GetCondition(player,"condition_carry_charge") ~= nil then
-            GaleCondition.RemoveCondition(player,"condition_carry_charge")
+        if GaleCondition.GetCondition(player, "condition_carry_charge") ~= nil then
+            GaleCondition.RemoveCondition(player, "condition_carry_charge")
         end
     end
 end
@@ -84,14 +84,12 @@ local function CommonBombProjClientFn(inst)
     inst.Physics:SetDontRemoveOnSleep(true) -- so the object can land and put out the fire, also an optimization due to how this moves through the world
 
     inst.Transform:SetFourFaced()
-
-    
 end
 
-local function BombResetFireFx(inst, owner,prefab_name)
+local function BombResetFireFx(inst, owner, prefab_name)
     if inst.firefx then
         inst.firefx:Remove()
-        inst.firefx = nil 
+        inst.firefx = nil
     end
 
     if prefab_name then
@@ -100,19 +98,19 @@ local function BombResetFireFx(inst, owner,prefab_name)
         inst.firefx.entity:AddFollower()
         if owner then
             inst.firefx.entity:SetParent(owner.entity)
-            inst.firefx.Follower:FollowSymbol( owner.GUID, "swap_object", 32, -130, 1 )
+            inst.firefx.Follower:FollowSymbol(owner.GUID, "swap_object", 32, -130, 1)
         else
             inst.firefx.entity:SetParent(inst.entity)
-            inst.firefx.Follower:FollowSymbol( inst.GUID, "fireline", -10, 4, 0.1 )
+            inst.firefx.Follower:FollowSymbol(inst.GUID, "fireline", -10, 4, 0.1)
         end
         inst.firefx:AttachLightTo(owner or inst)
     end
 end
 
-local function EnableFlashing(inst,enabled)
+local function EnableFlashing(inst, enabled)
     if inst.FlashingTask then
         KillThread(inst.FlashingTask)
-        inst.FlashingTask = nil 
+        inst.FlashingTask = nil
     end
 
     if enabled then
@@ -120,9 +118,9 @@ local function EnableFlashing(inst,enabled)
             local red = true
             while true do
                 if red then
-                    inst.AnimState:SetAddColour(1,0,0,1)
+                    inst.AnimState:SetAddColour(1, 0, 0, 1)
                 else
-                    inst.AnimState:SetAddColour(0,0,0,1)
+                    inst.AnimState:SetAddColour(0, 0, 0, 1)
                 end
                 red = not red
                 Sleep(0.1)
@@ -131,15 +129,15 @@ local function EnableFlashing(inst,enabled)
     end
 end
 
-local function DoExplode(source,attacker,eater)
-    local explo = SpawnAt("gale_bomb_projectile_explode",source)
-    explo.Transform:SetScale(1.5,1.5,1.5)
+local function DoExplode(source, attacker, eater)
+    local explo = SpawnAt("gale_bomb_projectile_explode", source)
+    explo.Transform:SetScale(1.5, 1.5, 1.5)
     explo.SoundEmitter:PlaySound("gale_sfx/battle/p1_explode")
     explo:SpawnChild("gale_normal_explode_vfx")
 
     if source:GetPosition().y <= 0.05 then
-        local ring = SpawnAt("gale_laser_ring_fx",source)
-        ring.Transform:SetScale(0.9,0.9,0.9)
+        local ring = SpawnAt("gale_laser_ring_fx", source)
+        ring.Transform:SetScale(0.9, 0.9, 0.9)
         ring.AnimState:SetFinalOffset(3)
         ring.AnimState:SetLayer(LAYER_GROUND)
         ring.AnimState:HideSymbol("circle")
@@ -154,41 +152,39 @@ local function DoExplode(source,attacker,eater)
         source:GetPosition(),
         2.8,
         nil,
-        {"INLIMBO"},
+        { "INLIMBO" },
         nil,
-        function(attacker,v)
+        function(attacker, v)
             if v.components.combat then
                 local multi = 1
-                local basedamage = GetRandomMinMax(60,120)
+                local basedamage = GetRandomMinMax(60, 120)
                 if eater and v == eater then
                     multi = 2.5
-                    basedamage = math.max(100,basedamage)
+                    basedamage = math.max(100, basedamage)
                 elseif source.components.inventoryitem:GetGrandOwner() == v then
                     multi = 2
-                    basedamage = math.max(100,basedamage)
+                    basedamage = math.max(100, basedamage)
                 end
-                v.components.combat:GetAttacked(attacker,basedamage * multi)
-                v:PushEvent("knockback", { knocker = explo, radius = GetRandomMinMax(1.2,1.4) + v:GetPhysicsRadius(.5)})
+                v.components.combat:GetAttacked(attacker, basedamage * multi)
+                v:PushEvent("knockback", { knocker = explo, radius = GetRandomMinMax(1.2, 1.4) + v:GetPhysicsRadius(.5) })
             elseif v.components.inventoryitem then
                 if v.Physics then
-                    GaleCommon.LaunchItem(v,source,5)
+                    GaleCommon.LaunchItem(v, source, 5)
                 end
-                
             elseif v.components.workable ~= nil
                 and v.components.workable:CanBeWorked()
                 and v.components.workable.action ~= ACTIONS.NET then
-
                 -- SpawnPrefab("collapse_small",v)
 
-                v.components.workable:WorkedBy(attacker,5)
+                v.components.workable:WorkedBy(attacker, 11)
             end
         end,
-        function(inst,v)
+        function(inst, v)
             local is_combat = v.components.combat and v.components.health and not v.components.health:IsDead()
                 and not (v.sg and v.sg:HasStateTag("dead"))
                 and not v:HasTag("playerghost")
             local is_inventory = v.components.inventoryitem
-            return v and v:IsValid() 
+            return v and v:IsValid()
                 and (is_combat or is_inventory or v.components.workable)
         end
     )
@@ -197,36 +193,36 @@ local function DoExplode(source,attacker,eater)
 end
 
 local function BombProjOnThrown(inst)
-    inst.AnimState:PlayAnimation("throw",true)
+    inst.AnimState:PlayAnimation("throw", true)
 
-    inst:BombResetFireFx(nil,torchfire_prefab)
+    inst:BombResetFireFx(nil, torchfire_prefab)
 
     if inst.status == nil then
-        inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse","fuse")
-        inst:DoTaskInTime(inst.burning_time,function()
+        inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse", "fuse")
+        inst:DoTaskInTime(inst.burning_time, function()
             inst.SoundEmitter:KillSound("fuse")
-            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse_warn","fuse_warn")
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse_warn", "fuse_warn")
             inst.status = "fuse_warn"
 
             inst:EnableFlashing(true)
-            inst:DoTaskInTime(inst.explode_delay,function()
+            inst:DoTaskInTime(inst.explode_delay, function()
                 inst:DoExplode(inst.components.complexprojectile.attacker or inst)
             end)
         end)
         inst.status = "fuse"
 
-        inst:ListenForEvent("onremove",function()
+        inst:ListenForEvent("onremove", function()
             inst:Remove()
-        end,inst.components.complexprojectile.attacker)
+        end, inst.components.complexprojectile.attacker)
     end
 end
 
-local function BombProjOnHit(inst,other)
+local function BombProjOnHit(inst, other)
     inst.AnimState:PlayAnimation("single")
 end
 
 local function CommonBombProjServerFn(inst)
-    inst.status = nil 
+    inst.status = nil
     inst.has_triggered = false
     inst.burning_time = 3.2
     inst.explode_delay = 0.8
@@ -245,11 +241,11 @@ local function CommonBombProjServerFn(inst)
     inst.components.edible.sanityvalue = 0
     inst.components.edible.temperaturedelta = 0
     inst.components.edible.temperatureduration = 0
-    inst.components.edible:SetOnEatenFn(function(inst,eater)
+    inst.components.edible:SetOnEatenFn(function(inst, eater)
         local attacker = inst.components.complexprojectile.attacker
-        eater:DoTaskInTime(1.2,function()
-            local fakeball = SpawnAt(inst.prefab,eater)
-            fakeball:DoExplode(attacker and attacker:IsValid() and attacker or fakeball,eater)
+        eater:DoTaskInTime(1.2, function()
+            local fakeball = SpawnAt(inst.prefab, eater)
+            fakeball:DoExplode(attacker and attacker:IsValid() and attacker or fakeball, eater)
         end)
     end)
 
@@ -264,27 +260,27 @@ local function CommonBombProjServerFn(inst)
 
     inst.components.inventoryitem:SetSinks(true)
     inst.components.inventoryitem:SetOnDroppedFn(function(inst)
-        inst:BombResetFireFx(nil,torchfire_prefab)
+        inst:BombResetFireFx(nil, torchfire_prefab)
     end)
     inst.components.inventoryitem:SetOnPutInInventoryFn(function(inst)
         inst:BombResetFireFx()
         if inst.status == "fuse" then
-            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse","fuse")
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse", "fuse")
         elseif inst.status == "fuse_warn" then
             inst.SoundEmitter:KillSound("fuse")
-            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse_warn","fuse_warn")
+            inst.SoundEmitter:PlaySound("gale_sfx/battle/bomb/p1_bomb_fuse_warn", "fuse_warn")
         end
     end)
 
-    inst:ListenForEvent("equipped",function(inst,data)
-        inst:BombResetFireFx(data.owner,torchfire_prefab)
+    inst:ListenForEvent("equipped", function(inst, data)
+        inst:BombResetFireFx(data.owner, torchfire_prefab)
     end)
 
-    inst:ListenForEvent("unequipped",function(inst,data)
+    inst:ListenForEvent("unequipped", function(inst, data)
         inst:BombResetFireFx()
     end)
 
-    inst:ListenForEvent("onremove",function(inst,data)
+    inst:ListenForEvent("onremove", function(inst, data)
         inst:BombResetFireFx()
     end)
 end
@@ -296,89 +292,89 @@ local function HighLightClientFn(inst)
 end
 
 return GaleEntity.CreateNormalWeapon({
-    prefabname = "gale_bombbox",
-    assets = assets,
+        prefabname = "gale_bombbox",
+        assets = assets,
 
-    bank = "gale_bombbox",
-    build = "gale_bombbox",
-    anim = "idle",
+        bank = "gale_bombbox",
+        build = "gale_bombbox",
+        anim = "idle",
 
-    clientfn = CommonBombBoxClientFn,
-    serverfn = CommonBombBoxServerFn,
+        clientfn = CommonBombBoxClientFn,
+        serverfn = CommonBombBoxServerFn,
 
-    inventoryitem_data = {
-        use_gale_item_desc = true,
-    },
+        inventoryitem_data = {
+            use_gale_item_desc = true,
+        },
 
-    weapon_data = {
-        swapanims = {"swap_gale_bombbox","swap_gale_bombbox"},
-        damage = 0,
-        ranges = {12,36}
-    },
-}),
-GaleEntity.CreateNormalWeapon({
-    prefabname = "gale_bombbox_duplicate",
-    assets = assets,
+        weapon_data = {
+            swapanims = { "swap_gale_bombbox", "swap_gale_bombbox" },
+            damage = 0,
+            ranges = { 12, 36 }
+        },
+    }),
+    GaleEntity.CreateNormalWeapon({
+        prefabname = "gale_bombbox_duplicate",
+        assets = assets,
 
-    bank = "gale_bombbox",
-    build = "gale_bombbox",
-    anim = "idle",
+        bank = "gale_bombbox",
+        build = "gale_bombbox",
+        anim = "idle",
 
-    clientfn = CommonBombBoxClientFn,
-    serverfn = CommonBombBoxServerFn,
+        clientfn = CommonBombBoxClientFn,
+        serverfn = CommonBombBoxServerFn,
 
-    inventoryitem_data = {
-        use_gale_item_desc = true,
-    },
+        inventoryitem_data = {
+            use_gale_item_desc = true,
+        },
 
-    weapon_data = {
-        swapanims = {"swap_gale_bombbox","swap_gale_bombbox"},
-        damage = 0,
-        ranges = {12,36}
-    },
-}),
-GaleEntity.CreateNormalWeapon({
-    prefabname = "gale_bomb_projectile",
-    assets = assets,
+        weapon_data = {
+            swapanims = { "swap_gale_bombbox", "swap_gale_bombbox" },
+            damage = 0,
+            ranges = { 12, 36 }
+        },
+    }),
+    GaleEntity.CreateNormalWeapon({
+        prefabname = "gale_bomb_projectile",
+        assets = assets,
 
-    bank = "gale_bombbox",
-    build = "gale_bombbox",
-    anim = "single",
+        bank = "gale_bombbox",
+        build = "gale_bombbox",
+        anim = "single",
 
-    tags = {"molebait","explosive"},
+        tags = { "molebait", "explosive" },
 
-    persists = false,
+        persists = false,
 
-    clientfn = CommonBombProjClientFn,
-    serverfn = CommonBombProjServerFn,
+        clientfn = CommonBombProjClientFn,
+        serverfn = CommonBombProjServerFn,
 
-    inventoryitem_data = {
-        use_gale_item_desc = true,
-    },
+        inventoryitem_data = {
+            use_gale_item_desc = true,
+        },
 
-    weapon_data = {
-        swapanims = {"swap_gale_bombbox","swap_gale_bombbox"},
-        damage = 0,
-        ranges = {12,36}
-    },
-}),
-GaleEntity.CreateNormalFx({
-    prefabname = "gale_bomb_projectile_explode",
-    assets = assets,
+        weapon_data = {
+            swapanims = { "swap_gale_bombbox", "swap_gale_bombbox" },
+            damage = 0,
+            ranges = { 12, 36 }
+        },
+    }),
+    GaleEntity.CreateNormalFx({
+        prefabname = "gale_bomb_projectile_explode",
+        assets = assets,
 
-    bank = "lavaarena_firebomb",
-    build = "lavaarena_firebomb",
-    anim = "used",
+        bank = "lavaarena_firebomb",
+        build = "lavaarena_firebomb",
+        anim = "used",
 
-    clientfn = HighLightClientFn,
-}),
-GaleEntity.CreateNormalFx({
-    prefabname = "gale_bomb_projectile_hit",
-    assets = assets,
+        clientfn = HighLightClientFn,
+    }),
+    GaleEntity.CreateNormalFx({
+        prefabname = "gale_bomb_projectile_hit",
+        assets = assets,
 
-    bank = "lavaarena_firebomb",
-    build = "lavaarena_firebomb",
-    anim = "hitfx",
+        bank = "lavaarena_firebomb",
+        build = "lavaarena_firebomb",
+        anim = "hitfx",
 
-    clientfn = HighLightClientFn,
-})
+        clientfn = HighLightClientFn,
+    })
