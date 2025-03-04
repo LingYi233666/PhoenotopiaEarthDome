@@ -191,8 +191,8 @@ local function OnAttacked(inst, data)
 
     inst.components.combat:SetTarget(data.attacker)
     inst.components.combat:ShareTarget(data.attacker, 30, function(dude)
-                                           return dude:HasTag("typhon") and not IsEntityDead(dude, true)
-                                       end, 10)
+        return dude:HasTag("typhon") and not IsEntityDead(dude, true)
+    end, 10)
 end
 
 local function DoRandomIdleSound(inst)

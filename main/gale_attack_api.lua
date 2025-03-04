@@ -887,7 +887,7 @@ table.insert(SERVER_SG, State {
 
 table.insert(SERVER_SG, State {
     name = "gale_fire_dash",
-    tags = { "aoe", "doing", "busy", "nointerrupt", "nomorph", "nopredict" },
+    tags = { "aoe", "doing", "busy", "gale_attack_dodge", "nointerrupt", "nomorph", "nopredict" },
 
     onenter = function(inst)
         inst.Physics:Stop()

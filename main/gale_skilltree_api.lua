@@ -1260,6 +1260,9 @@ AddStategraphState("wilson",
                 else
                     inst.AnimState:PlayAnimation("gale_speedrun_withitem_loop")
                 end
+
+                -- gale with gale_attack_dodge SG tag will be invincible
+                inst.sg:AddStateTag("gale_attack_dodge")
             else
                 inst.AnimState:PlayAnimation("slide_pre")
                 inst.AnimState:PushAnimation("slide_loop")

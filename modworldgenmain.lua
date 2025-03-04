@@ -8,12 +8,17 @@ local Layouts = require("map/layouts").Layouts
 local tasks = require("map/tasks")
 
 
-local function GaleAddStaticLayout(name, path)
+local function GaleAddStaticLayout(name, path, ground_maps)
 	Layouts[name] = StaticLayout.Get(path)
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE] = WORLD_TILES.GALE_JUNGLE
 	Layouts[name].ground_types[WORLD_TILES.GALE_JUNGLE_DEEP] = WORLD_TILES.GALE_JUNGLE_DEEP
 	Layouts[name].ground_types[WORLD_TILES.GALE_SAVANNAH_DETAIL] = WORLD_TILES.GALE_SAVANNAH_DETAIL
+	-- Layouts[name].ground_types[30] = WORLD_TILES.DECIDUOUS
 	-- Layouts[name].ground_types[WORLD_TILES.FARMING_SOIL] = WORLD_TILES.FARMING_SOIL
+
+	if ground_maps then
+		Layouts[name].ground_types = MergeMaps(Layouts[name].ground_types, ground_maps)
+	end
 
 	return Layouts[name]
 end
@@ -24,6 +29,11 @@ GaleAddStaticLayout("athetos_employee_farmland1", "layouts/athetos_employee_farm
 GaleAddStaticLayout("athetos_employee_farmland2", "layouts/athetos_employee_farmland2")
 GaleAddStaticLayout("athetos_employee_farmland3", "layouts/athetos_employee_farmland3")
 -- GaleAddStaticLayout("athetos_employee_camp", "layouts/athetos_employee_camp")
+GaleAddStaticLayout("athetos_employee_carpet_camp", "layouts/athetos_employee_carpet_camp")
+GaleAddStaticLayout("athetos_mushroom_farm", "layouts/athetos_mushroom_farm", {
+	[5] = WORLD_TILES.DECIDUOUS,
+})
+
 
 local functioned_static_layouts = {
 	["Athetos_Employee_Camp_Fertilizer_Process"] = StaticLayout.Get("layouts/athetos_employee_camp", {
@@ -464,92 +474,152 @@ AddTaskPreInit("For a nice walk", function(tasksetdata)
 	tasksetdata.room_choices.katash_impact_zone_room = 1
 end)
 
-AddLevelPreInitAny(function(level)
-	if level.location == "forest" then
-		if level.required_setpieces == nil then
-			level.required_setpieces = {}
-		end
 
-		local setpieces_with_typhoon = {}
-		local setpieces_other = {
-			"Athetos_Employee_Camp_Fertilizer_Process",
-			"Athetos_Employee_Camp_Fertilizer_Process",
-			-- "Athetos_Employee_Camp_Fertilizer_Process",
+AddTaskSetPreInit("default", function(taskset)
+	assert(taskset.set_pieces ~= nil)
 
-			"Athetos_Employee_Camp_Mushroom",
-			"Athetos_Employee_Camp_Mushroom",
-			-- "Athetos_Employee_Camp_Mushroom2",
+	local tasks_for_typhoon = {
+		"Great Plains",
+		"Squeltch",
+		"Beeeees!",
+		"Forest hunters",
+		"Badlands",
+		"For a nice walk",
+		"Lightning Bluff",
+		"The hunters",
+		"Make a Beehat",
+		"Mole Colony Rocks",
+		"Frogs and bugs",
+		"Magic meadow",
+	}
 
-			"Athetos_Employee_Camp_Neuromod_Process",
-			"Athetos_Employee_Camp_Neuromod_Process",
-			-- "Athetos_Employee_Camp_Neuromod_Process2",
-		}
+	local tasks_common = {
+		"Great Plains",
+		"Squeltch",
+		"Beeeees!",
+		"Forest hunters",
+		"Badlands",
+		"For a nice walk",
+		"Lightning Bluff",
+		"The hunters",
+		"Make a Beehat",
+		"Mole Colony Rocks",
+		"Frogs and bugs",
+		"Magic meadow",
 
-		for i = 1, 8 do
-			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Security")
-		end
-		for i = 1, 4 do
-			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Psychic")
-		end
-		for i = 1, 2 do
-			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Psychic_Weaver")
-		end
-		for i = 1, 8 do
-			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Scientist")
-		end
+		"Make a pick",
+		"Dig that rock",
+		-- "Speak to the king",
+		-- "Speak to the king classic",
+		-- "Guarded Speak to the king",
+		-- "duri_forest",
+	}
 
-		local old_ChooseSetPieces = level.ChooseSetPieces
-		assert(level.ChooseSetPieces ~= nil, "ChooseSetPieces is nil, sth wrong !!!")
+	-- Typhoon
+	taskset.set_pieces["AthetosStaffBoon_Security"] = { count = 8, tasks = tasks_for_typhoon }
+	taskset.set_pieces["AthetosStaffBoon_Psychic"] = { count = 4, tasks = tasks_for_typhoon }
+	taskset.set_pieces["AthetosStaffBoon_Psychic_Weaver"] = { count = 2, tasks = tasks_for_typhoon }
+	taskset.set_pieces["AthetosStaffBoon_Scientist"] = { count = 8, tasks = tasks_for_typhoon }
 
-		level.ChooseSetPieces = function(self, ...)
-			local task_names_no_typhoon = {
-				"Make a pick",
-				"Dig that rock",
-				"Speak to the king",
-				"Speak to the king classic",
-				"Guarded Speak to the king",
-				"duri_forest"
-			}
-			local tasks = self:GetTasksForLevelSetPieces()
-			local tasks_no_typhoon = {}
+	-- Blueprint
+	taskset.set_pieces["Athetos_Employee_Camp_Fertilizer_Process"] = { count = 2, tasks = tasks_common }
+	taskset.set_pieces["Athetos_Employee_Camp_Mushroom"] = { count = 2, tasks = tasks_common }
+	taskset.set_pieces["Athetos_Employee_Camp_Neuromod_Process"] = { count = 2, tasks = tasks_common }
+	taskset.set_pieces["athetos_employee_carpet_camp"] = { count = 2, tasks = tasks_common }
+	taskset.set_pieces["athetos_mushroom_farm"] = { count = 1, tasks = tasks_common }
 
-			for _, v in pairs(tasks) do
-				if not table.contains(task_names_no_typhoon, v.id) then
-					table.insert(tasks_no_typhoon, v)
-				end
-			end
 
-			assert(#tasks_no_typhoon > 0, "Not enough tasks !!!")
-
-			print("Aviable tasks for typhoon boon:")
-			for _, v in pairs(tasks_no_typhoon) do
-				print(v.id)
-			end
-
-			for _, set_piece in pairs(setpieces_with_typhoon) do
-				--Get random task
-				local idx = math.random(#tasks_no_typhoon)
-
-				if tasks_no_typhoon[idx].random_set_pieces == nil then
-					tasks_no_typhoon[idx].random_set_pieces = {}
-				end
-				print("[Phoenotopia] " .. set_piece .. " added to task " .. tasks_no_typhoon[idx].id)
-				table.insert(tasks_no_typhoon[idx].random_set_pieces, set_piece)
-			end
-
-			for _, set_piece in pairs(setpieces_other) do
-				--Get random task
-				local idx = math.random(#tasks)
-
-				if tasks[idx].random_set_pieces == nil then
-					tasks[idx].random_set_pieces = {}
-				end
-				print("[Phoenotopia] " .. set_piece .. " added to task " .. tasks[idx].id)
-				table.insert(tasks[idx].random_set_pieces, set_piece)
-			end
-
-			return old_ChooseSetPieces(self, ...)
-		end
-	end
+	-- taskset.set_pieces["Athetos_Employee_Camp_Fertilizer_Process"] = { count = 2, tasks = tasks_common }
 end)
+
+
+
+-- AddLevelPreInitAny(function(level)
+-- 	if level.location == "forest" then
+-- 		if level.required_setpieces == nil then
+-- 			level.required_setpieces = {}
+-- 		end
+
+-- 		local setpieces_with_typhoon = {}
+-- 		local setpieces_other = {
+-- 			"Athetos_Employee_Camp_Fertilizer_Process",
+-- 			"Athetos_Employee_Camp_Fertilizer_Process",
+-- 			-- "Athetos_Employee_Camp_Fertilizer_Process",
+
+-- 			"Athetos_Employee_Camp_Mushroom",
+-- 			"Athetos_Employee_Camp_Mushroom",
+-- 			-- "Athetos_Employee_Camp_Mushroom2",
+
+-- 			"Athetos_Employee_Camp_Neuromod_Process",
+-- 			"Athetos_Employee_Camp_Neuromod_Process",
+-- 			-- "Athetos_Employee_Camp_Neuromod_Process2",
+-- 		}
+
+-- 		for i = 1, 8 do
+-- 			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Security")
+-- 		end
+-- 		for i = 1, 4 do
+-- 			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Psychic")
+-- 		end
+-- 		for i = 1, 2 do
+-- 			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Psychic_Weaver")
+-- 		end
+-- 		for i = 1, 8 do
+-- 			table.insert(setpieces_with_typhoon, "AthetosStaffBoon_Scientist")
+-- 		end
+
+-- 		local old_ChooseSetPieces = level.ChooseSetPieces
+-- 		assert(level.ChooseSetPieces ~= nil, "ChooseSetPieces is nil, sth wrong !!!")
+
+-- 		level.ChooseSetPieces = function(self, ...)
+-- 			local task_names_no_typhoon = {
+-- 				"Make a pick",
+-- 				"Dig that rock",
+-- 				"Speak to the king",
+-- 				"Speak to the king classic",
+-- 				"Guarded Speak to the king",
+-- 				"duri_forest"
+-- 			}
+-- 			local tasks = self:GetTasksForLevelSetPieces()
+-- 			local tasks_has_typhoon = {}
+
+-- 			for _, v in pairs(tasks) do
+-- 				if not table.contains(task_names_no_typhoon, v.id) then
+-- 					table.insert(tasks_has_typhoon, v)
+-- 				end
+-- 			end
+
+-- 			assert(#tasks_has_typhoon > 0, "Not enough tasks !!!")
+
+-- 			print("Aviable tasks for typhoon boon:")
+-- 			for _, v in pairs(tasks_has_typhoon) do
+-- 				print(v.id)
+-- 			end
+
+-- 			for _, set_piece in pairs(setpieces_with_typhoon) do
+-- 				--Get random task
+-- 				local idx = math.random(#tasks_has_typhoon)
+
+-- 				if tasks_has_typhoon[idx].random_set_pieces == nil then
+-- 					tasks_has_typhoon[idx].random_set_pieces = {}
+-- 				end
+-- 				print("[Phoenotopia] " .. set_piece .. " added to task " .. tasks_has_typhoon[idx].id)
+-- 				table.insert(tasks_has_typhoon[idx].random_set_pieces, set_piece)
+-- 			end
+
+-- 			for _, set_piece in pairs(setpieces_other) do
+-- 				--Get random task
+-- 				local idx = math.random(#tasks)
+
+-- 				if tasks[idx].random_set_pieces == nil then
+-- 					tasks[idx].random_set_pieces = {}
+-- 				end
+-- 				print("[Phoenotopia] " .. set_piece .. " added to task " .. tasks[idx].id)
+-- 				table.insert(tasks[idx].random_set_pieces, set_piece)
+-- 			end
+
+-- 			return old_ChooseSetPieces(self, ...)
+-- 		end
+-- 	end
+-- end)
 -- c_gonext("gale_forest_pillar_tree")

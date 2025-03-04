@@ -31,7 +31,7 @@ local function main_fn()
     -- inst.components.terraformer.onterraformfn = OnTerraform
     -- inst.components.terraformer.plow = true
 
-    inst.startup_task = inst:DoTaskInTime(0, CreateTileAndRemove)
+    inst.startup_task = inst:DoTaskInTime(5 * FRAMES, CreateTileAndRemove)
 
     return inst
 end

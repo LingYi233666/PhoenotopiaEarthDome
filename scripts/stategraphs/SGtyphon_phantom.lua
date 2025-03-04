@@ -227,6 +227,7 @@ local states = {
 
     State {
         name = "evade",
+        -- "noattack",
         tags = { "busy", "evade", },
 
 
@@ -341,8 +342,8 @@ local states = {
             carry_fx.entity:AddFollower()
             carry_fx.Follower:FollowSymbol(inst.GUID, "swap_object", 0, -65, 0)
             carry_fx:ListenForEvent("onremove", function()
-                                        carry_fx:Remove()
-                                    end, inst)
+                carry_fx:Remove()
+            end, inst)
             inst.sg.statemem.carry_fx = carry_fx
 
 
@@ -588,30 +589,30 @@ local states = {
 
 
 CommonStates.AddWalkStates(states, {
-                               walktimeline = {
-                                   --groggy
-                                   TimeEvent(1 * FRAMES, function(inst)
-                                       PlayFootstep(inst, 1, true)
-                                   end),
-                                   TimeEvent(12 * FRAMES, function(inst)
-                                       PlayFootstep(inst, 1, true)
-                                   end),
-                               },
-                           }, {
-                               --    startwalk = "walk_pre",
-                               --    -- walk = function() return GetRandomItem({"walk","walk2"}) end,
-                               --    walk = "walk",
-                               --    stopwalk = "walk_pst",
-                               --    startwalk = "idle_walk_pre",
-                               --    walk = "idle_walk",
-                               --    stopwalk = "idle_walk_pst",
+    walktimeline = {
+        --groggy
+        TimeEvent(1 * FRAMES, function(inst)
+            PlayFootstep(inst, 1, true)
+        end),
+        TimeEvent(12 * FRAMES, function(inst)
+            PlayFootstep(inst, 1, true)
+        end),
+    },
+}, {
+    --    startwalk = "walk_pre",
+    --    -- walk = function() return GetRandomItem({"walk","walk2"}) end,
+    --    walk = "walk",
+    --    stopwalk = "walk_pst",
+    --    startwalk = "idle_walk_pre",
+    --    walk = "idle_walk",
+    --    stopwalk = "idle_walk_pst",
 
-                               startwalk = "careful_walk_pre",
-                               walk = "careful_walk",
-                               stopwalk = "careful_walk_pst",
+    startwalk = "careful_walk_pre",
+    walk = "careful_walk",
+    stopwalk = "careful_walk_pst",
 
 
-                           })
+})
 
 local function AnimSpeedUp(inst)
     inst:EnableUpperBody(false)
@@ -623,43 +624,43 @@ local function AnimSpeedDown(inst)
 end
 
 CommonStates.AddRunStates(states, {
-                              runtimeline = {
-                                  --groggy
-                                  TimeEvent(1 * FRAMES, function(inst)
-                                      PlayFootstep(inst, 1, true)
-                                  end),
-                                  TimeEvent(8 * FRAMES, function(inst)
-                                      PlayFootstep(inst, 1, true)
-                                  end),
-                                  TimeEvent(15 * FRAMES, function(inst)
-                                      PlayFootstep(inst, 1, true)
-                                  end),
-                              },
-                          }, {
-                              -- startrun = "run_werewilba_pre",
-                              -- run = "run_werewilba_loop",
-                              -- stoprun = "run_werewilba_pst",
+        runtimeline = {
+            --groggy
+            TimeEvent(1 * FRAMES, function(inst)
+                PlayFootstep(inst, 1, true)
+            end),
+            TimeEvent(8 * FRAMES, function(inst)
+                PlayFootstep(inst, 1, true)
+            end),
+            TimeEvent(15 * FRAMES, function(inst)
+                PlayFootstep(inst, 1, true)
+            end),
+        },
+    }, {
+        -- startrun = "run_werewilba_pre",
+        -- run = "run_werewilba_loop",
+        -- stoprun = "run_werewilba_pst",
 
-                              --   startrun = "run_pre",
-                              --   run = "run",
-                              --   stoprun = "run_pst",
-                              --   startrun = "idle_walk_pre",
-                              --   run = "idle_walk",
-                              --   stoprun = "idle_walk_pst",
+        --   startrun = "run_pre",
+        --   run = "run",
+        --   stoprun = "run_pst",
+        --   startrun = "idle_walk_pre",
+        --   run = "idle_walk",
+        --   stoprun = "idle_walk_pst",
 
-                              startrun = "careful_walk_pre",
-                              run = "careful_walk",
-                              stoprun = "careful_walk_pst",
-                          },
-                          true,
-                          nil, {
-                              startonenter = AnimSpeedUp,
-                              startonexit = AnimSpeedDown,
-                              runonenter = AnimSpeedUp,
-                              runonexit = AnimSpeedDown,
-                              endonenter = AnimSpeedUp,
-                              endonexit = AnimSpeedDown,
-                          })
+        startrun = "careful_walk_pre",
+        run = "careful_walk",
+        stoprun = "careful_walk_pst",
+    },
+    true,
+    nil, {
+        startonenter = AnimSpeedUp,
+        startonexit = AnimSpeedDown,
+        runonenter = AnimSpeedUp,
+        runonexit = AnimSpeedDown,
+        endonenter = AnimSpeedUp,
+        endonexit = AnimSpeedDown,
+    })
 
 local hop_timelines =
 {
@@ -672,7 +673,7 @@ local hop_timelines =
 }
 
 CommonStates.AddHopStates(states, false, { pre = "boat_jump_pre", loop = "boat_jump_loop", pst = "boat_jump_pst" },
-                          hop_timelines)
+    hop_timelines)
 CommonStates.AddSinkAndWashAsoreStates(states)
 
 return StateGraph("SGtyphon_phantom", states, events, "idle", actionhandlers)

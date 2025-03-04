@@ -214,6 +214,11 @@ local function AdditionSleepTick(inst)
 
 end
 
+local function CanDodgeTest(inst, attacker)
+	-- return inst.components.gale_skill_shadow_dodge and inst.components.gale_skill_shadow_dodge:IsDodging()
+	return (inst.sg and inst.sg:HasStateTag("gale_attack_dodge")) or inst:HasTag("gale_attack_dodge")
+end
+
 -- local function OnCollide(inst, other, world_position_on_a_x, world_position_on_a_y, world_position_on_a_z, world_position_on_b_x, world_position_on_b_y, world_position_on_b_z, world_normal_on_b_x, world_normal_on_b_y, world_normal_on_b_z, lifetime_in_frames)
 
 -- 	print(inst, other,world_normal_on_b_x, world_normal_on_b_y, world_normal_on_b_z, lifetime_in_frames)
@@ -283,6 +288,12 @@ local master_postinit = function(inst)
 	end
 
 	-- inst.components.eater.custom_stats_mod_fn = CustomStateModFn
+
+	if not inst.components.attackdodger then
+		inst:AddComponent("attackdodger")
+	end
+	inst.components.attackdodger:SetCanDodgeFn(CanDodgeTest)
+
 
 	inst:AddComponent("gale_weaponcharge")
 

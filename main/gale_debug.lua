@@ -64,6 +64,11 @@ function GLOBAL.DebugCartPolar(v1, v2)
     end
 end
 
+function GLOBAL.c_spawnlayout(name)
+    require("debugcommands")
+    d_spawnlayout(name)
+end
+
 -- ThePlayer.components.locomotor:GoToEntity(c_findnext("galeboss_dragon_snare"))
 -- c_findnext("galeboss_ruinforce").sg:GoToState("roar")
 

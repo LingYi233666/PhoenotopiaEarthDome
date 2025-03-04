@@ -6,38 +6,38 @@ local brain = require("brains/galeboss_ruinforcebrain")
 
 
 SetSharedLootTable("galeboss_ruinforce",
-                   {
-                       { "galeboss_ruinforce_core",                      1.00 },
+    {
+        { "galeboss_ruinforce_core",                      1.00 },
 
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
-                       { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
+        { "gears",                                        1.00 },
 
 
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
-                       { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
+        { "trinket_6",                                    1.00 },
 
-                       { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-                       { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-                       { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-                       { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-                       { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-                   })
+        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+    })
 
 local function RetargetFn(inst)
     local range = inst:GetPhysicsRadius(0) + 20
@@ -179,7 +179,7 @@ return GaleEntity.CreateNormalEntity({
 
             inst._beheaded_enable = net_bool(inst.GUID, "inst._beheaded_enable", "beheadeddirty")
             inst._beheaded_smoke_vfx_enable = net_bool(inst.GUID, "inst._beheaded_smoke_vfx_enable",
-                                                       "beheaded_smoke_vfx_dirty")
+                "beheaded_smoke_vfx_dirty")
 
             GaleCommon.AddEpicBGM(inst, "galeboss_ruinforce")
 
