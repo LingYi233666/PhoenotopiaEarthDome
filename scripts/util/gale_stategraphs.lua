@@ -369,6 +369,8 @@ local function ServerChargePreUpdate(inst, data)
 		)
 		and (inst.AnimState:IsCurrentAnimation(data.last_anim)) then
 		local complete = inst.components.gale_weaponcharge:IsComplete()
+
+		inst.sg.statemem.exit_normally = true
 		inst.sg:GoToState(data.attack_sg_name, {
 			complete = complete,
 			buffaction_storage = data.buffaction_storage,
@@ -410,7 +412,7 @@ local function ClientChargePreUpdate(inst, data)
 		-- 	SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_weaponcharge_btn"],CONTROL_ATTACK,false)
 		-- 	SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_weaponcharge_btn"],CONTROL_CONTROLLER_ATTACK,false)
 		-- end
-		inst:PerformPreviewBufferedAction()
+		-- inst:PerformPreviewBufferedAction()
 		inst.sg:GoToState(data.attack_sg_name)
 	end
 end

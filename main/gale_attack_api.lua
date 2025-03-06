@@ -27,84 +27,84 @@ local aoespell_fn = COMPONENT_ACTIONS.POINT.aoespell
 -- print(ThePlayer.components.playeractionpicker:GetEquippedItemActions(TheInput:GetWorldEntityUnderMouse(), ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS), true))
 
 -- ACTIONS.CASTAOE.priority = -1
-AddComponentPostInit("playercontroller", function(self)
-    -- local old_TryAOETargeting = self.TryAOETargeting
-    -- self.TryAOETargeting = function(self,...)
-    --     local position = TheInput:GetWorldPosition()
-    --     local target = TheInput:GetWorldEntityUnderMouse()
-    --     local right_action = self.inst.components.playeractionpicker:GetRightClickActions(position, target)[1]
-    --     if right_action ~= nil and right_action.action ~= ACTIONS.CASTAOE then
-    --         return false
-    --     end
+-- AddComponentPostInit("playercontroller", function(self)
+--     -- local old_TryAOETargeting = self.TryAOETargeting
+--     -- self.TryAOETargeting = function(self,...)
+--     --     local position = TheInput:GetWorldPosition()
+--     --     local target = TheInput:GetWorldEntityUnderMouse()
+--     --     local right_action = self.inst.components.playeractionpicker:GetRightClickActions(position, target)[1]
+--     --     if right_action ~= nil and right_action.action ~= ACTIONS.CASTAOE then
+--     --         return false
+--     --     end
 
-    --     return old_TryAOETargeting(self,...)
-    -- end
+--     --     return old_TryAOETargeting(self,...)
+--     -- end
 
-    local old_GetRightMouseAction = self.GetRightMouseAction
-    self.GetRightMouseAction = function(self, ...)
-        local equipitem = self.inst.replica.inventory:GetEquippedItem(
-            EQUIPSLOTS.HANDS)
-        if equipitem and equipitem.components.aoetargeting then
-            local position = TheInput:GetWorldPosition()
-            local target = TheInput:GetWorldEntityUnderMouse()
-            local old_right =
-                self.inst.components.playeractionpicker:GetRightClickActions(
-                    position, target)[1]
-            -- local scene_action_right = target and self.inst.components.playeractionpicker:GetSceneActions(target, true)[1]
-            -- local scene_action_left = target and self.inst.components.playeractionpicker:GetSceneActions(target)[1]
+--     local old_GetRightMouseAction = self.GetRightMouseAction
+--     self.GetRightMouseAction = function(self, ...)
+--         local equipitem = self.inst.replica.inventory:GetEquippedItem(
+--             EQUIPSLOTS.HANDS)
+--         if equipitem and equipitem.components.aoetargeting then
+--             local position = TheInput:GetWorldPosition()
+--             local target = TheInput:GetWorldEntityUnderMouse()
+--             local old_right =
+--                 self.inst.components.playeractionpicker:GetRightClickActions(
+--                     position, target)[1]
+--             -- local scene_action_right = target and self.inst.components.playeractionpicker:GetSceneActions(target, true)[1]
+--             -- local scene_action_left = target and self.inst.components.playeractionpicker:GetSceneActions(target)[1]
 
-            if old_right and old_right.action ~= ACTIONS.CASTAOE then
-                return old_right
-            end
+--             if old_right and old_right.action ~= ACTIONS.CASTAOE then
+--                 return old_right
+--             end
 
-            -- if scene_action_right and scene_action_right.action.priority >= 0 and scene_action_right.action.rmb then
-            --     return scene_action_right
-            -- end
-        end
+--             -- if scene_action_right and scene_action_right.action.priority >= 0 and scene_action_right.action.rmb then
+--             --     return scene_action_right
+--             -- end
+--         end
 
-        return old_GetRightMouseAction(self, ...)
-    end
-end)
+--         return old_GetRightMouseAction(self, ...)
+--     end
+-- end)
 
-AddComponentPostInit("playeractionpicker", function(self)
-    -- local old_GetEquippedItemActions = self.GetEquippedItemActions
-    -- self.GetEquippedItemActions = function(self,target, useitem, right,...)
-    --     local actions = old_GetEquippedItemActions(self,target, useitem, right,...)
-    --     if useitem.components.aoetargeting ~= nil and right and (#actions <= 0 or actions[1].action == ACTIONS.CASTAOE) then
-    --         local scene_actions = self:GetSceneActions(target, true)
-    --         if scene_actions and #scene_actions > 0 then
-    --             actions = scene_actions
-    --         end
-    --     end
+-- AddComponentPostInit("playeractionpicker", function(self)
+--     -- local old_GetEquippedItemActions = self.GetEquippedItemActions
+--     -- self.GetEquippedItemActions = function(self,target, useitem, right,...)
+--     --     local actions = old_GetEquippedItemActions(self,target, useitem, right,...)
+--     --     if useitem.components.aoetargeting ~= nil and right and (#actions <= 0 or actions[1].action == ACTIONS.CASTAOE) then
+--     --         local scene_actions = self:GetSceneActions(target, true)
+--     --         if scene_actions and #scene_actions > 0 then
+--     --             actions = scene_actions
+--     --         end
+--     --     end
 
-    --     return actions
-    -- end
+--     --     return actions
+--     -- end
 
-    local old_GetRightClickActions = self.GetRightClickActions
-    self.GetRightClickActions = function(self, position, target, ...)
-        local actions = old_GetRightClickActions(self, position, target, ...)
-        if actions == nil or #actions <= 0 or actions[1].action ==
-            ACTIONS.CASTAOE then
-            local equipitem = self.inst.replica.inventory:GetEquippedItem(
-                EQUIPSLOTS.HANDS)
-            if equipitem and target and equipitem.components.aoetargeting ~= nil then
-                local scene_action = self:GetSceneActions(target, true)[1]
-                if scene_action then
-                    if (scene_action.action.priority >= 0 and
-                            scene_action.action.rmb) or
-                        (scene_action.action == ACTIONS.RUMMAGE) then
-                        actions = { scene_action }
-                    end
-                end
-                -- if scene_action and scene_action.action.priority >= -1 then
-                --     actions = {scene_action}
-                -- end
-            end
-        end
+--     local old_GetRightClickActions = self.GetRightClickActions
+--     self.GetRightClickActions = function(self, position, target, ...)
+--         local actions = old_GetRightClickActions(self, position, target, ...)
+--         if actions == nil or #actions <= 0 or actions[1].action ==
+--             ACTIONS.CASTAOE then
+--             local equipitem = self.inst.replica.inventory:GetEquippedItem(
+--                 EQUIPSLOTS.HANDS)
+--             if equipitem and target and equipitem.components.aoetargeting ~= nil then
+--                 local scene_action = self:GetSceneActions(target, true)[1]
+--                 if scene_action then
+--                     if (scene_action.action.priority >= 0 and
+--                             scene_action.action.rmb) or
+--                         (scene_action.action == ACTIONS.RUMMAGE) then
+--                         actions = { scene_action }
+--                     end
+--                 end
+--                 -- if scene_action and scene_action.action.priority >= -1 then
+--                 --     actions = {scene_action}
+--                 -- end
+--             end
+--         end
 
-        return actions
-    end
-end)
+--         return actions
+--     end
+-- end)
 
 local function CanUseCharge(inst)
     local weapon = (inst.components.combat and
@@ -114,16 +114,22 @@ local function CanUseCharge(inst)
             inst.components.rider:IsRiding()) or
         (inst.replica.rider and inst.replica.rider:IsRiding())
     local is_valid_user = inst:HasTag("gale_weaponcharge")
-    local is_sg_gale_carry_charge_pst = (inst.sg and
-        inst.sg:HasStateTag(
-            "gale_carry_charge_pst"))
-    return
-        weapon and weapon:HasTag("gale_chargeable_weapon") and is_valid_user and
-        not is_riding
+
+    return weapon and weapon:HasTag("gale_chargeable_weapon")
+        and is_valid_user and not is_riding
 end
 
 local function ServerGetChargeSG(inst)
-    if inst.sg:HasStateTag("charging_attack_pre") then return false end
+    if inst._charge_switch == nil or not inst._charge_switch:value() then
+        return false
+    end
+
+    if inst.sg:HasStateTag("charging_attack_pre")
+        or inst.sg:HasStateTag("nopredict")
+        or inst.sg:HasStateTag("nointerrupt")
+        or inst.sg:HasStateTag("busy") then
+        return false
+    end
 
     if CanUseCharge(inst) then
         local weapon = inst.components.combat:GetWeapon()
@@ -141,7 +147,16 @@ local function ServerGetChargeSG(inst)
 end
 
 local function ClientGetChargeSG(inst)
-    if inst.sg:HasStateTag("charging_attack_pre") then return false end
+    if inst._charge_switch == nil or not inst._charge_switch:value() then
+        return false
+    end
+
+    if inst.sg:HasStateTag("charging_attack_pre")
+        or inst.sg:HasStateTag("nopredict")
+        or inst.sg:HasStateTag("nointerrupt")
+        or inst.sg:HasStateTag("busy") then
+        return false
+    end
 
     if CanUseCharge(inst) then
         local weapon = inst.replica.combat:GetWeapon()
@@ -158,57 +173,155 @@ local function ClientGetChargeSG(inst)
     end
 end
 
+-- local function ServerGetAttackSG(inst, action)
+--     local weapon = inst.components.combat:GetWeapon()
+--     local is_riding = inst.components.rider:IsRiding()
+
+--     inst.sg.mem.localchainattack = not action.forced or nil
+
+--     local playercontroller = inst.components.playercontroller
+--     local attack_tag = playercontroller ~= nil and
+--         playercontroller.remote_authority and
+--         playercontroller.remote_predicting and
+--         "abouttoattack" or "attack"
+
+--     if not (inst.sg:HasStateTag(attack_tag) and action.target ==
+--             inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
+--         if not is_riding and inst.components.gale_skill_electric_punch and
+--             inst.components.gale_skill_electric_punch:CanPunch(action.target) then
+--             return "galeatk_electric_punch"
+--         end
+
+--         if weapon then
+--             if not weapon:HasTag("gale_only_rmb_charge") then
+--                 local chargesg = ServerGetChargeSG(inst)
+--                 if chargesg ~= nil then return chargesg end
+--             end
+
+--             if not is_riding then
+--                 if weapon:HasTag("gale_crowbar") then
+--                     if inst:HasTag("galeatk_lunge") then
+--                         return "galeatk_lunge"
+--                     elseif inst:HasTag("galeatk_multithrust") then
+--                         return "galeatk_multithrust"
+--                     elseif inst:HasTag("galeatk_leap") then
+--                         return "galeatk_leap"
+--                     end
+--                 elseif weapon:HasTag("gale_blaster") then
+--                     if weapon:HasTag("gale_blaster_jammed") or
+--                         weapon:HasTag("gale_blaster_out_of_ammo") then
+--                         return
+--                     end
+--                     if weapon.prefab == "msf_silencer_pistol" then
+--                         return
+--                         "galeatk_pistol_earlier_14_remove_attacktag_at_18"
+--                     end
+
+--                     if weapon.prefab == "gale_blaster_katash" then
+--                         return "galeatk_pistol_remove_attacktag_at_30"
+--                     end
+
+--                     return "galeatk_pistol_remove_attacktag_at_30"
+--                 end
+--             end
+--         end
+--     end
+-- end
+
+
+
+-- local function ClientGetAttackSG(inst, action)
+--     local weapon = inst.replica.combat:GetWeapon()
+--     local is_riding = inst.replica.rider:IsRiding()
+
+--     if not (inst.sg:HasStateTag("attack") and action.target ==
+--             inst.sg.statemem.attacktarget or IsEntityDead(inst)) then
+--         if not is_riding and inst.replica.gale_skill_electric_punch and
+--             inst.replica.gale_skill_electric_punch:CanPunch(action.target) then
+--             return "galeatk_electric_punch"
+--         end
+
+--         if weapon then
+--             if not weapon:HasTag("gale_only_rmb_charge") then
+--                 local chargesg = ClientGetChargeSG(inst)
+--                 if chargesg ~= nil then return chargesg end
+--             end
+
+--             if not is_riding then
+--                 if weapon:HasTag("gale_crowbar") then
+--                     if inst:HasTag("galeatk_lunge") then
+--                         return "galeatk_lunge"
+--                     elseif inst:HasTag("galeatk_multithrust") then
+--                         return "galeatk_multithrust"
+--                     elseif inst:HasTag("galeatk_leap") then
+--                         return "galeatk_leap"
+--                     end
+--                 elseif weapon:HasTag("gale_blaster") then
+--                     if weapon:HasTag("gale_blaster_jammed") or
+--                         weapon:HasTag("gale_blaster_out_of_ammo") then
+--                         return
+--                     end
+
+--                     if weapon.prefab == "msf_silencer_pistol" then
+--                         return
+--                         "galeatk_pistol_earlier_14_remove_attacktag_at_18"
+--                     end
+
+--                     if weapon.prefab == "gale_blaster_katash" then
+--                         return "galeatk_pistol_remove_attacktag_at_30"
+--                     end
+
+--                     return "galeatk_pistol_remove_attacktag_at_30"
+--                 end
+--             end
+--         end
+--     end
+-- end
+
+
 local function ServerGetAttackSG(inst, action)
     local weapon = inst.components.combat:GetWeapon()
     local is_riding = inst.components.rider:IsRiding()
 
-    inst.sg.mem.localchainattack = not action.forced or nil
+    if is_riding then
+        return
+    end
 
-    local playercontroller = inst.components.playercontroller
-    local attack_tag = playercontroller ~= nil and
-        playercontroller.remote_authority and
-        playercontroller.remote_predicting and
-        "abouttoattack" or "attack"
+    if inst.components.gale_skill_electric_punch and inst.components.gale_skill_electric_punch:CanPunch(action.target) then
+        return "galeatk_electric_punch"
+    end
 
-    if not (inst.sg:HasStateTag(attack_tag) and action.target ==
-            inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
-        if not is_riding and inst.components.gale_skill_electric_punch and
-            inst.components.gale_skill_electric_punch:CanPunch(action.target) then
-            return "galeatk_electric_punch"
+    if weapon then
+        if not weapon:HasTag("gale_only_rmb_charge") then
+            local chargesg = ServerGetChargeSG(inst)
+            if chargesg ~= nil then
+                return chargesg
+            end
         end
 
-        if weapon then
-            if not weapon:HasTag("gale_only_rmb_charge") then
-                local chargesg = ServerGetChargeSG(inst)
-                if chargesg ~= nil then return chargesg end
+        if weapon:HasTag("gale_crowbar") then
+            if inst:HasTag("galeatk_lunge") then
+                return "galeatk_lunge"
+            elseif inst:HasTag("galeatk_multithrust") then
+                return "galeatk_multithrust"
+            elseif inst:HasTag("galeatk_leap") then
+                return "galeatk_leap"
+            end
+        elseif weapon:HasTag("gale_blaster") then
+            if weapon:HasTag("gale_blaster_jammed") or
+                weapon:HasTag("gale_blaster_out_of_ammo") then
+                return
             end
 
-            if not is_riding then
-                if weapon:HasTag("gale_crowbar") then
-                    if inst:HasTag("galeatk_lunge") then
-                        return "galeatk_lunge"
-                    elseif inst:HasTag("galeatk_multithrust") then
-                        return "galeatk_multithrust"
-                    elseif inst:HasTag("galeatk_leap") then
-                        return "galeatk_leap"
-                    end
-                elseif weapon:HasTag("gale_blaster") then
-                    if weapon:HasTag("gale_blaster_jammed") or
-                        weapon:HasTag("gale_blaster_out_of_ammo") then
-                        return
-                    end
-                    if weapon.prefab == "msf_silencer_pistol" then
-                        return
-                        "galeatk_pistol_earlier_14_remove_attacktag_at_18"
-                    end
-
-                    if weapon.prefab == "gale_blaster_katash" then
-                        return "galeatk_pistol_remove_attacktag_at_30"
-                    end
-
-                    return "galeatk_pistol_remove_attacktag_at_30"
-                end
+            if weapon.prefab == "msf_silencer_pistol" then
+                return "galeatk_pistol_earlier_14_remove_attacktag_at_18"
             end
+
+            if weapon.prefab == "gale_blaster_katash" then
+                return "galeatk_pistol_remove_attacktag_at_30"
+            end
+
+            return "galeatk_pistol_remove_attacktag_at_30"
         end
     end
 end
@@ -217,54 +330,55 @@ local function ClientGetAttackSG(inst, action)
     local weapon = inst.replica.combat:GetWeapon()
     local is_riding = inst.replica.rider:IsRiding()
 
-    if not (inst.sg:HasStateTag("attack") and action.target ==
-            inst.sg.statemem.attacktarget or IsEntityDead(inst)) then
-        if not is_riding and inst.replica.gale_skill_electric_punch and
-            inst.replica.gale_skill_electric_punch:CanPunch(action.target) then
-            return "galeatk_electric_punch"
+    if is_riding then
+        return
+    end
+
+    if inst.replica.gale_skill_electric_punch and inst.replica.gale_skill_electric_punch:CanPunch(action.target) then
+        return "galeatk_electric_punch"
+    end
+
+    if weapon then
+        if not weapon:HasTag("gale_only_rmb_charge") then
+            local chargesg = ClientGetChargeSG(inst)
+            if chargesg ~= nil then
+                return chargesg
+            end
         end
 
-        if weapon then
-            if not weapon:HasTag("gale_only_rmb_charge") then
-                local chargesg = ClientGetChargeSG(inst)
-                if chargesg ~= nil then return chargesg end
+        if weapon:HasTag("gale_crowbar") then
+            if inst:HasTag("galeatk_lunge") then
+                return "galeatk_lunge"
+            elseif inst:HasTag("galeatk_multithrust") then
+                return "galeatk_multithrust"
+            elseif inst:HasTag("galeatk_leap") then
+                return "galeatk_leap"
+            end
+        elseif weapon:HasTag("gale_blaster") then
+            if weapon:HasTag("gale_blaster_jammed") or
+                weapon:HasTag("gale_blaster_out_of_ammo") then
+                return
             end
 
-            if not is_riding then
-                if weapon:HasTag("gale_crowbar") then
-                    if inst:HasTag("galeatk_lunge") then
-                        return "galeatk_lunge"
-                    elseif inst:HasTag("galeatk_multithrust") then
-                        return "galeatk_multithrust"
-                    elseif inst:HasTag("galeatk_leap") then
-                        return "galeatk_leap"
-                    end
-                elseif weapon:HasTag("gale_blaster") then
-                    if weapon:HasTag("gale_blaster_jammed") or
-                        weapon:HasTag("gale_blaster_out_of_ammo") then
-                        return
-                    end
-
-                    if weapon.prefab == "msf_silencer_pistol" then
-                        return
-                        "galeatk_pistol_earlier_14_remove_attacktag_at_18"
-                    end
-
-                    if weapon.prefab == "gale_blaster_katash" then
-                        return "galeatk_pistol_remove_attacktag_at_30"
-                    end
-
-                    return "galeatk_pistol_remove_attacktag_at_30"
-                end
+            if weapon.prefab == "msf_silencer_pistol" then
+                return
+                "galeatk_pistol_earlier_14_remove_attacktag_at_18"
             end
+
+            if weapon.prefab == "gale_blaster_katash" then
+                return "galeatk_pistol_remove_attacktag_at_30"
+            end
+
+            return "galeatk_pistol_remove_attacktag_at_30"
         end
     end
 end
 
 local function PushSpecialAtkEvent(inst, other_data)
-    local target = inst.sg.statemem.attacktarget or
-        inst.components.combat.target
-    if not (target and target:IsValid()) then return end
+    local target = inst.sg.statemem.attacktarget or inst.components.combat.target
+    if not (target and target:IsValid()) then
+        return
+    end
     inst:PushEvent("gale_speicalatk", {
         name = inst.sg.currentstate.name,
         target = target,
@@ -301,8 +415,7 @@ local function ChargingRunOrStop(inst, ismastersim)
         -- inst.Physics:Stop()
         inst.AnimState:PlayAnimation("atk_pre")
         inst.AnimState:PushAnimation("atk_lag", false)
-        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_whoosh", nil, nil,
-            true)
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_whoosh", nil, nil, true)
     elseif not is_moving and should_move then
         -- inst.Physics:SetMotorVel(3, 0, 0)
         inst.sg:AddStateTag("moving")
@@ -320,17 +433,12 @@ end
 
 table.insert(SERVER_SG, State {
     name = "gale_charging_attack_pre",
-    tags = {
-        "charging_attack", "charging_attack_pre", "moving", "running",
-        "autopredict"
-    },
+    tags = { "charging_attack", "charging_attack_pre", "moving", "running", "autopredict", "busy" },
 
     onenter = function(inst)
         inst:AddTag("charging_attack_pre")
 
-        inst.components.locomotor:SetExternalSpeedMultiplier(inst,
-            "gale_charging_attack_pre",
-            0.5)
+        inst.components.locomotor:SetExternalSpeedMultiplier(inst, "gale_charging_attack_pre", 0.5)
 
         local buffaction = inst:GetBufferedAction()
         -- buffaction will be automatally cleared when moving,store it
@@ -357,22 +465,24 @@ table.insert(SERVER_SG, State {
     end,
 
     events = {
-        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end)
+        EventHandler("unequip", function(inst)
+            inst.sg:GoToState("idle")
+        end)
     },
 
     onexit = function(inst)
         inst:RemoveTag("charging_attack_pre")
+        inst.components.locomotor:RemoveExternalSpeedMultiplier(inst, "gale_charging_attack_pre")
 
-        inst.components.locomotor:RemoveExternalSpeedMultiplier(inst,
-            "gale_charging_attack_pre")
+        -- if not inst.sg.statemem.exit_normally then
+        --     inst:ClearBufferedAction()
+        -- end
     end
 })
 
 table.insert(SERVER_SG, State {
     name = "gale_charging_attack",
-    tags = {
-        "attack", "charging_attack", "doing", "busy", "notalking", "autopredict"
-    },
+    tags = { "attack", "charging_attack", "busy", "notalking", "autopredict" },
 
     onenter = function(inst, data)
         inst.components.locomotor:Stop()
@@ -418,7 +528,6 @@ table.insert(SERVER_SG, State {
         end),
 
         TimeEvent(4 * FRAMES, function(inst)
-            inst.sg:RemoveStateTag("doing")
             inst.sg:RemoveStateTag("busy")
             inst.sg:RemoveStateTag("attack")
             inst.sg:AddStateTag("idle")
@@ -430,62 +539,7 @@ table.insert(SERVER_SG, State {
         EventHandler("actionfailed", function(inst, data)
             print(inst, "action failed !")
             print("Action = ", data.action, "Reason = ", data.reason)
-        end), EventHandler("animover", function(inst)
-        if inst.AnimState:AnimDone() then
-            inst.sg:GoToState("idle")
-        end
-    end)
-    }
-})
-
-table.insert(SERVER_SG, State {
-    name = "gale_crowbar_superattack",
-    tags = { "aoe", "doing", "busy", "nointerrupt", "nomorph", "nopredict" },
-
-    onenter = function(inst, data)
-        -- inst.Transform:SetEightFaced()
-
-        inst.components.locomotor:Stop()
-        -- inst.Physics:SetMotorVel(3.5,0,0)
-
-        -- inst.AnimState:PlayAnimation("atk_leap")
-        -- inst.AnimState:SetDeltaTimeMultiplier(1.2)
-        -- inst.AnimState:PlayAnimation("gale_melee_chargeatk_pre")
-        -- inst.AnimState:PushAnimation("gale_melee_chargeatk_loop",false)
-        -- inst.AnimState:PushAnimation("gale_melee_chargeatk_pst",false)
-
-        inst.AnimState:PlayAnimation("atk_prop_pre")
-        inst.AnimState:PushAnimation("atk_prop_lag", false)
-
-        -- inst.AnimState:PushAnimation("gale_melee_chargeatk_pst",false)
-
-        inst.SoundEmitter:PlaySound("dontstarve/common/deathpoof")
-    end,
-    timeline = {
-        -- TimeEvent(10 * FRAMES, function(inst)
-        --     inst.sg.statemem.fade_thread = GaleCommon.FadeTo(inst,15 * FRAMES,nil,nil,{Vector4(0,0.9,0.9,1),Vector4(0,0,0,1)})
-        -- end),
-        -- TimeEvent(13 * FRAMES, function(inst)
-        --     inst:PerformBufferedAction()
-        --     inst.Physics:Stop()
-        -- end),
-
-        TimeEvent(8 * FRAMES, function(inst)
-            inst.AnimState:PlayAnimation("atk_prop")
-            inst.SoundEmitter:PlaySound(
-                "gale_sfx/character/p1_gale_charge_atk_shout")
-            inst.sg.statemem.fade_thread =
-                GaleCommon.FadeTo(inst, 15 * FRAMES, nil, nil, {
-                    Vector4(0, 0.9, 0.9, 1), Vector4(0, 0, 0, 1)
-                })
-        end), TimeEvent(10 * FRAMES, function(inst)
-        inst:PerformBufferedAction()
-        inst.Physics:Stop()
-    end)
-    },
-
-    events = {
-        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+        end),
         EventHandler("animover", function(inst)
             if inst.AnimState:AnimDone() then
                 inst.sg:GoToState("idle")
@@ -494,13 +548,10 @@ table.insert(SERVER_SG, State {
     },
 
     onexit = function(inst)
-        -- if inst.sg.statemem.fade_thread then
-        --     KillThread(inst.sg.statemem.fade_thread)
-        -- end
-        inst.AnimState:SetDeltaTimeMultiplier(1)
-        inst.Transform:SetFourFaced()
-    end
+        -- inst:ClearBufferedAction()
+    end,
 })
+
 
 table.insert(SERVER_SG, State {
     name = "galeatk_multithrust",
@@ -868,12 +919,14 @@ table.insert(SERVER_SG, State {
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
-        -- inst:ClearBufferedAction()
+
         inst.AnimState:PlayAnimation("pickup_pst")
         inst.sg:SetTimeout(2)
     end,
 
-    ontimeout = function(inst) inst.sg:GoToState("idle") end,
+    ontimeout = function(inst)
+        inst.sg:GoToState("idle")
+    end,
 
     events = {
         EventHandler("animover", function(inst)
@@ -881,7 +934,11 @@ table.insert(SERVER_SG, State {
                 inst.sg:GoToState("idle")
             end
         end)
-    }
+    },
+
+    onexit = function(inst)
+        -- inst:ClearBufferedAction()
+    end,
 
 })
 
@@ -1397,7 +1454,9 @@ table.insert(CLIENT_SG, State {
         })
     end,
 
-    onexit = function(inst) end,
+    onexit = function(inst)
+        -- inst:ClearBufferedAction()
+    end,
 
     events = {
         EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end)
@@ -1406,25 +1465,29 @@ table.insert(CLIENT_SG, State {
 
 table.insert(CLIENT_SG, State {
     name = "gale_charging_attack",
-    tags = { "attack", "charging_attack", "doing", "busy", "notalking" },
+    tags = { "attack", "charging_attack", "busy", "notalking" },
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
         inst.AnimState:PlayAnimation("atk")
         inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil,
             true)
-        inst:PerformPreviewBufferedAction()
+        -- inst:PerformPreviewBufferedAction()
     end,
     timeline = {
+        TimeEvent(FRAMES, function(inst)
+            inst:ClearBufferedAction()
+        end),
+
         TimeEvent(4 * FRAMES, function(inst)
-            inst.sg:RemoveStateTag("doing")
             inst.sg:RemoveStateTag("busy")
             inst.sg:RemoveStateTag("attack")
             inst.sg:AddStateTag("idle")
         end),
 
-        TimeEvent(13 * FRAMES,
-            function(inst) inst.sg:GoToState("idle", true) end)
+        TimeEvent(13 * FRAMES, function(inst)
+            inst.sg:GoToState("idle", true)
+        end)
     },
 
     events = {
@@ -1433,24 +1496,13 @@ table.insert(CLIENT_SG, State {
                 inst.sg:GoToState("idle")
             end
         end)
-    }
+    },
+
+    onexit = function(inst)
+        -- inst:ClearBufferedAction()
+    end,
 })
 
-table.insert(CLIENT_SG, State {
-    name = "gale_crowbar_superattack",
-    tags = { "aoe", "doing", "busy", "nomorph" },
-
-    onenter = function(inst, data) inst:PerformPreviewBufferedAction() end,
-
-    events = {
-        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
-        EventHandler("animover", function(inst)
-            if inst.AnimState:AnimDone() then
-                inst.sg:GoToState("idle")
-            end
-        end)
-    }
-})
 
 table.insert(CLIENT_SG, State {
     name = "galeatk_multithrust",
@@ -1799,12 +1851,14 @@ table.insert(CLIENT_SG, State {
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
-        inst:ClearBufferedAction()
+
         inst.AnimState:PlayAnimation("pickup_pst")
         inst.sg:SetTimeout(2)
     end,
 
-    ontimeout = function(inst) inst.sg:GoToState("idle") end,
+    ontimeout = function(inst)
+        inst.sg:GoToState("idle")
+    end,
 
     events = {
         EventHandler("animover", function(inst)
@@ -1812,7 +1866,11 @@ table.insert(CLIENT_SG, State {
                 inst.sg:GoToState("idle")
             end
         end)
-    }
+    },
+
+    onexit = function(inst)
+        -- inst:ClearBufferedAction()
+    end,
 
 })
 
@@ -1883,20 +1941,45 @@ AddStategraphPostInit("wilson", function(sg)
     local old_ATTACK = sg.actionhandlers[ACTIONS.ATTACK].deststate
     sg.actionhandlers[ACTIONS.ATTACK].deststate =
         function(inst, action, ...)
-            local sg = ServerGetAttackSG(inst, action)
-            if sg ~= false then
-                return sg or old_ATTACK(inst, action, ...)
+            -- local sg = ServerGetAttackSG(inst, action)
+            -- if sg ~= false then
+            --     return sg or old_ATTACK(inst, action, ...)
+            -- end
+
+
+            local old_rets = old_ATTACK(inst, action, ...)
+            if old_rets ~= nil then
+                local mod_attack_sg = ServerGetAttackSG(inst, action)
+                if mod_attack_sg == false then
+                    return
+                elseif type(mod_attack_sg) == "string" then
+                    return mod_attack_sg
+                end
             end
+
+            return old_rets
         end
 end)
 AddStategraphPostInit("wilson_client", function(sg)
     local old_ATTACK = sg.actionhandlers[ACTIONS.ATTACK].deststate
     sg.actionhandlers[ACTIONS.ATTACK].deststate =
         function(inst, action, ...)
-            local sg = ClientGetAttackSG(inst, action)
-            if sg ~= false then
-                return sg or old_ATTACK(inst, action, ...)
+            -- local sg = ClientGetAttackSG(inst, action)
+            -- if sg ~= false then
+            --     return sg or old_ATTACK(inst, action, ...)
+            -- end
+
+            local old_rets = old_ATTACK(inst, action, ...)
+            if old_rets ~= nil then
+                local mod_attack_sg = ClientGetAttackSG(inst, action)
+                if mod_attack_sg == false then
+                    return
+                elseif type(mod_attack_sg) == "string" then
+                    return mod_attack_sg
+                end
             end
+
+            return old_rets
         end
 end)
 
@@ -1936,9 +2019,6 @@ AddStategraphPostInit("wilson", function(sg)
                         weapon.components.rechargeable:IsCharged())
 
                 if can_cast then
-                    -- if weapon:HasTag("gale_crowbar") then
-                    --     return "gale_crowbar_superattack"
-                    -- else
                     if weapon.prefab == "gale_blaster_katash" then
                         return "galeatk_pistol_remove_attacktag_at_30"
                     elseif weapon.prefab == "gale_sky_striker_blade_fire" then
@@ -1964,9 +2044,6 @@ AddStategraphPostInit("wilson_client", function(sg)
                 local can_cast = weapon.components.aoetargeting:IsEnabled()
 
                 if can_cast then
-                    -- if weapon:HasTag("gale_crowbar") then
-                    --     return "gale_crowbar_superattack"
-                    -- else
                     if weapon.prefab == "gale_blaster_katash" then
                         return "galeatk_pistol_remove_attacktag_at_30"
                     elseif weapon.prefab == "gale_sky_striker_blade_fire" then
@@ -1999,12 +2076,17 @@ end
 AddStategraphPostInit("wilson", WalkPostInit)
 AddStategraphPostInit("wilson_client", WalkPostInit)
 
-AddModRPCHandler("gale_rpc", "gale_weaponcharge_btn",
-    function(inst, control, pressed)
-        if inst.components.gale_weaponcharge then
-            inst.components.gale_weaponcharge:SetKey(control, pressed)
-        end
-    end)
+AddModRPCHandler("gale_rpc", "gale_weaponcharge_btn", function(inst, control, pressed)
+    if inst.components.gale_weaponcharge then
+        inst.components.gale_weaponcharge:SetKey(control, pressed)
+    end
+end)
+
+AddModRPCHandler("gale_rpc", "gale_charge_switch", function(inst, enable)
+    inst._charge_switch:set(enable)
+end)
+
+
 
 -- AddModRPCHandler("gale_rpc", "gale_face_point", function(inst, x, y, z, force)
 --     local buffer = inst:GetBufferedAction()
@@ -2043,25 +2125,17 @@ local atk_btns = {
 TheInput:AddGeneralControlHandler(function(control, pressed)
     if ThePlayer and ThePlayer:HasTag("gale_weaponcharge") then
         if table.contains(atk_btns, control) then
-            SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_weaponcharge_btn"],
-                control, pressed)
+            SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_weaponcharge_btn"], control, pressed)
         end
-
-        -- if control == CONTROL_SECONDARY then
-        --     if ThePlayer._gale_face_point_task then
-        --         ThePlayer._gale_face_point_task:Cancel()
-        --         ThePlayer._gale_face_point_task = nil
-        --     end
-        --     if pressed then
-        --         ThePlayer._gale_face_point_task = ThePlayer:DoPeriodicTask(0,function()
-        --             local x,y,z = TheInput:GetWorldPosition():Get()
-        --             ThePlayer:ForceFacePoint(x,y,z)
-        --             SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_face_point"],x,y,z,false)
-        --         end)
-        --     end
-        -- end
     end
 end)
+
+TheInput:AddControlHandler(CONTROL_SECONDARY, function(pressed)
+    if not pressed then
+        SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_charge_switch"], true)
+    end
+end)
+
 
 ------------------------------------------------------------------------------------------------------
 -- 注册动作
@@ -2082,7 +2156,7 @@ AddAction("GALE_FREE_CHARGE", "GALE_FREE_CHARGE", function(act)
 end)
 ACTIONS.GALE_FREE_CHARGE.priority = -99
 ACTIONS.GALE_FREE_CHARGE.customarrivecheck = function() return true end
-ACTIONS.GALE_FREE_CHARGE.rmb = true
+-- ACTIONS.GALE_FREE_CHARGE.rmb = true
 
 -- ACTIONS.GALE_FREE_CHARGE.is_relative_to_platform = true
 -- ACTIONS.GALE_FREE_CHARGE.rmb = true
@@ -2091,29 +2165,46 @@ ACTIONS.GALE_FREE_CHARGE.rmb = true
 -- inst, doer, pos, actions, right, target
 AddComponentAction("POINT", "gale_chargeable_weapon",
     function(inst, doer, pos, actions, right, target)
-        if right and not doer:HasTag("charging_attack_pre") and CanUseCharge(doer) and
-            not doer._just_use_carry_charge then
+        if not doer:HasTag("charging_attack_pre") and CanUseCharge(doer)
+            and not doer._just_use_carry_charge
+            and doer._charge_switch
+            and doer._charge_switch:value() then
             table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
         end
+
+        -- if right and CanUseCharge(doer) then
+        --     table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
+        -- end
     end)
 
 AddComponentAction("EQUIPPED", "gale_chargeable_weapon",
     function(inst, doer, target, actions, right)
-        if right and not doer:HasTag("charging_attack_pre") and CanUseCharge(doer) and
-            not doer._just_use_carry_charge then
+        if not doer:HasTag("charging_attack_pre") and CanUseCharge(doer)
+            and not doer._just_use_carry_charge
+            and doer._charge_switch
+            and doer._charge_switch:value() then
             table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
         end
+
+        -- if right and CanUseCharge(doer) then
+        --     table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
+        -- end
     end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_FREE_CHARGE,
-    function(inst)
-        return ServerGetChargeSG(inst) or nil
-    end))
-AddStategraphActionHandler("wilson_client",
-    ActionHandler(ACTIONS.GALE_FREE_CHARGE,
-        function(inst)
-            return ClientGetChargeSG(inst) or nil
-        end))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_FREE_CHARGE, function(inst)
+    print("server ACTIONS.GALE_FREE_CHARGE")
+    local sg = ServerGetChargeSG(inst)
+
+    if sg then
+        inst._charge_switch:set(false)
+        return sg
+    end
+end)
+)
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_FREE_CHARGE, function(inst)
+    -- print("client ACTIONS.GALE_FREE_CHARGE")
+    return ClientGetChargeSG(inst) or nil
+end))
 
 local old_ACTIONS_ATTACK_fn = ACTIONS.ATTACK.fn
 ACTIONS.ATTACK.fn = function(act, ...)
@@ -2257,11 +2348,6 @@ local function ClearStatusAilments(inst)
     end
 end
 
-local function CheckFuncVal(val, ...)
-    local ret = val
-    if val and type(val) == "function" then ret = val(...) end
-    return ret
-end
 
 GLOBAL.GaleModAddKnockbackSG = function(sgname, add_data)
     add_data = add_data or {}
@@ -2281,12 +2367,12 @@ GLOBAL.GaleModAddKnockbackSG = function(sgname, add_data)
             inst:ClearBufferedAction()
 
             if not data.is_dead then
-                inst.AnimState:PlayAnimation(CheckFuncVal(
+                inst.AnimState:PlayAnimation(FunctionOrValue(
                         add_data.knockback_anim, inst) or
                     "hit")
             end
 
-            inst.sg.statemem.hoc_hit = CheckFuncVal(add_data.hoc_hit, inst)
+            inst.sg.statemem.hoc_hit = FunctionOrValue(add_data.hoc_hit, inst)
             if inst.sg.statemem.hoc_hit then
                 inst.sg.statemem.fx =
                     inst:SpawnChild("gale_enemy_die_smoke_vfx")
@@ -2307,10 +2393,10 @@ GLOBAL.GaleModAddKnockbackSG = function(sgname, add_data)
                     local k = distsq < rangesq and .3 * distsq / rangesq - 1 or
                         -.7
                     inst.sg.statemem.speed =
-                        (CheckFuncVal(add_data.speed, inst) or
+                        (FunctionOrValue(add_data.speed, inst) or
                             (data.strengthmult or 1) * 12) * k
                     inst.sg.statemem.dspeed =
-                        CheckFuncVal(add_data.dspeed, inst) or 0
+                        FunctionOrValue(add_data.dspeed, inst) or 0
 
                     inst.sg.statemem.hspeed =
                         inst.sg.statemem.hoc_hit and (data.strengthmult or 1) *
@@ -2345,7 +2431,7 @@ GLOBAL.GaleModAddKnockbackSG = function(sgname, add_data)
                 if inst.sg.statemem.speed < 0 then
                     inst.sg.statemem.dspeed =
                         inst.sg.statemem.dspeed +
-                        (CheckFuncVal(add_data.vec_acc, inst) or 0.075)
+                        (FunctionOrValue(add_data.vec_acc, inst) or 0.075)
                 else
                     inst.sg.statemem.speed = 0
                 end
@@ -2478,6 +2564,11 @@ GaleModAddKnockbackSG("pig", {
     hoc_hit = false,
     vec_acc = 0.075
 })
+GaleModAddKnockbackSG("bunnyman", {
+    knockback_anim = "hit",
+    hoc_hit = true,
+    vec_acc = 0.0075
+})
 
 GaleModAddKnockbackSG("merm", { hoc_hit = true, vec_acc = 0.0075 })
 GaleModAddKnockbackSG("werepig", { hoc_hit = true, vec_acc = 0.0075 })
@@ -2510,6 +2601,12 @@ GaleModAddKnockbackSG("bishop")
 GaleModAddKnockbackSG("knight")
 GaleModAddKnockbackSG("rook")
 GaleModAddKnockbackSG("powdermonkey", {
+    knockback_anim = "hit",
+    hoc_hit = true,
+    vec_acc = 0.0075
+})
+
+GaleModAddKnockbackSG("otter", {
     knockback_anim = "hit",
     hoc_hit = true,
     vec_acc = 0.0075

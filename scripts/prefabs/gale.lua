@@ -112,6 +112,12 @@ local common_postinit = function(inst)
 	inst:AddTag("gale")
 	inst:AddTag("gale_weaponcharge")
 
+	-- When enter charge pre SG, set this to false,
+	-- until if CONTROL_SECONDARY is release,
+	-- to avoid server-client not syn into charge SG
+	inst._charge_switch = net_bool(inst.GUID, "inst._charge_switch")
+	inst._charge_switch:set(true)
+
 	-- Minimap icon
 	inst.MiniMapEntity:SetIcon("gale.tex")
 
