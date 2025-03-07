@@ -115,8 +115,8 @@ local common_postinit = function(inst)
 	-- When enter charge pre SG, set this to false,
 	-- until if CONTROL_SECONDARY is release,
 	-- to avoid server-client not syn into charge SG
-	inst._charge_switch = net_bool(inst.GUID, "inst._charge_switch")
-	inst._charge_switch:set(true)
+	-- inst._charge_switch = net_bool(inst.GUID, "inst._charge_switch")
+	-- inst._charge_switch:set(true)
 
 	-- Minimap icon
 	inst.MiniMapEntity:SetIcon("gale.tex")

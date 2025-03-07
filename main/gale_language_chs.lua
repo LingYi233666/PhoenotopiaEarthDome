@@ -3,8 +3,8 @@
 -- //////////////////////////////////////////////////////////////////////
 
 -- The character select screen lines  --人物选人界面的描述
-STRINGS.CHARACTER_TITLES.gale = "凯尔"
-STRINGS.CHARACTER_NAMES.gale = "凯尔"
+STRINGS.CHARACTER_TITLES.gale = "盖尔"
+STRINGS.CHARACTER_NAMES.gale = "盖尔"
 STRINGS.CHARACTER_DESCRIPTIONS.gale = "*很能吃\n*非常有弹性\n*蓄力攻击更是重量级"
 STRINGS.CHARACTER_QUOTES.gale = "\"基德...你到底上哪里去了...？\""
 STRINGS.CHARACTER_SURVIVABILITY.gale = "简单"
@@ -17,8 +17,8 @@ STRINGS.CHARACTER_BIOS.gale = {
 STRINGS.CHARACTERS.GALE = require "speech_gale"
 
 -- The character's name as appears in-game  --人物在游戏里面的名字
-STRINGS.NAMES.GALE = "凯尔"
--- STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE = "是凯尔！"
+STRINGS.NAMES.GALE = "盖尔"
+-- STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE = "是盖尔！"
 
 
 -- //////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ STRINGS.GALE_BUFF_DESC.CONDITION_METALLIC = {
 	STATIC = "免疫{CONDITION_BLEED}与{CONDITION_WOUND}，\n但是受到的爆炸伤害翻倍。",
 }
 
-STRINGS.NAMES.CONDITION_GALE_BOON = "凯尔的本能"
+STRINGS.NAMES.CONDITION_GALE_BOON = "盖尔的本能"
 STRINGS.GALE_BUFF_DESC.CONDITION_GALE_BOON = {
 	STATIC = "战斗开始时，获得等同层数的{CONDITION_POWER}。\n种族恩赐。",
 	DYNAMIC = "战斗开始时，获得%d层{CONDITION_POWER}。\n种族恩赐。",
@@ -191,16 +191,16 @@ STRINGS.RECIPE_DESC.GALE_FLUTE_DUPLICATE = "居然把笛子扔掉，太过分了
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_FLUTE_DUPLICATE = "只是复制品。"
 STRINGS.GALE_ITEM_DESC.GALE_FLUTE_DUPLICATE = {
 	SIMPLE = "使用后能自由吹奏音符的笛子。",
-	COMPLEX = "凯尔按照衔尾蛇之笛的模样制作的笛子。\n使用时，按攻击键可以吹奏音符，按方向键能改变音调。\n按下动作键或者取消键就可以停止吹奏。\n若是在特殊的地方吹奏，也许就会发生什么好事。",
+	COMPLEX = "盖尔按照衔尾蛇之笛的模样制作的笛子。\n使用时，按攻击键可以吹奏音符，按方向键能改变音调。\n按下动作键或者取消键就可以停止吹奏。\n若是在特殊的地方吹奏，也许就会发生什么好事。",
 }
 
-STRINGS.NAMES.GALE_CROWBAR = "凯尔的撬棍"
+STRINGS.NAMES.GALE_CROWBAR = "盖尔的撬棍"
 STRINGS.RECIPE_DESC.GALE_CROWBAR = "威力无穷的应急铁棒。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_CROWBAR = "可以拿来打棒球！"
 STRINGS.GALE_ITEM_DESC.GALE_CROWBAR = {
 	SIMPLE = "威力无穷的应急铁棒。",
 	COMPLEX = [[使用废料拼装的临时近战武器，
-是凯尔擅长使用的棍棒系武器之一。
+是盖尔擅长使用的棍棒系武器之一。
 能够借此打出多种多样的近身攻击。
 战技·抡锤：
 长按鼠标右键蓄力后，打出致命的大力挥击，
@@ -230,7 +230,7 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_BOMBBOX_DUPLICATE = "感觉不如阿达
 STRINGS.GALE_ITEM_DESC.GALE_BOMBBOX_DUPLICATE = {
 	SIMPLE = "装着无数炸弹的蛇皮袋。",
 	COMPLEX =
-	"凯尔自己制作的一袋炸弹，数量多到结档也用不完。\n装备后，轻按攻击键或者鼠标右键可以投出炸弹。\n从此炸弹袋里扔出的炸弹最多只能同时存在2个。\n炸弹会在4秒后爆炸，可能误伤到自己与盟友并摧毁建筑物，要小心！\n战技·远端投掷：\n长按攻击键或者鼠标右键蓄力后松开投掷，炸弹可以被扔得更高更远，\n其最远距离视蓄力时长而定。",
+	"盖尔自己制作的一袋炸弹，数量多到结档也用不完。\n装备后，轻按攻击键或者鼠标右键可以投出炸弹。\n从此炸弹袋里扔出的炸弹最多只能同时存在2个。\n炸弹会在4秒后爆炸，可能误伤到自己与盟友并摧毁建筑物，要小心！\n战技·远端投掷：\n长按攻击键或者鼠标右键蓄力后松开投掷，炸弹可以被扔得更高更远，\n其最远距离视蓄力时长而定。",
 }
 
 
@@ -355,10 +355,10 @@ STRINGS.GALE_ITEM_DESC.GALE_POCKET_BACKPACK = {
 	SIMPLE_2 = "用破损的GEO夹克缝合的背包，\n上面有一些口袋用来存放物品。",
 	SIMPLE_3 = "用破损的GEO夹克缝合的背包，\n上面有好多口袋！",
 
-	COMPLEX = "凯尔的GEO夹克在穿越裂隙时被撕碎，\n这背包正是用夹克的碎片缝成。\n上面的口袋可以存放物品，\n倘若用缝纫包缝上更多口袋，可存放的物品数量就会增加。\nGEO夹克是优秀的防具，因此该背包也具有一定的减伤率。",
+	COMPLEX = "盖尔的GEO夹克在穿越裂隙时被撕碎，\n这背包正是用夹克的碎片缝成。\n上面的口袋可以存放物品，\n倘若用缝纫包缝上更多口袋，可存放的物品数量就会增加。\nGEO夹克是优秀的防具，因此该背包也具有一定的减伤率。",
 }
 
-STRINGS.NAMES.GALE_SKILL_HONEYBEE_TOKEN = "凯尔衍生物"
+STRINGS.NAMES.GALE_SKILL_HONEYBEE_TOKEN = "盖尔衍生物"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_SKILL_HONEYBEE_TOKEN = "大概可以拿她去凑LINK值..."
 
 STRINGS.NAMES.GALE_HOUSE_DOOR = "门"
@@ -628,7 +628,7 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALEBOSS_KATASH_SKYMINE     = "这又是什�
 STRINGS.CHARACTERS.WX78.DESCRIBE.GALEBOSS_KATASH_SKYMINE        = "警告：该机器人随时有可能爆炸。"
 STRINGS.CHARACTERS.GALE.DESCRIBE.GALEBOSS_KATASH_SKYMINE        = "皇宫里有很多这种东西。"
 
-STRINGS.NAMES.GALE_HAMMER                                       = "凯尔的大锤"
+STRINGS.NAMES.GALE_HAMMER                                       = "盖尔的大锤"
 STRINGS.RECIPE_DESC.GALE_HAMMER                                 = "能有效地发挥你的蛮力。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_HAMMER                 = "再正常不过的锤子。"
 STRINGS.CHARACTERS.GALE.DESCRIBE.GALE_HAMMER                    = "当我的冒险结束后，可以拿它来钉钉子。"
@@ -638,7 +638,7 @@ STRINGS.GALE_ITEM_DESC.GALE_HAMMER                              = {
 	"使用废铁与岩石制造的大型锤。\n除了一般锤子的功能外，也能当做打击武器使用，\n摧毁护甲、击溃盾防御的效果显著。\n大锤是个重蛮力的武器，\n仅在计算伤害时，力量的增益会变成两倍。\n战技·抡锤：\n长按鼠标右键蓄力后，打出致命的大力挥击，\n造成巨量伤害并击退一部分敌人。",
 }
 
-STRINGS.NAMES.GALE_MACE                                         = "凯尔的刺锤"
+STRINGS.NAMES.GALE_MACE                                         = "盖尔的刺锤"
 STRINGS.RECIPE_DESC.GALE_MACE                                   = "这件武器来自另一个时代。"
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_MACE                   = "很明显是用太空陨石打造的。"
 STRINGS.GALE_ITEM_DESC.GALE_MACE                                = {
@@ -1349,9 +1349,9 @@ STRINGS.GALE_MELODIES = {
 		MELODY_OUROBOROS = "流传于衔尾蛇内部的民谣，\n在衔尾蛇的旋律石前奏响，会发生某些特别的事。",
 		MELODY_GEO = "GEO的所有成员都熟知的歌，\n在GEO的旋律石前奏响，\n就能打开通往GEO地下城的大门，接受试炼。",
 		MELODY_ROYAL = "王族代代相传的秘密歌谣，\n在画着王家印文章的旋律石前奏响，\n就能打开门扉。",
-		MELODY_PANSELO = "对凯尔来说十分熟悉的潘瑟罗印象曲。\n似乎是从村子创立之初就存在的歌曲，\n在村民中代代相传。",
+		MELODY_PANSELO = "对盖尔来说十分熟悉的潘瑟罗印象曲。\n似乎是从村子创立之初就存在的歌曲，\n在村民中代代相传。",
 		MELODY_BATTLE = "衔尾蛇的精英士兵用来激励自己的歌曲。\n吹奏后可以增强自己与盟友的力量。\n生效后要间隔6分钟才能再次使用。",
-		MELODY_PHOENIX = "温柔的歌谣，能够唤醒沉睡的记忆。\n可以在1分钟内提高凯尔的耐力恢复速度。\n生效后要间隔6分钟才能再次使用。",
+		MELODY_PHOENIX = "温柔的歌谣，能够唤醒沉睡的记忆。\n可以在1分钟内提高盖尔的耐力恢复速度。\n生效后要间隔6分钟才能再次使用。",
 	},
 
 	TRIGGER_NORMAL = "吹奏了%s！",
@@ -1359,9 +1359,9 @@ STRINGS.GALE_MELODIES = {
 	TEND_TO_PLANTS = "周围%d个农作物因为歌曲的原因变得开心了！",
 
 	TRIGGER_SUCCESS = {
-		MELODY_PANSELO = "吹奏了潘瑟罗序曲，凯尔的生命值恢复了99点！",
-		MELODY_BATTLE = "吹奏了战斗号令，凯尔及其附近的盟友均获得力量提升！",
-		MELODY_PHOENIX = "吹奏了艾娃的摇篮曲，凯尔的耐力恢复速度得到提升！",
+		MELODY_PANSELO = "吹奏了潘瑟罗序曲，盖尔的生命值恢复了99点！",
+		MELODY_BATTLE = "吹奏了战斗号令，盖尔及其附近的盟友均获得力量提升！",
+		MELODY_PHOENIX = "吹奏了艾娃的摇篮曲，盖尔的耐力恢复速度得到提升！",
 	},
 
 	TRIGGER_FAIL = {
@@ -1459,7 +1459,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 	},
 	BURGER_EATER = {
 		NAME = "代谢强化",
-		DESC = "提高凯尔的营养吸收能力。\n吃下的食物会促进新陈代谢，\n一段时间内持续恢复生命值。",
+		DESC = "提高盖尔的营养吸收能力。\n吃下的食物会促进新陈代谢，\n一段时间内持续恢复生命值。",
 	},
 	ROLLING = {
 		NAME = "滑铲",
@@ -1496,7 +1496,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	QUICK_CHARGE = {
 		NAME = "聚精会神",
-		DESC = "提高凯尔蓄力的速度。",
+		DESC = "提高盖尔蓄力的速度。",
 	},
 
 	CARRY_CHARGE = {
@@ -1567,12 +1567,12 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	DIMENSION_JUMP = {
 		NAME = "幻影冲刺",
-		DESC = "凯尔在滑铲时会化作一团暗影，无视伤害与物体碰撞。\n这个效果每隔3秒才能使用一次。",
+		DESC = "盖尔在滑铲时会化作一团暗影，无视伤害与物体碰撞。\n这个效果每隔3秒才能使用一次。",
 	},
 
 	PICKER_BUTTERFLY = {
 		NAME = "远端拾取",
-		DESC = "使用自己的意志创造信使，帮助拾取物资。\n被凯尔击败的敌人，其掉落物会随信使飞到凯尔口袋里。",
+		DESC = "使用自己的意志创造信使，帮助拾取物资。\n被盖尔击败的敌人，其掉落物会随信使飞到盖尔口袋里。",
 	},
 
 	LINKAGE = {

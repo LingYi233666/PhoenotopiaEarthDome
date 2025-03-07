@@ -3,108 +3,9 @@ local GaleCommon = require("util/gale_common")
 local UpvalueHacker = require("util/upvaluehacker")
 local GaleCondition = require("util/gale_conditions")
 
-require("entityscript")
 
 AddReplicableComponent("gale_weaponcharge")
 
--- Hack aoe actions
-print("[GaleMod]Hack aoe actions:")
-local COMPONENT_ACTIONS = UpvalueHacker.GetUpvalue(EntityScript.IsActionValid,
-    "COMPONENT_ACTIONS")
-local aoespell_fn = COMPONENT_ACTIONS.POINT.aoespell
--- COMPONENT_ACTIONS.POINT.aoespell = function(inst, doer, pos, actions, right)
---     for k,v in pairs(actions) do
---         if v.rmb == true and v ~= ACTIONS.CASTAOE then
---             return
---         end
---     end
-
---     return aoespell_fn(inst, doer, pos, actions, right)
--- end
--- ThePlayer.components.playercontroller:OnRightClick(true)
--- TheWorld:DoTaskInTime(1,function() print(ThePlayer.components.playercontroller:GetRightMouseAction()[1]) end)
--- print(ThePlayer.components.playeractionpicker:GetRightClickActions(TheInput:GetWorldPosition(), TheInput:GetWorldEntityUnderMouse())[1])
--- print(ThePlayer.components.playeractionpicker:GetEquippedItemActions(TheInput:GetWorldEntityUnderMouse(), ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS), true))
-
--- ACTIONS.CASTAOE.priority = -1
--- AddComponentPostInit("playercontroller", function(self)
---     -- local old_TryAOETargeting = self.TryAOETargeting
---     -- self.TryAOETargeting = function(self,...)
---     --     local position = TheInput:GetWorldPosition()
---     --     local target = TheInput:GetWorldEntityUnderMouse()
---     --     local right_action = self.inst.components.playeractionpicker:GetRightClickActions(position, target)[1]
---     --     if right_action ~= nil and right_action.action ~= ACTIONS.CASTAOE then
---     --         return false
---     --     end
-
---     --     return old_TryAOETargeting(self,...)
---     -- end
-
---     local old_GetRightMouseAction = self.GetRightMouseAction
---     self.GetRightMouseAction = function(self, ...)
---         local equipitem = self.inst.replica.inventory:GetEquippedItem(
---             EQUIPSLOTS.HANDS)
---         if equipitem and equipitem.components.aoetargeting then
---             local position = TheInput:GetWorldPosition()
---             local target = TheInput:GetWorldEntityUnderMouse()
---             local old_right =
---                 self.inst.components.playeractionpicker:GetRightClickActions(
---                     position, target)[1]
---             -- local scene_action_right = target and self.inst.components.playeractionpicker:GetSceneActions(target, true)[1]
---             -- local scene_action_left = target and self.inst.components.playeractionpicker:GetSceneActions(target)[1]
-
---             if old_right and old_right.action ~= ACTIONS.CASTAOE then
---                 return old_right
---             end
-
---             -- if scene_action_right and scene_action_right.action.priority >= 0 and scene_action_right.action.rmb then
---             --     return scene_action_right
---             -- end
---         end
-
---         return old_GetRightMouseAction(self, ...)
---     end
--- end)
-
--- AddComponentPostInit("playeractionpicker", function(self)
---     -- local old_GetEquippedItemActions = self.GetEquippedItemActions
---     -- self.GetEquippedItemActions = function(self,target, useitem, right,...)
---     --     local actions = old_GetEquippedItemActions(self,target, useitem, right,...)
---     --     if useitem.components.aoetargeting ~= nil and right and (#actions <= 0 or actions[1].action == ACTIONS.CASTAOE) then
---     --         local scene_actions = self:GetSceneActions(target, true)
---     --         if scene_actions and #scene_actions > 0 then
---     --             actions = scene_actions
---     --         end
---     --     end
-
---     --     return actions
---     -- end
-
---     local old_GetRightClickActions = self.GetRightClickActions
---     self.GetRightClickActions = function(self, position, target, ...)
---         local actions = old_GetRightClickActions(self, position, target, ...)
---         if actions == nil or #actions <= 0 or actions[1].action ==
---             ACTIONS.CASTAOE then
---             local equipitem = self.inst.replica.inventory:GetEquippedItem(
---                 EQUIPSLOTS.HANDS)
---             if equipitem and target and equipitem.components.aoetargeting ~= nil then
---                 local scene_action = self:GetSceneActions(target, true)[1]
---                 if scene_action then
---                     if (scene_action.action.priority >= 0 and
---                             scene_action.action.rmb) or
---                         (scene_action.action == ACTIONS.RUMMAGE) then
---                         actions = { scene_action }
---                     end
---                 end
---                 -- if scene_action and scene_action.action.priority >= -1 then
---                 --     actions = {scene_action}
---                 -- end
---             end
---         end
-
---         return actions
---     end
--- end)
 
 local function CanUseCharge(inst)
     local weapon = (inst.components.combat and
@@ -120,9 +21,9 @@ local function CanUseCharge(inst)
 end
 
 local function ServerGetChargeSG(inst)
-    if inst._charge_switch == nil or not inst._charge_switch:value() then
-        return false
-    end
+    -- if inst._charge_switch == nil or not inst._charge_switch:value() then
+    --     return false
+    -- end
 
     if inst.sg:HasStateTag("charging_attack_pre")
         or inst.sg:HasStateTag("nopredict")
@@ -147,9 +48,9 @@ local function ServerGetChargeSG(inst)
 end
 
 local function ClientGetChargeSG(inst)
-    if inst._charge_switch == nil or not inst._charge_switch:value() then
-        return false
-    end
+    -- if inst._charge_switch == nil or not inst._charge_switch:value() then
+    --     return false
+    -- end
 
     if inst.sg:HasStateTag("charging_attack_pre")
         or inst.sg:HasStateTag("nopredict")
@@ -915,12 +816,15 @@ table.insert(SERVER_SG, State {
 
 table.insert(SERVER_SG, State {
     name = "gale_carry_charge_pst",
-    tags = { "busy", "nopredict", "nointerrupt", "gale_carry_charge_pst" },
+    tags = { "busy", "nopredict" },
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
-
+        -- inst:ClearBufferedAction()
         inst.AnimState:PlayAnimation("pickup_pst")
+        if inst.components.playercontroller then
+            inst.components.playercontroller:Enable(false)
+        end
         inst.sg:SetTimeout(2)
     end,
 
@@ -938,6 +842,9 @@ table.insert(SERVER_SG, State {
 
     onexit = function(inst)
         -- inst:ClearBufferedAction()
+        if inst.components.playercontroller then
+            inst.components.playercontroller:Enable(true)
+        end
     end,
 
 })
@@ -1428,7 +1335,8 @@ table.insert(SERVER_SG, State {
 
 table.insert(CLIENT_SG, State {
     name = "gale_charging_attack_pre",
-    tags = { "charging_attack", "charging_attack_pre", "moving", "running" },
+    tags = { "charging_attack", "charging_attack_pre", "moving", "running", "busy" },
+    -- "charging_attack", "charging_attack_pre", "moving", "running", "autopredict", "busy"
 
     onenter = function(inst)
         local buffaction = inst:GetBufferedAction()
@@ -1466,12 +1374,12 @@ table.insert(CLIENT_SG, State {
 table.insert(CLIENT_SG, State {
     name = "gale_charging_attack",
     tags = { "attack", "charging_attack", "busy", "notalking" },
+    -- { "attack", "charging_attack", "busy", "notalking", "autopredict" },
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
         inst.AnimState:PlayAnimation("atk")
-        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil,
-            true)
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil, true)
         -- inst:PerformPreviewBufferedAction()
     end,
     timeline = {
@@ -1485,9 +1393,9 @@ table.insert(CLIENT_SG, State {
             inst.sg:AddStateTag("idle")
         end),
 
-        TimeEvent(13 * FRAMES, function(inst)
-            inst.sg:GoToState("idle", true)
-        end)
+        -- TimeEvent(13 * FRAMES, function(inst)
+        --     inst.sg:GoToState("idle", true)
+        -- end)
     },
 
     events = {
@@ -1847,16 +1755,41 @@ table.insert(CLIENT_SG, State {
 
 table.insert(CLIENT_SG, State {
     name = "gale_carry_charge_pst",
-    tags = { "busy", "nointerrupt", "gale_carry_charge_pst" },
+    tags = { "busy", },
+    -- server_states = { "gale_carry_charge_pst" },
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
-
+        -- inst:ClearBufferedAction()
+        inst:PerformPreviewBufferedAction()
+        -- inst:ClearBufferedAction()
         inst.AnimState:PlayAnimation("pickup_pst")
         inst.sg:SetTimeout(2)
     end,
 
+    -- onupdate = function(inst)
+    --     if inst.sg:HasStateTag("idle") then
+    --         if inst.sg:HasStateTag("busy") and not (inst:HasTag("busy") and inst.sg:ServerStateMatches()) then
+    --             inst.sg:RemoveStateTag("busy")
+    --         end
+    --     elseif inst.sg:ServerStateMatches() then
+    --         if inst.entity:FlattenMovementPrediction() then
+    --             inst.sg:AddStateTag("idle")
+    --             inst.sg:AddStateTag("canrotate")
+    --             inst.entity:SetIsPredictingMovement(false) -- so the animation will come across
+    --             inst:ClearBufferedAction()
+    --         end
+    --     elseif inst.bufferedaction == nil then
+    --         inst.sg:GoToState("idle")
+    --     end
+    -- end,
+
     ontimeout = function(inst)
+        -- if not inst.sg:HasStateTag("idle") then
+        --     inst:ClearBufferedAction()
+        --     inst.sg:GoToState("idle")
+        -- end
+
         inst.sg:GoToState("idle")
     end,
 
@@ -1869,7 +1802,7 @@ table.insert(CLIENT_SG, State {
     },
 
     onexit = function(inst)
-        -- inst:ClearBufferedAction()
+        -- inst.entity:SetIsPredictingMovement(true)
     end,
 
 })
@@ -2082,9 +2015,9 @@ AddModRPCHandler("gale_rpc", "gale_weaponcharge_btn", function(inst, control, pr
     end
 end)
 
-AddModRPCHandler("gale_rpc", "gale_charge_switch", function(inst, enable)
-    inst._charge_switch:set(enable)
-end)
+-- AddModRPCHandler("gale_rpc", "gale_charge_switch", function(inst, enable)
+--     inst._charge_switch:set(enable)
+-- end)
 
 
 
@@ -2130,11 +2063,11 @@ TheInput:AddGeneralControlHandler(function(control, pressed)
     end
 end)
 
-TheInput:AddControlHandler(CONTROL_SECONDARY, function(pressed)
-    if not pressed then
-        SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_charge_switch"], true)
-    end
-end)
+-- TheInput:AddControlHandler(CONTROL_SECONDARY, function(pressed)
+--     if not pressed then
+--         SendModRPCToServer(MOD_RPC["gale_rpc"]["gale_charge_switch"], true)
+--     end
+-- end)
 
 
 ------------------------------------------------------------------------------------------------------
@@ -2165,44 +2098,49 @@ ACTIONS.GALE_FREE_CHARGE.customarrivecheck = function() return true end
 -- inst, doer, pos, actions, right, target
 AddComponentAction("POINT", "gale_chargeable_weapon",
     function(inst, doer, pos, actions, right, target)
-        if not doer:HasTag("charging_attack_pre") and CanUseCharge(doer)
-            and not doer._just_use_carry_charge
-            and doer._charge_switch
-            and doer._charge_switch:value() then
-            table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
-        end
+        -- if right
+        --     and not doer:HasTag("charging_attack_pre")
+        --     and CanUseCharge(doer)
+        --     and not doer._just_use_carry_charge then
+        --     -- and doer._charge_switch
+        --     -- and doer._charge_switch:value()
 
-        -- if right and CanUseCharge(doer) then
         --     table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
         -- end
+
+        if right and CanUseCharge(doer) then
+            table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
+        end
     end)
 
 AddComponentAction("EQUIPPED", "gale_chargeable_weapon",
     function(inst, doer, target, actions, right)
-        if not doer:HasTag("charging_attack_pre") and CanUseCharge(doer)
-            and not doer._just_use_carry_charge
-            and doer._charge_switch
-            and doer._charge_switch:value() then
-            table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
-        end
-
-        -- if right and CanUseCharge(doer) then
+        -- if right
+        --     and not doer:HasTag("charging_attack_pre")
+        --     and CanUseCharge(doer)
+        --     and not doer._just_use_carry_charge then
+        --     -- and doer._charge_switch
+        --     -- and doer._charge_switch:value()
         --     table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
         -- end
+
+        if right and CanUseCharge(doer) then
+            table.insert(actions, ACTIONS.GALE_FREE_CHARGE)
+        end
     end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GALE_FREE_CHARGE, function(inst)
-    print("server ACTIONS.GALE_FREE_CHARGE")
+    -- print("server ACTIONS.GALE_FREE_CHARGE")
     local sg = ServerGetChargeSG(inst)
 
     if sg then
-        inst._charge_switch:set(false)
+        -- inst._charge_switch:set(false)
         return sg
     end
 end)
 )
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GALE_FREE_CHARGE, function(inst)
-    -- print("client ACTIONS.GALE_FREE_CHARGE")
+    print("client ACTIONS.GALE_FREE_CHARGE")
     return ClientGetChargeSG(inst) or nil
 end))
 

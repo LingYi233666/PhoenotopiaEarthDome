@@ -1119,6 +1119,9 @@ TheInput:AddGeneralControlHandler(function(control, pressed)
 
             ThePlayer._just_use_carry_charge = true
             print("ThePlayer._just_use_carry_charge set to true")
+            -- if ThePlayer.sg then
+            --     ThePlayer.sg:GoToState("gale_carry_charge_pst")
+            -- end
             SendModRPCToServer(MOD_RPC["gale_rpc"]["press_space_and_carry_charge"])
         end
     end
@@ -1268,13 +1271,14 @@ AddStategraphState("wilson",
                 inst.AnimState:PushAnimation("slide_loop")
             end
 
+            if inst.components.playercontroller then
+                inst.components.playercontroller:Enable(false)
+            end
+
             inst:ForceFacePoint(data.targetpos:Get())
             inst.Physics:SetMotorVelOverride(20, 0, 0)
 
             inst.components.locomotor:EnableGroundSpeedMultiplier(false)
-
-
-
 
             inst.sg.statemem.beginpos = inst:GetPosition()
             inst.sg.statemem.targetpos = data.targetpos
@@ -1344,6 +1348,10 @@ AddStategraphState("wilson",
             inst.Physics:ClearMotorVelOverride()
             inst.components.locomotor:Stop()
 
+            if inst.components.playercontroller then
+                inst.components.playercontroller:Enable(true)
+            end
+
             for k, v in pairs(inst.sg.statemem.missfxs) do
                 if v and v:IsValid() then
                     v:Remove()
@@ -1369,6 +1377,10 @@ AddStategraphState("wilson", State {
         inst:ForceFacePoint(data.targetpos:Get())
 
         GaleCommon.ToggleOffPhysics(inst)
+
+        if inst.components.playercontroller then
+            inst.components.playercontroller:Enable(false)
+        end
 
         inst.sg.statemem.ball = SpawnAt("gale_rolling_low_stamina", inst)
         inst.sg.statemem.ball:ForceFacePoint(data.targetpos:Get())
@@ -1406,6 +1418,11 @@ AddStategraphState("wilson", State {
     onexit = function(inst)
         inst.Physics:Stop()
         inst.components.locomotor:Stop()
+
+        if inst.components.playercontroller then
+            inst.components.playercontroller:Enable(true)
+        end
+
         inst:Show()
         if inst.sg.statemem.ball then
             inst.sg.statemem.ball:Remove()
@@ -1604,6 +1621,9 @@ AddStategraphState("wilson",
                 GaleCondition.RemoveCondition(inst, "condition_carry_charge")
             end
 
+            if inst.components.playercontroller then
+                inst.components.playercontroller:Enable(false)
+            end
 
             inst.sg.statemem.cast_fn = function(knockback)
                 GaleCommon.AoeForEach(inst, inst:GetPosition(), 4.3, nil, { "INLIMBO" }, { "_combat" },
@@ -1700,6 +1720,10 @@ AddStategraphState("wilson",
         onexit = function(inst)
             inst.AnimState:SetDeltaTimeMultiplier(1)
             inst.Transform:SetFourFaced()
+
+            if inst.components.playercontroller then
+                inst.components.playercontroller:Enable(true)
+            end
         end,
     }
 )

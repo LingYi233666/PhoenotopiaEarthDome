@@ -180,7 +180,7 @@ STRINGS.RECIPE_DESC.GALE_FLUTE_DUPLICATE = "居然把笛子扔掉，太过分了
 STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_FLUTE_DUPLICATE = "只是复制品。"
 STRINGS.GALE_ITEM_DESC.GALE_FLUTE_DUPLICATE = {
 	SIMPLE = "使用后能自由吹奏音符的笛子。",
-	COMPLEX = "凯尔按照衔尾蛇之笛的模样制作的笛子。\n使用时，按攻击键可以吹奏音符，按方向键能改变音调。\n按下动作键或者取消键就可以停止吹奏。\n若是在特殊的地方吹奏，也许就会发生什么好事。",
+	COMPLEX = "盖尔按照衔尾蛇之笛的模样制作的笛子。\n使用时，按攻击键可以吹奏音符，按方向键能改变音调。\n按下动作键或者取消键就可以停止吹奏。\n若是在特殊的地方吹奏，也许就会发生什么好事。",
 }
 
 
@@ -221,7 +221,7 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_BOMBBOX_DUPLICATE = "感觉不如阿达
 STRINGS.GALE_ITEM_DESC.GALE_BOMBBOX_DUPLICATE = {
 	SIMPLE = "装着无数炸弹的蛇皮袋。",
 	COMPLEX =
-	"凯尔自己制作的一袋炸弹，数量多到结档也用不完。\n装备后，轻按攻击键或者鼠标右键可以投出炸弹。\n从此炸弹袋里扔出的炸弹最多只能同时存在2个。\n炸弹会在4秒后爆炸，可能误伤到自己与盟友并摧毁建筑物，要小心！\n战技·远端投掷：\n长按攻击键或者鼠标右键蓄力后松开投掷，炸弹可以被扔得更高更远，\n其最远距离视蓄力时长而定。",
+	"盖尔自己制作的一袋炸弹，数量多到结档也用不完。\n装备后，轻按攻击键或者鼠标右键可以投出炸弹。\n从此炸弹袋里扔出的炸弹最多只能同时存在2个。\n炸弹会在4秒后爆炸，可能误伤到自己与盟友并摧毁建筑物，要小心！\n战技·远端投掷：\n长按攻击键或者鼠标右键蓄力后松开投掷，炸弹可以被扔得更高更远，\n其最远距离视蓄力时长而定。",
 }
 
 STRINGS.NAMES.GALE_BOMB_PROJECTILE = "BOMB!"
@@ -321,7 +321,7 @@ STRINGS.GALE_ITEM_DESC.GALE_POCKET_BACKPACK = {
 	SIMPLE_3 = "用破损的GEO夹克缝合的背包，\n上面有好多口袋！",
 
 	COMPLEX =
-	"凯尔的GEO夹克在穿越裂隙时被撕碎，\n这背包正是用夹克的碎片缝成。\n上面的口袋可以存放物品，\n倘若用缝纫包缝上更多口袋，则可存放的物品数量会增加。\nGEO夹克也是优秀的防具，因此该背包也具有一定的减伤率。",
+	"盖尔的GEO夹克在穿越裂隙时被撕碎，\n这背包正是用夹克的碎片缝成。\n上面的口袋可以存放物品，\n倘若用缝纫包缝上更多口袋，则可存放的物品数量会增加。\nGEO夹克也是优秀的防具，因此该背包也具有一定的减伤率。",
 }
 
 STRINGS.NAMES.GALE_SKILL_HONEYBEE_TOKEN = "Gale Token"
