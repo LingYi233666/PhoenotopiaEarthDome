@@ -54,24 +54,37 @@ local function onclose(inst)
     -- inst.SoundEmitter:PlaySound("dontstarve/HUD/Together_HUD/container_close")
 end
 
+-- local firelevels =
+-- {
+--     { anim = "fire", radius = 0.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 0.6, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 0.8, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.1, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.3, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+-- }
+
+-- local firelevels_advance =
+-- {
+--     { anim = "fire", radius = 0.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 0.8, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.0, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.3, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 1.7, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+--     { anim = "fire", radius = 2.1, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+-- }
+
 local firelevels =
 {
-    { anim = "fire", radius = 0.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 0.6, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 0.8, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.1, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.3, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+    { anim = "fire", radius = 3, intensity = .4, falloff = .9, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+    { anim = "fire", radius = 5, intensity = .6, falloff = .9, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
 }
 
 local firelevels_advance =
 {
-    { anim = "fire", radius = 0.5, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 0.8, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.0, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.3, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 1.7, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
-    { anim = "fire", radius = 2.1, intensity = .8, falloff = .33, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+    { anim = "fire", radius = 3, intensity = .4, falloff = .9, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+    { anim = "fire", radius = 4, intensity = .5, falloff = .9, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
+    { anim = "fire", radius = 5, intensity = .6, falloff = .9, colour = { 255 / 255, 255 / 255, 192 / 255 }, },
 }
 
 local function UpdateLightOwner(inst)
@@ -175,11 +188,106 @@ local function OnPercentUsedChange(inst, data)
     end
 end
 
-local function MakeLamp(prefabname,
-                        bank, build, anim, tags,
-                        duration, prefabname_light,
-                        client_fn, server_fn)
-    return GaleEntity.CreateNormalInventoryItem({
+-- local function MakeLamp(prefabname,
+--                         bank, build, anim, tags,
+--                         duration, prefabname_light,
+--                         client_fn, server_fn)
+--     return GaleEntity.CreateNormalInventoryItem({
+--         prefabname = prefabname,
+--         assets = assets,
+
+--         bank = bank,
+--         build = build,
+--         anim = anim,
+
+--         inventoryitem_data = {
+--             use_gale_item_desc = true,
+--         },
+
+--         clientfn = function(inst)
+--             inst.entity:AddDynamicShadow()
+--             inst.DynamicShadow:SetSize(1.3, 0.9)
+
+--             for _, tag in pairs(tags or {}) do
+--                 inst:AddTag(tag)
+--             end
+
+--             inst.AnimState:SetSymbolMultColour("light", 0, 0, 0, 0)
+
+--             if client_fn then
+--                 client_fn(inst)
+--             end
+--         end,
+
+--         serverfn = function(inst)
+--             inst.prefabname_light = prefabname_light
+
+--             inst:AddComponent("fueled")
+--             inst.components.fueled:InitializeFuelLevel(duration)
+--             inst.components.fueled:SetDepletedFn(function()
+--                 inst.SoundEmitter:PlaySound("gale_sfx/lamp/p1_lamp_switch")
+--             end)
+--             inst.components.fueled:SetSections(6)
+--             inst.components.fueled.accepting = false
+
+--             inst:AddComponent("container")
+--             inst.components.container:WidgetSetup(prefabname, containers.params[prefabname])
+--             inst.components.container.onopenfn = onopen
+--             inst.components.container.onclosefn = onclose
+--             -- inst.components.container.skipclosesnd = true
+--             -- inst.components.container.skipopensnd = true
+
+--             inst:ListenForEvent("percentusedchange", OnPercentUsedChange)
+
+--             inst:DoTaskInTime(FRAMES, function()
+--                 if inst.components.fueled:GetPercent() > 0 then
+--                     inst.components.fueled:DoDelta(0)
+--                 end
+--             end)
+
+--             inst:ListenForEvent("onputininventory", UpdateLightOwner)
+--             inst:ListenForEvent("ondropped", UpdateLightOwner)
+
+--             if server_fn then
+--                 server_fn(inst)
+--             end
+--         end,
+--     })
+-- end
+
+-- local function MakeLampLight(prefabname, levels)
+--     return GaleEntity.CreateNormalFx({
+--         -- gale_lamp_light only afford Light,it dosen't have a anim
+--         prefabname = prefabname,
+--         assets = assets,
+
+--         bank = "gale_lamp",
+--         build = "gale_lamp",
+--         anim = "fire",
+
+--         persists = true,
+--         animover_remove = false,
+
+--         clientfn = function(inst)
+--             inst.AnimState:HideSymbol("light")
+--         end,
+
+--         serverfn = function(inst)
+--             inst:AddComponent("firefx")
+--             inst.components.firefx.levels = levels
+--             inst.components.firefx.usedayparamforsound = false
+--             inst.components.firefx.playignitesound = false
+--             inst.components.firefx:SetLevel(1)
+--         end,
+--     })
+-- end
+
+local function MakeLampAndLight(prefabname,
+                                bank, build, anim, tags,
+                                duration,
+                                client_fn, server_fn,
+                                prefabname_light, levels_light)
+    local result_lamp = GaleEntity.CreateNormalInventoryItem({
         prefabname = prefabname,
         assets = assets,
 
@@ -214,7 +322,7 @@ local function MakeLamp(prefabname,
             inst.components.fueled:SetDepletedFn(function()
                 inst.SoundEmitter:PlaySound("gale_sfx/lamp/p1_lamp_switch")
             end)
-            inst.components.fueled:SetSections(6)
+            inst.components.fueled:SetSections(#levels_light)
             inst.components.fueled.accepting = false
 
             inst:AddComponent("container")
@@ -240,12 +348,10 @@ local function MakeLamp(prefabname,
             end
         end,
     })
-end
 
-local function MakeLampLight(prefabname, levels)
-    return GaleEntity.CreateNormalFx({
+    local result_light = GaleEntity.CreateNormalFx({
         -- gale_lamp_light only afford Light,it dosen't have a anim
-        prefabname = prefabname,
+        prefabname = prefabname_light,
         assets = assets,
 
         bank = "gale_lamp",
@@ -261,19 +367,63 @@ local function MakeLampLight(prefabname, levels)
 
         serverfn = function(inst)
             inst:AddComponent("firefx")
-            inst.components.firefx.levels = levels
+            inst.components.firefx.levels = levels_light
             inst.components.firefx.usedayparamforsound = false
             inst.components.firefx.playignitesound = false
             inst.components.firefx:SetLevel(1)
         end,
     })
+
+    return result_lamp, result_light
 end
 
+-- return
+--     MakeLamp("gale_lamp", "gale_lamp", "gale_lamp", "idle_2_off", { "glitch_on_wet" }, TUNING.TOTAL_DAY_TIME * 0.33,
+--         "gale_lamp_light"),
+--     MakeLamp("gale_lamp_lv2", "gale_lamp_lv2", "gale_lamp_lv2", "idle_2_off", nil, TUNING.TOTAL_DAY_TIME,
+--         "gale_lamp_light_lv2"),
+--     MakeLampLight("gale_lamp_light", firelevels),
+--     MakeLampLight("gale_lamp_light_lv2", firelevels_advance)
 
-return
-    MakeLamp("gale_lamp", "gale_lamp", "gale_lamp", "idle_2_off", { "glitch_on_wet" }, TUNING.TOTAL_DAY_TIME * 0.33,
-        "gale_lamp_light"),
-    MakeLamp("gale_lamp_lv2", "gale_lamp_lv2", "gale_lamp_lv2", "idle_2_off", nil, TUNING.TOTAL_DAY_TIME,
-        "gale_lamp_light_lv2"),
-    MakeLampLight("gale_lamp_light", firelevels),
-    MakeLampLight("gale_lamp_light_lv2", firelevels_advance)
+local generate_data = {
+    {
+        prefabname = "gale_lamp",
+        bank = "gale_lamp",
+        build = "gale_lamp",
+        anim = "idle_2_off",
+        tags = { "glitch_on_wet" },
+        duration = TUNING.TOTAL_DAY_TIME * 0.5,
+        prefabname_light = "gale_lamp_light",
+        levels_light = firelevels,
+    },
+    {
+        prefabname = "gale_lamp_lv2",
+        bank = "gale_lamp_lv2",
+        build = "gale_lamp_lv2",
+        anim = "idle_2_off",
+        -- tags = {},
+        duration = TUNING.TOTAL_DAY_TIME,
+        prefabname_light = "gale_lamp_light_lv2",
+        levels_light = firelevels_advance,
+    },
+}
+
+local rets = {}
+for _, data in pairs(generate_data) do
+    local result_lamp, result_light = MakeLampAndLight(
+        data.prefabname,
+        data.bank,
+        data.build,
+        data.anim,
+        data.tags,
+        data.duration,
+        data.client_fn,
+        data.server_fn,
+        data.prefabname_light,
+        data.levels_light)
+
+    table.insert(rets, result_lamp)
+    table.insert(rets, result_light)
+end
+
+return unpack(rets)
