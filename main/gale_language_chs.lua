@@ -714,6 +714,9 @@ STRINGS.GALE_ITEM_DESC.ATHETOS_AMULET_BERSERKER_BROKEN              = {
 	COMPLEX = "讨伐梦魇疯猪时获得的金属大戒指。\n因为已经损坏，所以不知道有什么功能。\n表面上有着大量回路和鲜红色的纹样。\n也许你能修好它？",
 }
 
+STRINGS.NAMES.ATHETOS_SANDBAG                                       = "沙袋"
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.ATHETOS_SANDBAG                 = "一袋沙子。"
+
 -- Foods are below...
 
 

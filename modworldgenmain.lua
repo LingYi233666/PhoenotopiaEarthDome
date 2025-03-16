@@ -33,6 +33,8 @@ GaleAddStaticLayout("athetos_employee_carpet_camp", "layouts/athetos_employee_ca
 GaleAddStaticLayout("athetos_mushroom_farm", "layouts/athetos_mushroom_farm", {
 	[5] = WORLD_TILES.DECIDUOUS,
 })
+GaleAddStaticLayout("athetos_sandbag_fort", "layouts/athetos_sandbag_fort")
+GaleAddStaticLayout("athetos_abandoned_portal_station", "layouts/athetos_abandoned_portal_station")
 
 
 local functioned_static_layouts = {
@@ -522,12 +524,13 @@ AddTaskSetPreInit("default", function(taskset)
 	taskset.set_pieces["AthetosStaffBoon_Scientist"] = { count = 8, tasks = tasks_for_typhoon }
 
 	-- Blueprint
-	taskset.set_pieces["Athetos_Employee_Camp_Fertilizer_Process"] = { count = 2, tasks = tasks_common }
-	taskset.set_pieces["Athetos_Employee_Camp_Mushroom"] = { count = 2, tasks = tasks_common }
-	taskset.set_pieces["Athetos_Employee_Camp_Neuromod_Process"] = { count = 2, tasks = tasks_common }
-	taskset.set_pieces["athetos_employee_carpet_camp"] = { count = 2, tasks = tasks_common }
+	-- taskset.set_pieces["Athetos_Employee_Camp_Fertilizer_Process"] = { count = 2, tasks = tasks_common }
+	-- taskset.set_pieces["Athetos_Employee_Camp_Mushroom"] = { count = 2, tasks = tasks_common }
+	taskset.set_pieces["Athetos_Employee_Camp_Neuromod_Process"] = { count = 1, tasks = tasks_common }
+	taskset.set_pieces["athetos_employee_carpet_camp"] = { count = 1, tasks = tasks_common }
 	taskset.set_pieces["athetos_mushroom_farm"] = { count = 1, tasks = tasks_common }
-
+	taskset.set_pieces["athetos_sandbag_fort"] = { count = 1, tasks = tasks_for_typhoon }
+	taskset.set_pieces["athetos_abandoned_portal_station"] = { count = 1, tasks = tasks_common }
 
 	-- taskset.set_pieces["Athetos_Employee_Camp_Fertilizer_Process"] = { count = 2, tasks = tasks_common }
 end)

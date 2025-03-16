@@ -33,6 +33,12 @@ local GaleControlKeyHelper = Class(function(self, inst)
             local pos = TheInput:GetWorldPosition()
             local target = TheInput:GetWorldEntityUnderMouse()
 
+            if target then
+                if target:HasTag("NOCLICK") or target:HasTag("boat") then
+                    target = nil
+                end
+            end
+
             self.mouse_pos_client = pos
             self.mouse_target_client = target
 
@@ -75,9 +81,9 @@ end
 
 function GaleControlKeyHelper:GetDebugString()
     return string.format("Direct:%s Mouse:%s Entity:%s",
-                         tostring(self:GetMovingDirectVector()),
-                         tostring(self:GetMousePosition()),
-                         tostring(self:GetEntityUnderMouse()))
+        tostring(self:GetMovingDirectVector()),
+        tostring(self:GetMousePosition()),
+        tostring(self:GetEntityUnderMouse()))
 end
 
 return GaleControlKeyHelper

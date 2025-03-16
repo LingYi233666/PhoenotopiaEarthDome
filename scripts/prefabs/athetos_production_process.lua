@@ -132,7 +132,7 @@ local prefabs = {
     CreateProductionProcess(),
 }
 local force_include_recipes = {
-
+    "gale_fran_door_item",
 }
 local force_exclude_recipes = {
     "athetos_amulet_berserker_fixed", "athetos_amulet_berserker"

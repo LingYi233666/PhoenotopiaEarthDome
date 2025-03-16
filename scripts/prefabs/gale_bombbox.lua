@@ -167,15 +167,9 @@ local function DoExplode(source, attacker, eater)
                 end
                 v.components.combat:GetAttacked(attacker, basedamage * multi)
                 v:PushEvent("knockback", { knocker = explo, radius = GetRandomMinMax(1.2, 1.4) + v:GetPhysicsRadius(.5) })
-            elseif v.components.inventoryitem then
-                if v.Physics then
-                    GaleCommon.LaunchItem(v, source, 5)
-                end
             elseif v.components.workable ~= nil
                 and v.components.workable:CanBeWorked()
                 and v.components.workable.action ~= ACTIONS.NET then
-                -- SpawnPrefab("collapse_small",v)
-
                 v.components.workable:WorkedBy(attacker, 11)
             end
         end,
@@ -183,9 +177,23 @@ local function DoExplode(source, attacker, eater)
             local is_combat = v.components.combat and v.components.health and not v.components.health:IsDead()
                 and not (v.sg and v.sg:HasStateTag("dead"))
                 and not v:HasTag("playerghost")
-            local is_inventory = v.components.inventoryitem
             return v and v:IsValid()
-                and (is_combat or is_inventory or v.components.workable)
+                and (is_combat or v.components.workable)
+        end
+    )
+
+    GaleCommon.AoeForEach(
+        attacker,
+        source:GetPosition(),
+        2.8,
+        nil,
+        { "INLIMBO" },
+        nil,
+        function(attacker, v)
+            GaleCommon.LaunchItem(v, source, 5)
+        end,
+        function(inst, v)
+            return v and v:IsValid() and v.Physics and v.components.inventoryitem
         end
     )
 

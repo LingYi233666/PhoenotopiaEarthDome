@@ -5,76 +5,103 @@ local assets =
 
 local anims =
 {
-    { threshold = 0,    anim = "rubble" },
-    { threshold = 0.4,  anim = "heavy_damage" },
-    { threshold = 0.5,  anim = "half" },
-    { threshold = 0.99, anim = "light_damage" },
-    { threshold = 1,    anim = { "full", "full", "full" } },
+    -- { threshold = 0,    anim = "rubble" },
+    -- { threshold = 0.4,  anim = "heavy_damage" },
+    -- { threshold = 0.5,  anim = "half" },
+    -- { threshold = 0.99, anim = "light_damage" },
+    -- -- { threshold = 1,    anim = { "full", "full", "full" } },
+    -- { threshold = 1,    anim = "full" },
+
+
+
+    { threshold = 0,   anim = "rubble" },
+    { threshold = 0.4, anim = "heavy_damage" },
+    { threshold = 0.6, anim = "half" },
+    { threshold = 0.8, anim = "light_damage" },
+    { threshold = 1,   anim = "full" },
 }
 
 
-local function resolveanimtoplay(inst, percent)
+-- local function ResolveAnimToPlay(inst, percent)
+--     for i, v in ipairs(anims) do
+--         if percent <= v.threshold then
+--             if type(v.anim) == "table" then
+--                 -- get a stable animation, by basing it on world position
+--                 local x, y, z = inst.Transform:GetWorldPosition()
+--                 local x = math.floor(x)
+--                 local z = math.floor(z)
+--                 local q1 = #v.anim + 1
+--                 local q2 = #v.anim + 4
+--                 local t = (((x % q1) * (x + 3) % q2) + ((z % q1) * (z + 3) % q2)) % #v.anim + 1
+--                 return v.anim[t]
+--             else
+--                 return v.anim
+--             end
+--         end
+--     end
+-- end
+
+
+local function ResolveAnimToPlay(inst, percent)
     for i, v in ipairs(anims) do
         if percent <= v.threshold then
-            if type(v.anim) == "table" then
-                -- get a stable animation, by basing it on world position
-                local x, y, z = inst.Transform:GetWorldPosition()
-                local x = math.floor(x)
-                local z = math.floor(z)
-                local q1 = #v.anim + 1
-                local q2 = #v.anim + 4
-                local t = (((x % q1) * (x + 3) % q2) + ((z % q1) * (z + 3) % q2)) % #v.anim + 1
-                return v.anim[t]
-            else
-                return v.anim
-            end
+            return v.anim
         end
     end
 end
 
+local function MakeSandBagObstacle(inst)
+    if not inst.Physics then
+        inst.entity:AddPhysics()
+    end
 
-
-local function makeobstacle(inst)
+    inst.Physics:SetMass(0) --Bullet wants 0 mass for static objects
     inst.Physics:SetCollisionGroup(COLLISION.OBSTACLES)
     inst.Physics:ClearCollisionMask()
-    --inst.Physics:CollidesWith(GetWorldCollision())
-    inst.Physics:SetMass(0)
     inst.Physics:CollidesWith(COLLISION.ITEMS)
     inst.Physics:CollidesWith(COLLISION.CHARACTERS)
-    inst.Physics:CollidesWith(COLLISION.WAVES)
-    inst.Physics:CollidesWith(COLLISION.INTWALL)
-    inst.Physics:SetActive(true)
+    inst.Physics:CollidesWith(COLLISION.GIANTS)
+    inst.Physics:SetCapsule(1, 2)
 
-    local ground = GetWorld()
-    if ground then
-        local pt = Point(inst.Transform:GetWorldPosition())
-        ground.Pathfinder:AddWall(pt.x + 0.5, pt.y, pt.z + 0.5)
-        ground.Pathfinder:AddWall(pt.x + 0.5, pt.y, pt.z - 0.5)
-        ground.Pathfinder:AddWall(pt.x - 0.5, pt.y, pt.z + 0.5)
-        ground.Pathfinder:AddWall(pt.x - 0.5, pt.y, pt.z - 0.5)
-        ground:PushEvent("floodblockercreated", { blocker = inst })
-    end
+    local x, y, z = inst.Transform:GetWorldPosition()
+    TheWorld.Pathfinder:AddWall(x + 0.5, y, z + 0.5)
+    TheWorld.Pathfinder:AddWall(x + 0.5, y, z - 0.5)
+    TheWorld.Pathfinder:AddWall(x - 0.5, y, z + 0.5)
+    TheWorld.Pathfinder:AddWall(x - 0.5, y, z - 0.5)
 end
 
 
-local function clearobstacle(inst)
-    inst:DoTaskInTime(2 * FRAMES, function() inst.Physics:SetActive(false) end)
+local function ClearSandBagObstacle(inst)
+    if not inst.Physics then
+        inst.entity:AddPhysics()
+    end
 
-    local ground = GetWorld()
-    if ground then
-        local pt = Point(inst.Transform:GetWorldPosition())
-        ground.Pathfinder:RemoveWall(pt.x + 0.5, pt.y, pt.z + 0.5)
-        ground.Pathfinder:RemoveWall(pt.x + 0.5, pt.y, pt.z - 0.5)
-        ground.Pathfinder:RemoveWall(pt.x - 0.5, pt.y, pt.z + 0.5)
-        ground.Pathfinder:RemoveWall(pt.x - 0.5, pt.y, pt.z - 0.5)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.WORLD)
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    TheWorld.Pathfinder:RemoveWall(x + 0.5, y, z + 0.5)
+    TheWorld.Pathfinder:RemoveWall(x + 0.5, y, z - 0.5)
+    TheWorld.Pathfinder:RemoveWall(x - 0.5, y, z + 0.5)
+    TheWorld.Pathfinder:RemoveWall(x - 0.5, y, z - 0.5)
+end
+
+local function OnObstacleDirty(inst)
+    local val = inst._use_obstacle:value()
+    print(inst, "OnObstacleDirty", val)
+    if val then
+        MakeSandBagObstacle(inst)
+    else
+        ClearSandBagObstacle(inst)
     end
 end
 
-local function onhammered(inst, worker)
+local function OnHammered(inst, worker)
     local max_loots = 2
     local num_loots = math.max(1, math.floor(max_loots * inst.components.health:GetPercent()))
     for k = 1, num_loots do
-        inst.components.lootdropper:SpawnLootPrefab("sand")
+        -- inst.components.lootdropper:SpawnLootPrefab("sand")
+        inst.components.lootdropper:SpawnLootPrefab("turf_desertdirt")
     end
 
     SpawnPrefab("collapse_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
@@ -82,39 +109,36 @@ local function onhammered(inst, worker)
     inst:Remove()
 end
 
-local function onhealthchange(inst, old_percent, new_percent)
-    if old_percent <= 0 and new_percent > 0 then
-        makeobstacle(inst)
+local function OnHealthDelta(inst, data)
+    if data.oldpercent <= 0 and data.newpercent > 0 then
+        inst._use_obstacle:set(true)
     end
-    if old_percent > 0 and new_percent <= 0 then
-        clearobstacle(inst)
+    if data.oldpercent > 0 and data.newpercent <= 0 then
+        inst._use_obstacle:set(false)
     end
 
-    local anim_to_play = resolveanimtoplay(inst, new_percent)
+    local anim_to_play = ResolveAnimToPlay(inst, data.newpercent)
     inst.AnimState:PlayAnimation(anim_to_play)
 end
 
-local function onhit(inst)
-    inst.SoundEmitter:PlaySound("dontstarve_DLC002/common/sandbag")
-
-    local healthpercent = inst.components.health:GetPercent()
-    local anim_to_play = resolveanimtoplay(inst, healthpercent)
-    inst.AnimState:PlayAnimation(anim_to_play)
+local function OnWork(inst)
+    -- inst.SoundEmitter:PlaySound("dontstarve_DLC002/common/sandbag")
+    local percent = inst.components.health:GetPercent()
+    inst.AnimState:PlayAnimation(ResolveAnimToPlay(inst, percent))
 end
 
 local function onrepaired(inst)
     inst.SoundEmitter:PlaySound("dontstarve_DLC002/common/sandbag")
-    makeobstacle(inst)
+    -- inst._use_obstacle:set(true)
 end
 
-local function onremoveentity(inst)
-    clearobstacle(inst)
+local function OnRemove(inst)
+    inst._use_obstacle:set(false)
 end
 
-local function onload(inst, data)
-    makeobstacle(inst)
+local function OnLoad(inst, data)
     if inst.components.health:GetPercent() <= 0 then
-        clearobstacle(inst)
+        inst._use_obstacle:set(false)
     end
 end
 
@@ -128,15 +152,22 @@ local function fn()
 
     inst.Transform:SetEightFaced()
 
-    MakeObstaclePhysics(inst, 1)
+    MakeSandBagObstacle(inst)
 
     inst:AddTag("sandbag")
     inst:AddTag("wall")
     inst:AddTag("noauradamage")
+    inst:AddTag("blocker")
 
     inst.AnimState:SetBank("sandbag_small")
     inst.AnimState:SetBuild("sandbag_small")
     inst.AnimState:PlayAnimation("full", false)
+
+
+    inst._use_obstacle = net_bool(inst.GUID, "inst._use_obstacle", "use_obstacle_dirty")
+    inst._use_obstacle:set(true)
+    -- Handled by client and server
+    inst:ListenForEvent("use_obstacle_dirty", OnObstacleDirty)
 
     inst.entity:SetPristine()
 
@@ -144,33 +175,31 @@ local function fn()
         return inst
     end
 
+    inst.OnLoad = OnLoad
 
     inst:AddComponent("inspectable")
 
     inst:AddComponent("lootdropper")
 
-    inst:AddComponent("repairable")
-    inst.components.repairable.repairmaterial = "sandbagsmall"
-    inst.components.repairable.onrepaired = onrepaired
+    -- inst:AddComponent("repairable")
+    -- inst.components.repairable.repairmaterial = "sandbagsmall"
+    -- inst.components.repairable.onrepaired = onrepaired
 
     inst:AddComponent("combat")
-    inst.components.combat.onhitfn = onhit
 
     inst:AddComponent("health")
-    inst.components.health:SetMaxHealth(TUNING.SANDBAG_HEALTH)
-    inst.components.health.currenthealth = TUNING.SANDBAG_HEALTH
-    inst.components.health.ondelta = onhealthchange
+    inst.components.health:SetMaxHealth(200)
     inst.components.health.nofadeout = true
     inst.components.health.canheal = false
 
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(3)
-    inst.components.workable:SetOnFinishCallback(onhammered)
-    inst.components.workable:SetOnWorkCallback(onhit)
+    inst.components.workable:SetOnFinishCallback(OnHammered)
+    inst.components.workable:SetOnWorkCallback(OnWork)
 
-    inst.OnLoad = onload
-    inst.OnRemoveEntity = onremoveentity
+    inst:ListenForEvent("onremove", OnRemove)
+    inst:ListenForEvent("healthdelta", OnHealthDelta)
 
     return inst
 end
