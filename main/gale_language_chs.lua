@@ -1427,7 +1427,7 @@ STRINGS.GALE_UI.SKILL_LOCK_STATUS = {
 STRINGS.GALE_UI.SKILL_TREE = {
 	SURVIVAL = {
 		NAME = "生存",
-		DESC = "提高身体素质，学习求生知识，利用撬棍解决问题。",
+		DESC = "提高身体素质，学习求生知识，利用棍子解决问题。",
 	},
 	SCIENCE = {
 		NAME = "科学",
@@ -1514,7 +1514,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	HARPY_WHIRL = {
 		NAME = "回旋强风",
-		DESC = "手持撬棍，在蓄力姿态中完成蓄力时，\n再使用滑铲技能会在目标点打出强劲的回旋攻击。",
+		DESC = "手持盖尔的棍棒武器，在蓄力姿态中完成蓄力时，\n再使用滑铲技能会在目标点打出强劲的回旋攻击。",
 	},
 
 	SPEAR_FRAGMENT = {
@@ -1529,7 +1529,7 @@ STRINGS.GALE_UI.SKILL_NODES = {
 
 	COMBAT_LEAP = {
 		NAME = "跳跃攻击",
-		DESC = "进行跳跃攻击，造成小范围伤害。能在装备撬棍、锤类、斧类、镐类武器时使用。",
+		DESC = "进行跳跃攻击，造成小范围伤害。能在装备棍棒、锤类、斧类、镐类武器时使用。",
 	},
 
 	MULTITHRUST = {

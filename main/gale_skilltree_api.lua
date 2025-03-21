@@ -267,7 +267,7 @@ GLOBAL.GALE_SKILL_NODES = {
 
                     local weapon = inst.components.combat:GetWeapon()
                     local should_circle = weapon
-                        and weapon.prefab == "gale_crowbar"
+                        and weapon:HasTag("gale_bat")
                         and inst.components.gale_skiller
                         and inst.components.gale_skiller:IsLearned("harpy_whirl")
                         and inst.sg:HasStateTag("charging_attack_pre")

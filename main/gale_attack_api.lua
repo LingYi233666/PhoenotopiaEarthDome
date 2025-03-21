@@ -34,7 +34,7 @@ local function ServerGetChargeSG(inst)
 
     if CanUseCharge(inst) then
         local weapon = inst.components.combat:GetWeapon()
-        if weapon:HasTag("gale_crowbar") then
+        if weapon:HasTag("gale_bat") then
             return "gale_charging_attack_pre"
         elseif weapon.prefab == "gale_bombbox" then
             if weapon:HasTag("out_of_bomb") then
@@ -61,7 +61,7 @@ local function ClientGetChargeSG(inst)
 
     if CanUseCharge(inst) then
         local weapon = inst.replica.combat:GetWeapon()
-        if weapon:HasTag("gale_crowbar") then
+        if weapon:HasTag("gale_bat") then
             return "gale_charging_attack_pre"
         elseif weapon.prefab == "gale_bombbox" then
             if weapon:HasTag("out_of_bomb") then
@@ -200,15 +200,17 @@ local function ServerGetAttackSG(inst, action)
             end
         end
 
-        if weapon:HasTag("gale_crowbar") then
-            if inst:HasTag("galeatk_lunge") then
-                return "galeatk_lunge"
-            elseif inst:HasTag("galeatk_multithrust") then
-                return "galeatk_multithrust"
-            elseif inst:HasTag("galeatk_leap") then
-                return "galeatk_leap"
-            end
-        elseif weapon:HasTag("gale_blaster") then
+        -- if weapon:HasTag("gale_crowbar") then
+        --     if inst:HasTag("galeatk_lunge") then
+        --         return "galeatk_lunge"
+        --     elseif inst:HasTag("galeatk_multithrust") then
+        --         return "galeatk_multithrust"
+        --     elseif inst:HasTag("galeatk_leap") then
+        --         return "galeatk_leap"
+        --     end
+        -- else
+
+        if weapon:HasTag("gale_blaster") then
             if weapon:HasTag("gale_blaster_jammed") or
                 weapon:HasTag("gale_blaster_out_of_ammo") then
                 return
@@ -247,15 +249,17 @@ local function ClientGetAttackSG(inst, action)
             end
         end
 
-        if weapon:HasTag("gale_crowbar") then
-            if inst:HasTag("galeatk_lunge") then
-                return "galeatk_lunge"
-            elseif inst:HasTag("galeatk_multithrust") then
-                return "galeatk_multithrust"
-            elseif inst:HasTag("galeatk_leap") then
-                return "galeatk_leap"
-            end
-        elseif weapon:HasTag("gale_blaster") then
+        -- if weapon:HasTag("gale_crowbar") then
+        --     if inst:HasTag("galeatk_lunge") then
+        --         return "galeatk_lunge"
+        --     elseif inst:HasTag("galeatk_multithrust") then
+        --         return "galeatk_multithrust"
+        --     elseif inst:HasTag("galeatk_leap") then
+        --         return "galeatk_leap"
+        --     end
+        -- else
+
+        if weapon:HasTag("gale_blaster") then
             if weapon:HasTag("gale_blaster_jammed") or
                 weapon:HasTag("gale_blaster_out_of_ammo") then
                 return

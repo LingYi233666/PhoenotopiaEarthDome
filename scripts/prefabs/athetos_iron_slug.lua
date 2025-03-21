@@ -17,7 +17,8 @@ local function OnCollide(inst, other)
         and not inst.components.combat:IsAlly(other)
         and GetTime() - (inst.collide_targets[other] or 0) > 1
         and not inst.sg:HasStateTag("fall")
-        and not other:HasTag("wall") then
+        and not other:HasTag("wall")
+        and not other:HasTag("flying") then
         local myvel = Vector3(inst.Physics:GetVelocity())
         local othervel = other.Physics and Vector3(other.Physics:GetVelocity()) or Vector3(0, 0, 0)
         local deltavel = othervel - myvel
@@ -29,7 +30,7 @@ local function OnCollide(inst, other)
 
         local min_speed = 0.25
         if toward_sub >= min_speed then
-            local damage_mult = Remap(math.clamp(toward_sub, 6, 20), 6, 20, 1, 10)
+            local damage_mult = Remap(math.clamp(toward_sub, 6, 20), 6, 20, 1, 5)
 
             inst.components.combat.ignorehitrange = true
             inst.components.combat:DoAttack(other, nil, nil, nil, damage_mult)
@@ -155,26 +156,29 @@ local function SteamAndFertilize(inst, workpos)
     local fxs = {}
 
 
-    local pos            = inst:GetPosition()
-    workpos              = workpos or pos
+    local pos = inst:GetPosition()
+    workpos   = workpos or pos
+
 
     local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(workpos:Get())
     local is_farm_soil   = TheWorld.Map:IsFarmableSoilAtPoint(workpos.x, workpos.y, workpos.z)
 
-    local steam_count    = math.random(2, 4)
-    local pos_preset     = {
+
+    local steam_count = math.random(2, 4)
+    local pos_preset  = {
         Vector3(30, -47),
         Vector3(92, -52),
         Vector3(-24, -47),
         Vector3(-83, -52),
     }
 
-    local add_value      = 4
 
+    -- local add_value      = 4
+    local add_value = 6
 
-    local add_steam_fn      = function(inst, fx)
+    local function add_steam_fn(inst, fx)
         if is_farm_soil then
-            TheWorld.components.farming_manager:AddSoilMoistureAtPoint(workpos.x, workpos.y, workpos.z, 4)
+            TheWorld.components.farming_manager:AddSoilMoistureAtPoint(workpos.x, workpos.y, workpos.z, add_value)
         end
 
         if fx then
@@ -182,28 +186,28 @@ local function SteamAndFertilize(inst, workpos)
         end
     end
 
-    local add_nutrient_1_fn = function(inst, fx)
+    local function add_nutrient_1_fn(inst, fx)
         TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, add_value, 0, 0)
         if fx then
             fx._color_index:set(2)
         end
     end
 
-    local add_nutrient_2_fn = function(inst, fx)
+    local function add_nutrient_2_fn(inst, fx)
         TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 0, add_value, 0)
         if fx then
             fx._color_index:set(3)
         end
     end
 
-    local add_nutrient_3_fn = function(inst, fx)
+    local function add_nutrient_3_fn(inst, fx)
         TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 0, 0, add_value)
         if fx then
             fx._color_index:set(4)
         end
     end
 
-    local effects           = {
+    local effects = {
         add_steam_fn,
     }
 

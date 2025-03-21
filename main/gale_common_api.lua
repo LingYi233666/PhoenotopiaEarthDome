@@ -16,6 +16,34 @@ AddPrefabPostInit("mushroom_farm", function(inst)
     inst.components.trader:SetAbleToAcceptTest(accepttest)
 end)
 
+
+-- function self:SetRegrowthForType(prefab, regrowtime, product, timemult)
+--     _regrowthvalues[prefab] = {regrowtime=regrowtime, product=product, timemult=timemult}
+--     _internaltimes[prefab] = 0
+-- end
+
+AddPrefabPostInit("world", function(inst)
+    --
+
+    if not TheWorld.ismastersim then
+        return
+    end
+
+    if inst.components.regrowthmanager then
+        inst.components.regrowthmanager:SetRegrowthForType(
+            "gale_duri_flower",
+            -- TUNING.FLOWER_REGROWTH_TIME,
+            10,
+            "gale_duri_flower",
+            function()
+                -- Flowers grow during the day, during not winter, while the ground is still wet after a rain.
+                return ((TheWorld.state.israining or TheWorld.state.isnight or TheWorld.state.iswinter or TheWorld.state.wetness <= 1 or TheWorld.state.snowlevel > 0) and 0)
+                    or (TheWorld.state.isspring and 2 * TUNING.FLOWER_REGROWTH_TIME_MULT) -- double speed in spring
+                    or TUNING.FLOWER_REGROWTH_TIME_MULT
+            end)
+    end
+end)
+
 -- 囊状体攻击动作
 AddAction("TYPHON_CYSTOID_ATTACK", "TYPHON_CYSTOID_ATTACK", function(act)
     if act.target and act.target:IsValid() then
@@ -99,6 +127,3 @@ end))
 
 AddIngredientValues({ "gale_duri_flower_petal" }, { veggie = 0.5 })
 AddIngredientValues({ "athetos_mushroom_cap" }, { veggie = 0.5 })
-
-
- 

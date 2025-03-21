@@ -74,34 +74,34 @@ local function OnNewSpawn(inst)
 	inst.sg:GoToState("gale_newspawn_sleeping")
 end
 
-local AtkTags = {
-	-- galeatk_lunge = 0.5,
-	galeatk_leap = 0.4,
-	galeatk_multithrust = 0.3,
-	galeatk_none = 1.0,
-}
+-- local AtkTags = {
+-- 	-- galeatk_lunge = 0.5,
+-- 	galeatk_leap = 0.4,
+-- 	galeatk_multithrust = 0.3,
+-- 	galeatk_none = 1.0,
+-- }
 
-local function RemoveAllAtkTags(player)
-	for k, v in pairs(AtkTags) do
-		player:RemoveTag(k)
-	end
-end
+-- local function RemoveAllAtkTags(player)
+-- 	for k, v in pairs(AtkTags) do
+-- 		player:RemoveTag(k)
+-- 	end
+-- end
 
-local function AddRandomAtkTag(player)
-	RemoveAllAtkTags(player)
+-- local function AddRandomAtkTag(player)
+-- 	RemoveAllAtkTags(player)
 
-	if player:HasTag("attack") and not player:HasTag("gale_skill_carry_charge_trigger") then
-		local weapon = player.components.combat:GetWeapon()
-		if weapon and weapon:HasTag("gale_crowbar") then
-			local tag = weighted_random_choice(AtkTags)
-			if tag ~= "galeatk_none" then
-				-- print("Configure gale atk tag to",tag)
-				player.last_atk_tag = tag
-				player:AddTag(tag)
-			end
-		end
-	end
-end
+-- 	if player:HasTag("attack") and not player:HasTag("gale_skill_carry_charge_trigger") then
+-- 		local weapon = player.components.combat:GetWeapon()
+-- 		if weapon and weapon:HasTag("gale_crowbar") then
+-- 			local tag = weighted_random_choice(AtkTags)
+-- 			if tag ~= "galeatk_none" then
+-- 				-- print("Configure gale atk tag to",tag)
+-- 				player.last_atk_tag = tag
+-- 				player:AddTag(tag)
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 
 --这个函数将在服务器和客户端都会执行

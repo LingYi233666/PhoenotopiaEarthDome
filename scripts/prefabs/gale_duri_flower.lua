@@ -49,7 +49,7 @@ local function PetalOnHaunt(inst, haunter)
 
         local heart = SpawnAt("reviver", inst)
         heart.components.inventoryitem:InheritMoisture(inst.components.inventoryitem:GetMoisture(),
-                                                       inst.components.inventoryitem:IsWet())
+            inst.components.inventoryitem:IsWet())
         heart:PushEvent("spawnedfromhaunt", { haunter = haunter, oldPrefab = inst })
         inst:PushEvent("despawnedfromhaunt", { haunter = haunter, newPrefab = heart })
 
@@ -93,6 +93,7 @@ return GaleEntity.CreateNormalEntity({
 
             MakeSmallBurnable(inst)
             MakeSmallPropagator(inst)
+            AddToRegrowthManager(inst)
 
             inst:AddComponent("halloweenmoonmutable")
             inst.components.halloweenmoonmutable:SetPrefabMutated("moonbutterfly_sapling")

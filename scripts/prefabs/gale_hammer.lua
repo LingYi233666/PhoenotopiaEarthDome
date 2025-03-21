@@ -17,7 +17,7 @@ local assets = {
 }
 
 local function GetDamageFn(inst, attacker, target)
-    local basedamage = 49.5
+    local basedamage = 51
     local power_level = GaleCondition.GetConditionStacks(attacker, "condition_power")
 
     return basedamage * (1 + power_level * 0.10) / (1 + power_level * 0.05)
@@ -48,7 +48,7 @@ end
 return GaleEntity.CreateNormalWeapon({
     assets = assets,
     prefabname = "gale_hammer",
-    tags = { "gale_hammer", "gale_only_rmb_charge", "gale_parryweapon" },
+    tags = { "gale_bat", "gale_only_rmb_charge", "gale_parryweapon" },
 
 
     bank = "gale_hammer",

@@ -187,7 +187,7 @@ end
 return GaleEntity.CreateNormalWeapon({
         assets = assets,
         prefabname = "gale_crowbar",
-        tags = { "gale_crowbar", "gale_only_rmb_charge", "gale_parryweapon" },
+        tags = { "gale_bat", "gale_only_rmb_charge", "gale_parryweapon" },
 
 
         bank = "gale_crowbar",

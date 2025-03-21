@@ -100,7 +100,7 @@ end
 return GaleEntity.CreateNormalWeapon({
     assets = assets,
     prefabname = "gale_mace",
-    tags = { "gale_mace", "gale_only_rmb_charge", "gale_parryweapon" },
+    tags = { "gale_bat", "gale_only_rmb_charge", "gale_parryweapon" },
 
 
     bank = "gale_mace",
@@ -147,7 +147,7 @@ return GaleEntity.CreateNormalWeapon({
     },
 
     weapon_data = {
-        damage = 55,
+        damage = 34,
     },
 
     finiteuses_data = {
@@ -162,7 +162,7 @@ return GaleEntity.CreateNormalWeapon({
         inst.components.equippable.restrictedtag = "gale_weaponcharge"
 
         inst:AddComponent("planardamage")
-        inst.components.planardamage:SetBaseDamage(10)
+        inst.components.planardamage:SetBaseDamage(34)
 
         inst:AddComponent("gale_helmsplitter")
         inst.components.gale_helmsplitter:SetWhooshSound("gale_sfx/skill/divine_smite_whoosh")
