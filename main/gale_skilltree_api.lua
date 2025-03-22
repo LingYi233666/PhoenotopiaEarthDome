@@ -159,27 +159,41 @@ GLOBAL.GALE_SKILL_NODES = {
         ingredients = {
             Ingredient("athetos_mushroom_cap", 1, "images/inventoryimages/athetos_mushroom_cap.xml"),
         },
-        _on_owner_heal = function(inst, data)
-            local buffered_action = data.action
-            local action = buffered_action.action
+        -- _on_owner_heal = function(inst, data)
+        --     local buffered_action = data.action
+        --     local action = buffered_action.action
 
-            if action == ACTIONS.HEAL then
-                local target = buffered_action.target or buffered_action.doer
-                if target ~= nil and buffered_action.invobject ~= nil
-                    and target.components.health ~= nil
-                    and not (target.components.health:IsDead() or target:HasTag("playerghost")) then
-                    if buffered_action.invobject.components.healer ~= nil then
-                        target.components.health:DoDelta(buffered_action.invobject.components.healer.health / 2, false,
-                            buffered_action.invobject.prefab)
-                    end
-                end
-            end
-        end,
+        --     if action == ACTIONS.HEAL then
+        --         local target = buffered_action.target or buffered_action.doer
+        --         if target ~= nil and buffered_action.invobject ~= nil
+        --             and target.components.health ~= nil
+        --             and not (target.components.health:IsDead() or target:HasTag("playerghost")) then
+        --             if buffered_action.invobject.components.healer ~= nil then
+        --                 target.components.health:DoDelta(buffered_action.invobject.components.healer.health / 2, false,
+        --                     buffered_action.invobject.prefab)
+        --             end
+        --         end
+        --     end
+        -- end,
+        -- OnLearned = function(inst, is_load)
+        --     inst:ListenForEvent("performaction", GALE_SKILL_NODES.DOCTOR.data._on_owner_heal)
+        -- end,
+        -- OnForget = function(inst)
+        --     inst:RemoveEventCallback("performaction", GALE_SKILL_NODES.DOCTOR.data._on_owner_heal)
+        -- end,
+
         OnLearned = function(inst, is_load)
-            inst:ListenForEvent("performaction", GALE_SKILL_NODES.DOCTOR.data._on_owner_heal)
+            if inst.components.efficientuser == nil then
+                inst:AddComponent("efficientuser")
+            end
+
+            inst.components.efficientuser:AddMultiplier(ACTIONS.HEAL, 1.5, "gale_skill_doctor")
         end,
+
         OnForget = function(inst)
-            inst:RemoveEventCallback("performaction", GALE_SKILL_NODES.DOCTOR.data._on_owner_heal)
+            if inst.components.efficientuser ~= nil then
+                inst.components.efficientuser:RemoveMultiplier(ACTIONS.HEAL, "gale_skill_doctor")
+            end
         end,
     }),
     -- DISSECT = GaleNode({

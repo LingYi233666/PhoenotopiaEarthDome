@@ -1456,10 +1456,10 @@ STRINGS.GALE_UI.SKILL_NODES = {
 		NAME = "医学",
 		DESC = "增进医疗知识，\n使用治疗类物品时恢复的血量提高50%。",
 	},
-	DISSECT = {
-		NAME = "解刨",
-		DESC = "（未实装：解锁此技能暂无任何用处。）",
-	},
+	-- DISSECT = {
+	-- 	NAME = "解刨",
+	-- 	DESC = "（未实装：解锁此技能暂无任何用处。）",
+	-- },
 	BURGER_EATER = {
 		NAME = "代谢强化",
 		DESC = "提高盖尔的营养吸收能力。\n吃下的食物会促进新陈代谢，\n一段时间内持续恢复生命值。",
@@ -1478,14 +1478,14 @@ STRINGS.GALE_UI.SKILL_NODES = {
 		DESC = "按下技能按键即可向鼠标所指方向格挡，经典技能。",
 	},
 
-	ROLLING_BOMB = {
-		NAME = "临别赠礼",
-		DESC = "（未实装：解锁此技能暂无任何用处。）",
-	},
-	ROLLING_SMOKE = {
-		NAME = "烟雾弹",
-		DESC = "（未实装：解锁此技能暂无任何用处。）",
-	},
+	-- ROLLING_BOMB = {
+	-- 	NAME = "临别赠礼",
+	-- 	DESC = "（未实装：解锁此技能暂无任何用处。）",
+	-- },
+	-- ROLLING_SMOKE = {
+	-- 	NAME = "烟雾弹",
+	-- 	DESC = "（未实装：解锁此技能暂无任何用处。）",
+	-- },
 
 	ANATOMY = {
 		NAME = "解剖精通",
