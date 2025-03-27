@@ -199,9 +199,12 @@ local states = {
         timeline = {
             TimeEvent(15 * FRAMES, function(inst)
                 local bufferedaction = inst:GetBufferedAction()
-                local target = bufferedaction and bufferedaction.target
-                if target and target.components.stackable then
-                    inst:GetBufferedAction().target = target.components.stackable:Get()
+
+                if bufferedaction and bufferedaction:IsValid() then
+                    local target = bufferedaction and bufferedaction.target
+                    if target and target.components.stackable then
+                        inst:GetBufferedAction().target = target.components.stackable:Get()
+                    end
                 end
 
                 inst:PerformBufferedAction()
