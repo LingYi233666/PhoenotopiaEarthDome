@@ -29,26 +29,14 @@ local GaleSkillDarkVision = Class(function(self, inst)
         self.HUD_hover = nil
 
         inst:ListenForEvent("GaleSkillDarkVision._enable", function()
+            if not (ThePlayer and ThePlayer == self.inst) then
+                return
+            end
+
             if self:IsEnabled() then
-                inst.components.playervision:ForceNightVision(true)
-                inst.components.playervision:SetCustomCCTable(GHOSTVISION_COLOURCUBES)
-
-                -- if ThePlayer and ThePlayer == self.inst then
-                --     if self.HUD_hover == nil then
-                --         self.HUD_hover = ThePlayer.HUD.controls:AddChild(GaleDarkVisionHover(ThePlayer))
-                --     end
-                --     self.HUD_hover:Start()
-                -- end
+                inst.components.playervision:PushForcedNightVision(self.inst, -10, GHOSTVISION_COLOURCUBES)
             else
-                inst.components.playervision:ForceNightVision(false)
-                inst.components.playervision:SetCustomCCTable(nil)
-
-                -- if ThePlayer and ThePlayer == self.inst then
-                --     if self.HUD_hover then
-                --         self.HUD_hover:End()
-                --         self.HUD_hover = nil
-                --     end
-                -- end
+                inst.components.playervision:PopForcedNightVision(self.inst)
             end
         end)
     end
@@ -83,7 +71,11 @@ function GaleSkillDarkVision:Enable(enable)
     end
 
     self._enable:set(enable)
-    self.inst.components.playervision:ForceNightVision(enable)
+    if enable then
+        self.inst.components.playervision:PushForcedNightVision(self.inst, -10, GHOSTVISION_COLOURCUBES)
+    else
+        self.inst.components.playervision:PopForcedNightVision(self.inst)
+    end
 
     local DARK_VISION_GRUEIMMUNITY_NAME = "gale_dark_vision_nightvision"
     if enable then

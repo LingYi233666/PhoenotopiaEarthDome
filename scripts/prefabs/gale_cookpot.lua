@@ -63,7 +63,7 @@ local gale_cookpot =
             position = Vector3(0, -165, 0),
         }
     },
-    acceptsstacks = false,
+    acceptsstacks = true,
     type = "cooker",
 }
 

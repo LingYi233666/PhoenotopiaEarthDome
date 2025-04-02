@@ -1200,7 +1200,9 @@ table.insert(SERVER_SG, State {
             inst:ForceFacePoint(inst:GetPosition() + new_dir)
         end
 
-        -- inst.sg.statemem.hitted_targst
+        inst.Physics:SetMotorVel(inst.components.locomotor:GetRunSpeed(), 0, 0)
+
+
         local victims = GaleCommon.AoeDoAttack(inst, inst:GetPosition(),
             inst:GetPhysicsRadius(0) + 2,
             function(inst, other)
@@ -1216,21 +1218,19 @@ table.insert(SERVER_SG, State {
 
                 return weapon, projectile, stimuli, instancemult, ignorehitrange
             end, function(inst, other)
-                return inst.components.combat and
-                    inst.components.combat:CanTarget(other) and
-                    not inst.components.combat:IsAlly(other) and
-                    (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) >
-                        0.1)
+                return inst.sg.statemem
+                    and inst.sg.statemem.hitted_targst
+                    and (GetTime() - (inst.sg.statemem.hitted_targst[other] or 0) > 0.1)
+                    and inst.components.combat
+                    and inst.components.combat:CanTarget(other)
+                    and not inst.components.combat:IsAlly(other)
             end)
 
-        for k, v in pairs(victims) do
-            inst.sg.statemem.hitted_targst[v] = GetTime()
+        if inst.sg.statemem.hitted_targst then
+            for k, v in pairs(victims) do
+                inst.sg.statemem.hitted_targst[v] = GetTime()
+            end
         end
-        -- if dir ~= nil then
-        --     inst:ForceFacePoint(inst:GetPosition() + dir)
-        -- end
-
-        inst.Physics:SetMotorVel(inst.components.locomotor:GetRunSpeed(), 0, 0)
     end,
 
     ontimeout = function(inst)
@@ -1252,8 +1252,7 @@ table.insert(SERVER_SG, State {
         inst.SoundEmitter:KillSound("static_shocked")
         inst.SoundEmitter:KillSound("ElectricalBuzzLoop")
 
-        inst.components.locomotor:RemoveExternalSpeedMultiplier(inst,
-            "gale_lightning_roll")
+        inst.components.locomotor:RemoveExternalSpeedMultiplier(inst, "gale_lightning_roll")
 
         for _, v in pairs(inst.sg.statemem.fxs) do
             -- v:ListenForEvent("animqueueover", v.Remove)

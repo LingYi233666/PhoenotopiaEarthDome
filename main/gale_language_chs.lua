@@ -250,7 +250,7 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_COOKPOT_ITEM = {
 STRINGS.GALE_ITEM_DESC.GALE_COOKPOT_ITEM = {
 	SIMPLE = "古董商人赠送的锅。",
 	COMPLEX =
-	"历经数代厨师传承的古董铸铁锅。\n数十年的使用让它有了天然的不沾涂层，\n能够提高烹饪后食物的产量。\n放入食材后点击烹饪按钮开始烹饪游戏，在箭头到达中央时按下对应方向键。\n如果能成功通过QTE游戏，就可以收获食物。",
+	"历经数代厨师传承的古董铸铁锅。\n数十年的使用让它有了天然的不沾涂层，\n能能够同时烹饪复数食物。\n放入食材后点击烹饪按钮开始烹饪游戏，在箭头到达中央时按下对应方向键。\n如果能成功通过QTE游戏，就可以收获食物。",
 }
 
 STRINGS.NAMES.GALE_COOKPOT_ITEM_DUPLICATE = "现代烹饪锅"
@@ -259,7 +259,7 @@ STRINGS.CHARACTERS.GENERIC.DESCRIBE.GALE_COOKPOT_ITEM_DUPLICATE = deepcopy(STRIN
 	.GALE_COOKPOT_ITEM)
 STRINGS.GALE_ITEM_DESC.GALE_COOKPOT_ITEM_DUPLICATE = {
 	SIMPLE = "自己制作的锅。",
-	COMPLEX = "使用现代技术制作的烹饪锅。\n内置有不沾涂层，能够提高烹饪后食物的产量。\n放入食材后点击烹饪按钮开始烹饪游戏，在箭头到达中央时按下对应方向键。\n如果能成功通过QTE游戏，就可以收获食物。",
+	COMPLEX = "使用现代技术制作的烹饪锅。\n内置有不沾涂层，能能够同时烹饪复数食物。\n放入食材后点击烹饪按钮开始烹饪游戏，在箭头到达中央时按下对应方向键。\n如果能成功通过QTE游戏，就可以收获食物。",
 }
 
 STRINGS.NAMES.GALE_BLASTER_KATASH = "科伯特爆能枪"

@@ -23,6 +23,7 @@ end
 
 local function LaunchSpearAtPos(inst, player, pos, charge_complete)
     local proj = SpawnAt("gale_spear_projectile", inst)
+    proj.components.weapon:SetDamage(inst.components.weapon.damage)
 
     if charge_complete then
         proj.AnimState:SetAddColour(0, 1, 1, 1)
@@ -80,9 +81,11 @@ local function SpearServerFn(inst)
     inst:AddComponent("gale_chargeable_weapon")
     inst.components.gale_chargeable_weapon.do_attack_fn = function(inst, player, target, target_pos, percent)
         local face_vec = GaleCommon.GetFaceVector(player)
-        inst.components.finiteuses:Use(1)
+
         LaunchSpearAtPos(inst, player, player:GetPosition() + face_vec * 10,
             percent >= 1 or GaleCondition.GetCondition(player, "condition_carry_charge") ~= nil)
+
+        inst.components.finiteuses:Use(1)
     end
 
     inst:ListenForEvent("gale_charge_time_change", GaleChargeableWeaponFns.ChargeTimeCbWrapper({ 0, -155, 0 }))
@@ -112,7 +115,7 @@ local function OnProjectileHit(inst, attacker, target)
             function(attacker, v)
                 if attacker.components.combat:CanTarget(v) and not attacker.components.combat:IsAlly(v) then
                     attacker.components.combat.ignorehitrange = true
-                    attacker.components.combat:DoAttack(v, nil, inst, nil,
+                    attacker.components.combat:DoAttack(v, inst, inst, nil,
                         inst.charge_complete and GetRandomMinMax(2, 2.5) or 1)
                     attacker.components.combat.ignorehitrange = false
 
@@ -294,6 +297,9 @@ local function projectile_fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(0)
 
     inst.persists = false
 
