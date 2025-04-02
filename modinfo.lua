@@ -2,7 +2,7 @@
 name = "不死鸟传说-地球穹顶" ---mod名字
 description = "乡村女孩盖尔的迷之冒险。" --mod描述
 author = "左轮山猫" --作者
-version = "0.0.72" -- mod版本 上传mod需要两次的版本不一样
+version = "0.0.73" -- mod版本 上传mod需要两次的版本不一样
 
 -- This is the URL name of the mod's thread on the forum; the part after the ? and before the first & in the url
 forumthread = "/files/file/950-extended-sample-character/"

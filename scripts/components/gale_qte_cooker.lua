@@ -186,7 +186,8 @@ function GaleQteCooker:Stop(end_state)
 						product = self.product,
 						container = self.inst,
 						ingredient_prefabs = shallowcopy(self.ingredient_prefabs),
-						product_stacksize = (self.product == "spoiled_food" and 1 or self.product_stacksize)
+						-- product_stacksize = (self.product == "spoiled_food" and 1 or self.product_stacksize)
+						product_stacksize = self.product_stacksize
 					})
 			else
 				self.doer.sg:GoToState("idle")
