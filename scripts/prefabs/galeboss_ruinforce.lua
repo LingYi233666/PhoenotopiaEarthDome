@@ -7,36 +7,36 @@ local brain = require("brains/galeboss_ruinforcebrain")
 
 SetSharedLootTable("galeboss_ruinforce",
     {
-        { "galeboss_ruinforce_core",                      1.00 },
+        { "galeboss_ruinforce_core",       1.00 },
 
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
-        { "gears",                                        1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
+        { "gears",                         1.00 },
 
 
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
-        { "trinket_6",                                    1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
+        { "trinket_6",                     1.00 },
 
-        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
-        { "galeboss_ruinforce_projectile_dark_paracurve", 1.00 },
+        { "galeboss_ruinforce_death_ball", 1.00 },
+        { "galeboss_ruinforce_death_ball", 1.00 },
+        { "galeboss_ruinforce_death_ball", 1.00 },
+        { "galeboss_ruinforce_death_ball", 1.00 },
+        { "galeboss_ruinforce_death_ball", 1.00 },
     })
 
 local function RetargetFn(inst)
@@ -110,7 +110,17 @@ local function CreateHeadOnHand()
     return inst
 end
 
+local function AttachDarkSmoke(loot)
+    local vfx = loot:SpawnChild("gale_enemy_die_smoke_vfx")
+    vfx._emit_id:set(1)
 
+    vfx.remove_on_ground_task = vfx:DoPeriodicTask(0, function()
+        local x, y, z = loot.Transform:GetWorldPosition()
+        if y <= 0.05 then
+            vfx:Remove()
+        end
+    end)
+end
 
 return GaleEntity.CreateNormalEntity({
         prefabname = "galeboss_ruinforce",
@@ -507,39 +517,17 @@ return GaleEntity.CreateNormalEntity({
                 inst:EnableBeHeaded(false)
             end)
             inst:ListenForEvent("loot_prefab_spawned", function(inst, data)
-                if data.loot.prefab == "galeboss_ruinforce_projectile_dark_paracurve" then
-                    data.loot.components.complexprojectile.attacker = inst
-                    data.loot.task = data.loot:DoPeriodicTask(0, function()
-                        local x, y, z = data.loot.Transform:GetWorldPosition()
-                        if y <= 0.05 then
-                            for i = 1, GetRandomMinMax(3, 5) do
-                                SpawnAt("nightmarefuel", data.loot, nil, Vector3(UnitRand(), 0, UnitRand()))
-                            end
-                            data.loot.components.complexprojectile:Hit()
-                            data.loot.task:Cancel()
-                            data.loot.task = nil
-                        end
-                    end)
+                if data.loot.prefab == "galeboss_ruinforce_death_ball" then
+                    data.loot:StartCheckGround()
                 else
-                    local vfx = data.loot:SpawnChild("gale_enemy_die_smoke_vfx")
-                    vfx._emit_id:set(1)
+                    AttachDarkSmoke(data.loot)
+                end
 
-                    data.loot.task = data.loot:DoPeriodicTask(0, function()
-                        local speed = data.loot.Physics:GetMotorSpeed()
-                        local x, y, z = data.loot.Transform:GetWorldPosition()
-                        if y <= 0.05 then
-                            vfx:Remove()
-                            data.loot.task:Cancel()
-                            data.loot.task = nil
-                        end
-                    end)
+                if data.loot.prefab == "galeboss_ruinforce_core" then
+                    local ox, _, oz = inst.Transform:GetWorldPosition()
+                    local _, ly, _ = data.loot.Transform:GetWorldPosition()
 
-                    if data.loot.prefab == "galeboss_ruinforce_core" then
-                        local ox, _, oz = inst.Transform:GetWorldPosition()
-                        local _, ly, _ = data.loot.Transform:GetWorldPosition()
-
-                        data.loot.components.inventoryitem:DoDropPhysics(ox, ly, oz, true)
-                    end
+                    data.loot.components.inventoryitem:DoDropPhysics(ox, ly, oz, true)
                 end
             end)
 

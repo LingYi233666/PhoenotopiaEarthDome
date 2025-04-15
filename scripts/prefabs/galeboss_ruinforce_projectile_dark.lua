@@ -24,15 +24,11 @@ local function OnProjectileLaunch(inst)
     end)
 
     inst:ListenForEvent("onremove", function()
-                            inst:Remove()
-                        end, inst.components.complexprojectile.attacker)
+        inst:Remove()
+    end, inst.components.complexprojectile.attacker)
 end
 
-local function OnProjectileLaunchParacurve(inst)
-    inst:ListenForEvent("onremove", function()
-                            inst:Remove()
-                        end, inst.components.complexprojectile.attacker)
-end
+
 
 local function ShouldHitWhenUpdate(inst)
     local attacker = inst.components.complexprojectile.attacker
@@ -59,8 +55,8 @@ local function OnProjectileUpdate(inst)
     ShouldHitWhenUpdate(inst)
 
     inst.components.complexprojectile.horizontalSpeed = math.min(50,
-                                                                 inst.components.complexprojectile.horizontalSpeed +
-                                                                 FRAMES * 25)
+        inst.components.complexprojectile.horizontalSpeed +
+        FRAMES * 25)
 
     return true
 end
@@ -84,24 +80,24 @@ local function OnProjectileHit(inst, other)
 
     GaleCommon.AoeDestroyWorkableStuff(attacker, inst:GetPosition(), 3, 5)
     GaleCommon.AoeForEach(attacker, inst:GetPosition(), 3, nil, { "INLIMBO", },
-                          { "_combat", "_inventoryitem" },
-                          function(attacker, other)
-                              if (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other)) then
-                                  if not other:HasTag("epic") then
-                                      GaleCondition.AddCondition(other, "condition_dread", 10)
-                                  end
-                                  other.components.combat:GetAttacked(attacker, 40)
-                              elseif other.components.inventoryitem then
-                                  GaleCommon.LaunchItem(other, inst, 5)
-                              end
-                          end, function(attacker, other)
-                              -- Should not attack shadow creatures,unless they attack me
-                              if GaleCommon.IsShadowCreature(other) and not (attacker.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(attacker))) then
-                                  return false
-                              end
-                              return (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other))
-                                  or other.components.inventoryitem
-                          end)
+        { "_combat", "_inventoryitem" },
+        function(attacker, other)
+            if (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other)) then
+                if not other:HasTag("epic") then
+                    GaleCondition.AddCondition(other, "condition_dread", 10)
+                end
+                other.components.combat:GetAttacked(attacker, 40)
+            elseif other.components.inventoryitem then
+                GaleCommon.LaunchItem(other, inst, 5)
+            end
+        end, function(attacker, other)
+            -- Should not attack shadow creatures,unless they attack me
+            if GaleCommon.IsShadowCreature(other) and not (attacker.components.combat:TargetIs(other) or (other.components.combat and other.components.combat:TargetIs(attacker))) then
+                return false
+            end
+            return (attacker.components.combat and attacker.components.combat:CanTarget(other) and not attacker.components.combat:IsAlly(other))
+                or other.components.inventoryitem
+        end)
 
     -- inst:Remove()
     inst.vfx:Remove()
@@ -111,6 +107,46 @@ local function OnProjectileHit(inst, other)
     -- Delay remove to play sound
     inst:DoTaskInTime(1.5, inst.Remove)
 end
+
+local function OnDeathBallExplode(inst)
+    local pos = inst:GetPosition()
+    -- SpawnAt("gale_laser_explosion",Vector3(pos.x,math.max(0,pos.y - 0.4),pos.z))
+
+    inst:SpawnChild("galeboss_explode_vfx_shadow_oneshoot")
+    inst.SoundEmitter:PlaySound("gale_sfx/battle/explosion_4_wet")
+
+
+    for i = 1, 4 do
+        local offset = Vector3(UnitRand() * 2.5, 0, UnitRand() * 2.5)
+        SpawnAt("galeboss_ruinforce_projectile_dark_hitsplit", inst, nil, offset)
+        SpawnDrail(inst:GetPosition() + offset)
+    end
+
+    for i = 1, GetRandomMinMax(3, 5) do
+        SpawnAt("nightmarefuel", inst, nil, Vector3(UnitRand(), 0, UnitRand()))
+    end
+
+    inst.vfx:Remove()
+
+    inst.Physics:Stop()
+    inst:Hide()
+
+    -- Delay remove to play sound
+    inst:DoTaskInTime(1.5, inst.Remove)
+end
+
+local function DeathBallStartCheckGround(inst)
+    inst.task = inst:DoPeriodicTask(0, function()
+        local x, y, z = inst.Transform:GetWorldPosition()
+        if y <= 0.5 then
+            OnDeathBallExplode(inst)
+            inst.task:Cancel()
+            inst.task = nil
+        end
+    end)
+end
+
+
 
 return GaleEntity.CreateNormalEntity({
         prefabname = "galeboss_ruinforce_projectile_dark",
@@ -136,7 +172,7 @@ return GaleEntity.CreateNormalEntity({
         end,
     }),
     GaleEntity.CreateNormalEntity({
-        prefabname = "galeboss_ruinforce_projectile_dark_paracurve",
+        prefabname = "galeboss_ruinforce_death_ball",
         assets = {
 
         },
@@ -150,11 +186,13 @@ return GaleEntity.CreateNormalEntity({
 
             inst.vfx = inst:SpawnChild("galeboss_ruinforce_projectile_dark_vfx")
 
-            inst:AddComponent("complexprojectile")
-            inst.components.complexprojectile.horizontalSpeed = 20
-            inst.components.complexprojectile:SetGravity(-33)
-            inst.components.complexprojectile:SetOnHit(OnProjectileHit)
-            inst.components.complexprojectile:SetOnLaunch(OnProjectileLaunchParacurve)
+            inst.StartCheckGround = DeathBallStartCheckGround
+
+            -- inst:AddComponent("complexprojectile")
+            -- inst.components.complexprojectile.horizontalSpeed = 20
+            -- inst.components.complexprojectile:SetGravity(-33)
+            -- inst.components.complexprojectile:SetOnHit(OnProjectileHit)
+            -- inst.components.complexprojectile:SetOnLaunch(OnProjectileLaunchParacurve)
         end,
     }),
     GaleEntity.CreateNormalFx({
