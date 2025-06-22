@@ -1260,12 +1260,14 @@ AddStategraphState("wilson",
     State
     {
         name = "gale_dodge",
-        tags = { "busy", "evade", "dodge", "no_stun", "nopredict" },
+        tags = { "busy", "nopredict", "iframeskeepaggro" },
 
         onenter = function(inst, data)
             if data.is_shadow then
                 GaleCommon.ToggleOffPhysics(inst)
                 inst.components.gale_skill_shadow_dodge:Enable(true)
+
+                inst.sg:AddStateTag("noattack")
             end
 
             inst.components.locomotor:Stop()
@@ -1383,7 +1385,7 @@ AddStategraphState("wilson",
 -- gale_fangun
 AddStategraphState("wilson", State {
     name = "gale_fangun",
-    tags = { "busy", "evade", "no_stun", "nopredict" },
+    tags = { "busy", "nopredict" },
 
     onenter = function(inst, data)
         inst.components.locomotor:Stop()

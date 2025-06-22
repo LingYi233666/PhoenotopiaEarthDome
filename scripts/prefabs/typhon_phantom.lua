@@ -51,7 +51,7 @@ local sound_index_map = {
     THEY_CAN_BE_ANYTHING = "gale_sfx/battle/typhon_phantom/talk_text2/theycouldbeanythinga",
     THEY_WANT_TO_LIVE_INSIDE = "gale_sfx/battle/typhon_phantom/talk_text2/theywanttoliveinside",
     THE_SHAPE_IN_THE_GLASS = "gale_sfx/battle/typhon_phantom/talk_text2/whatdoesitlookliketh",
-    WAHT_DO_YOU_SEE_IN_THE_GLASS = "gale_sfx/battle/typhon_phantom/talk_text2/whatdoyouseeinthegla",
+    WHAT_DO_YOU_SEE_IN_THE_GLASS = "gale_sfx/battle/typhon_phantom/talk_text2/whatdoyouseeinthegla",
 }
 
 
@@ -66,6 +66,13 @@ local function SayAndPlaySound(inst, text, sound_index)
 
     if text then
         inst.components.talker:Say(text)
+    end
+end
+
+local function SayAndPlaySoundWithCD(inst, text, sound_index, cd)
+    if inst.last_talk_time == nil or GetTime() - inst.last_talk_time >= cd then
+        SayAndPlaySound(inst, text, sound_index)
+        inst.last_talk_time = GetTime()
     end
 end
 
@@ -311,6 +318,7 @@ end
 local function CommonServerFn(inst)
     inst.CanTarget = CanTarget
     inst.SayAndPlaySound = SayAndPlaySound
+    inst.SayAndPlaySoundWithCD = SayAndPlaySoundWithCD
 
     inst:AddComponent("planarentity")
 

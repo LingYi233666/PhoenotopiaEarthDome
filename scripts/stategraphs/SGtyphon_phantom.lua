@@ -227,7 +227,6 @@ local states = {
 
     State {
         name = "evade",
-        -- "noattack",
         tags = { "busy", "evade", },
 
 

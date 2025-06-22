@@ -1197,7 +1197,7 @@ STRINGS.GALE_CHATTYNODES.TYPHON_PHANTOM = {
 		THEY_CAN_BE_ANYTHING = "他们可以化为所有东西...所有人。",
 		THEY_WANT_TO_LIVE_INSIDE = "他们想寄生在我们体内，就像疾病一样。",
 		THE_SHAPE_IN_THE_GLASS = "它长什么样子？那个裂隙里的形体...",
-		WAHT_DO_YOU_SEE_IN_THE_GLASS = "你在裂隙里看到什么？",
+		WHAT_DO_YOU_SEE_IN_THE_GLASS = "你在裂隙里看到什么？",
 	},
 }
 
